@@ -1,0 +1,84 @@
+// Syntax
+
+local:
+
+		#animationName ([loop/iterations])
+		{
+			type : valueA [, valueB, ... ] : duration : startTime;
+			...
+		}
+		
+		//default
+			#spin()
+			{
+				...
+			}
+			
+		//do it 3 times
+			#spin (3)
+			{
+				...
+			}
+			
+		//do it continously
+			#spin (loop)
+			{
+				...
+			}
+			
+		//do it continously, back and forth
+			#spin (loop)
+			{
+				...
+			}
+		
+	
+global:
+
+	syntax a
+
+		#id : animationName([loop/iterations])
+		{
+			type : valueA [, valueB, ... ] : duration : startTime;
+			...
+		}
+	
+	syntax b
+	
+		#animationName([loop/iterations, cycle])
+		{
+			id : type : valueA [, valueB, ... ] : duration : startTime;
+			...
+		}
+
+		
+// Animation Types
+
+B3D_Anim_Move
+
+	move : float : ms : ms;
+	move : float, float, float : ms : ms;
+	
+B3D_Anim_Rotate
+
+	rotate : float, float, float : ms : ms;
+	
+B3D_Anim_Scale
+
+	scale : float : ms : ms;
+	scale : float, float, float, : ms : ms;
+	
+B3D_Anim_Call
+
+	call : UUID+"/"+animationName : ms;
+	
+B3D_Anim_FireParticles
+
+	fireParticles : true : ms;
+	fireParticles : false : ms;
+	
+B3D_Anim_PlayMotion
+
+	playMotion : play : ms;
+	playMotion : pause : ms;
+	playMotion : stop : ms;

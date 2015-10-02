@@ -1,0 +1,22 @@
+
+Vector rotation 	-> angles
+Vector correctedTranslation -> LocalTranslation im Fall einer falschen Positionierung durch das Duplizieren eines Node Childs mit RigidBodyControl
+Vector scale 		-> scale
+String cShape		-> dynamic, static
+String modelName	-> assetName
+String autoSyncPhysicsToTransform -> soll beim Physics start die 			Transformation gesynct werden (nein wenn null)
+Integer xSlices		-> x-slices of MBox
+Integer ySlices		-> y-slices of MBox
+Integer zSlices		-> z-slices of MBox
+String 	north,
+	south,
+	west,
+	east,
+	top,
+	bottom		-> for SkyBox only for transmitting 
+			it into its B3D_Element when attached
+Integer motionPathID
+int waypintNumber
+int B3D_ID -> hashCode of original object
+String adjust -> fuckup because of physics object, sync once with B3D_Spatial
+String heightmapLink -> null: store height values, not null: only store assetName
