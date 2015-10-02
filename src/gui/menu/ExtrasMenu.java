@@ -43,6 +43,8 @@ public class ExtrasMenu extends JMenu implements ActionListener
         add(configItem);
         add(new JSeparator());
         File apps = new File("dat//apps");
+        if (!apps.exists())
+            apps.mkdir();
         for (File f : apps.listFiles(new FileFilter()
         {
             public boolean accept(File file)
