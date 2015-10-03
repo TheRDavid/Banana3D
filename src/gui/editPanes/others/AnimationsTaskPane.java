@@ -47,7 +47,6 @@ public class AnimationsTaskPane extends EditTaskPane
         taskPane.add(animationsPanel, BorderLayout.CENTER);
         taskPane.add(editButton, BorderLayout.SOUTH);
         add(taskPane, BorderLayout.CENTER);
-        System.out.println("Creating animationPanel 3");
     }
 
     private class AnimationsPanel extends JPanel

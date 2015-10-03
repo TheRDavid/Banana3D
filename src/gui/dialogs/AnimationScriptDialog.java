@@ -39,7 +39,7 @@ import other.Wizard;
 public class AnimationScriptDialog extends BasicDialog implements ActionListener
 {
 
-    private ControlsPanel controlsPanel;
+    private ControlPane controlsPanel;
     private JTabbedPane scriptPane = new JTabbedPane();
     private String[][] commands =
     {
@@ -73,7 +73,7 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
     {
         setType(Type.NORMAL);
         setModal(false);
-        controlsPanel = new ControlsPanel();
+        controlsPanel = new ControlPane();
         add(controlsPanel, BorderLayout.NORTH);
         add(scriptPane, BorderLayout.CENTER);
         addComponentListener(new ComponentAdapter()
@@ -248,13 +248,13 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
         }
     }
 
-    class ControlsPanel extends JPanel
+    class ControlPane extends JPanel
     {
 
         private BButton openButton = new BButton("Open", new ImageIcon("dat//img//menu//open.png"));
         private BButton saveButton = new BButton("Save", new ImageIcon("dat//img//menu//save.png"));
 
-        public ControlsPanel()
+        public ControlPane()
         {
             setLayout(new FlowLayout(FlowLayout.LEFT));
             add(openButton);
@@ -287,6 +287,8 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
         {
             ScriptArea sa = (ScriptArea) ((JScrollPane) scriptPane.getSelectedComponent()).getViewport().getView();
             sa.setForeground(Color.LIGHT_GRAY);
+            for (B3D_Animation b3d_anim : sa.getB3D_Element().getAnimations())
+                b3d_anim.stop();
             sa.getB3D_Element().getAnimations().clear();
             sa.getB3D_Element().getAnimations().addAll(AnimationTranslator.parseToLocalAnimations(sa.getText(), sa.getB3D_Element().getUUID()));
             CurrentData.getEditorWindow().getEditPane().refresh();
