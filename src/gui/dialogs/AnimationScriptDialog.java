@@ -288,7 +288,7 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
             ScriptArea sa = (ScriptArea) ((JScrollPane) scriptPane.getSelectedComponent()).getViewport().getView();
             sa.setForeground(Color.LIGHT_GRAY);
             for (B3D_Animation b3d_anim : sa.getB3D_Element().getAnimations())
-                b3d_anim.stop();
+                b3d_anim.stop(); 
             sa.getB3D_Element().getAnimations().clear();
             sa.getB3D_Element().getAnimations().addAll(AnimationTranslator.parseToLocalAnimations(sa.getText(), sa.getB3D_Element().getUUID()));
             CurrentData.getEditorWindow().getEditPane().refresh();
