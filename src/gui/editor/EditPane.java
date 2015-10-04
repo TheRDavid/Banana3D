@@ -6,6 +6,8 @@ import b3dElements.spatials.geometries.B3D_Geometry;
 import b3dElements.spatials.B3D_Node;
 import b3dElements.spatials.B3D_Spatial;
 import b3dElements.other.B3D_MotionEvent;
+import b3dElements.spatials.B3D_Heightmap;
+import b3dElements.spatials.B3D_Terrain;
 import gui.dialogs.AdditionalCameraDialog;
 import gui.editPanes.EditTaskPane;
 import gui.editPanes.filters.BasicSSAOTaskPane;
@@ -57,10 +59,12 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.shadow.AbstractShadowFilter;
+import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.shaderblow.filter.basicssao.BasicSSAO;
 import com.shaderblow.filter.frostedglass.FrostedGlassFilter;
 import com.shaderblow.filter.oldfilm.OldFilmFilter;
 import dialogs.ObserverDialog;
+import gui.editPanes.spatials.TQMaterialTaskPane;
 import java.io.File;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -125,8 +129,12 @@ public class EditPane extends JScrollPane
     {
         if (taskPane instanceof MaterialTaskPane)
         {
+            if(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Geometry)
             ((MaterialTaskPane) taskPane).arrange(
                     new File("matD//" + ((Geometry) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getMaterial().getMaterialDef().getAssetName()));
+            else if(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof TerrainQuad)
+            ((TQMaterialTaskPane) taskPane).arrange(
+                    new File("matD//" + ((TerrainQuad) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getMaterial().getMaterialDef().getAssetName()));
         }
         panel.add(taskPane);
         currentEditPane = taskPane;
@@ -209,6 +217,12 @@ public class EditPane extends JScrollPane
                                 addTaskPane(materialTaskPane);
                                 taskPanes.add(materialTaskPane);
                             }
+                        } else if (selectedElement instanceof B3D_Terrain || selectedElement instanceof B3D_Heightmap)
+                        {
+                            TerrainQuad tq = (TerrainQuad) CurrentData.getEditorWindow().getB3DApp().getSelectedObject();
+                            TQMaterialTaskPane materialTaskPane = new TQMaterialTaskPane(tq.getMaterial().getMaterialDef().getAssetName());
+                            addTaskPane(materialTaskPane);
+                            taskPanes.add(materialTaskPane);
                         }
 
                         //Editing UserData and LightControls here

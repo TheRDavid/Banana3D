@@ -896,7 +896,7 @@ public class AddMenu extends JMenu
                                 Texture heightMapImage = CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture(name);
                                 ImageBasedHeightMap heightmap = new ImageBasedHeightMap(heightMapImage.getImage());
                                 heightmap.load();
-                                TerrainQuad terrain = new TerrainQuad("Terrain", 65, heightmap.getSize(), heightmap.getHeightMap());
+                                TerrainQuad terrain = new TerrainQuad("Terrain", 65, heightmap.getSize()+1, heightmap.getHeightMap());
                                 terrain.setUserData("angles", new Vector3f());
                                 terrain.setUserData("scale", new Vector3f(1, 1, 1));
                                 terrain.setMaterial(new Material(CurrentData.getEditorWindow().getB3DApp().getAssetManager(),
