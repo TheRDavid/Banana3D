@@ -241,18 +241,16 @@ public class EditorWindow extends JFrame
         upperPanel.setPreferredSize(new Dimension(180, 30));
         treeScrollPane.setPreferredSize(new Dimension(320, getHeight() - 100));
         if (isUndecorated())
-        {
-            middlePanel.setPreferredSize(new Dimension(getWidth() - tree.getPreferredSize().width - editPane.getPreferredSize().width, getHeight() - 60));
-        } else
-        {
+            middlePanel.setPreferredSize(new Dimension(getContentPane().getWidth() - tree.getPreferredSize().width - editPane.getPreferredSize().width, getHeight() - 60));
+        else
             middlePanel.setPreferredSize(new Dimension(getWidth() - tree.getPreferredSize().width - editPane.getPreferredSize().width, getHeight() - 110));
-        }
         toolbar.setPreferredSize(new Dimension(middlePanel.getWidth(), 110));
         playPanel.setPreferredSize(new Dimension(
                 middlePanel.getPreferredSize().width,
                 middlePanel.getPreferredSize().height - upperPanel.getPreferredSize().height - toolbar.getPreferredSize().height));
         if (canvasContext != null)
         {
+            b3DSimpleApplication.restart();
             canvasContext.getCanvas().setPreferredSize(playPanel.getPreferredSize());
         }
     }
@@ -304,7 +302,7 @@ public class EditorWindow extends JFrame
                 public void mouseDragged(MouseEvent e)
                 {
                     if (weakning > .0008f)
-                    { 
+                    {
                         weakning -= .00002f;
                         strong = true;
                     }

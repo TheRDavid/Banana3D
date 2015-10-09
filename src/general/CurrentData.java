@@ -47,6 +47,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
@@ -627,7 +629,7 @@ public class CurrentData
                 configuration.save();
                 if (CurrentData.getConfiguration().exitwithoutprompt)
                     Runtime.getRuntime().exit(0);
-                 else
+                else
                     new ExitDialog();
             }
         });
@@ -1089,7 +1091,6 @@ public class CurrentData
                 int elementsAdded = 0;
                 //Lights first
                 for (B3D_Element e : scene.getElements())
-                {
                     if (e instanceof B3D_Light)
                     {
                         Light l = ElementToObjectConverter.convertLight((B3D_Light) e);
@@ -1097,29 +1098,31 @@ public class CurrentData
                         getEditorWindow().getB3DApp().getSceneNode().addLight(l);
                         elementsAdded++;
                     }
-                }
                 //Filters
-                ArrayList<Filter> filters = new ArrayList<Filter>();
+                ArrayList<B3D_Filter> filters = new ArrayList<B3D_Filter>();
                 for (B3D_Element e : scene.getElements())
-                {
                     if (e instanceof B3D_Filter)
                     {
-                        Filter f = ElementToObjectConverter.convertFilter((B3D_Filter) e);
-                        Wizard.getObjects().add(f, e);
-                        //Right order
-                        filters.add(((B3D_Filter) e).getFilterIndex(), f);
+                        filters.add((B3D_Filter) e);
                         elementsAdded++;
                     }
-                }
-                for (Filter f : filters)
+                Collections.sort(filters, new Comparator<B3D_Filter>()
                 {
-                    if (f instanceof LightScatteringFilter)
-                        CurrentData.getEditorWindow().getB3DApp().getLightScatteringModels().add(new LightScatteringModel((LightScatteringFilter) f));
-                    getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(f);
+                    public int compare(B3D_Filter o1, B3D_Filter o2)
+                    {
+                        return o1.getFilterIndex() - o2.getFilterIndex();
+                    }
+                });
+                for (B3D_Filter f : filters)
+                {
+                    Filter filter = ElementToObjectConverter.convertFilter(f);
+                    Wizard.getObjects().add(filter, f);
+                    if (filter instanceof LightScatteringFilter)
+                        CurrentData.getEditorWindow().getB3DApp().getLightScatteringModels().add(new LightScatteringModel((LightScatteringFilter) filter));
+                    getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(filter);
                 }
                 //Spatials
                 for (B3D_Element e : scene.getElements())
-                {
                     if (e instanceof B3D_Spatial && ((B3D_Spatial) e).getParentUUID().equals(Wizard.NULL_SELECTION))
                     {
                         Spatial s = ElementToObjectConverter.convertSpatial((B3D_Spatial) e);
@@ -1127,10 +1130,8 @@ public class CurrentData
                         getEditorWindow().getB3DApp().getSceneNode().attachChild(s);
                         elementsAdded++;
                     }
-                }
                 //MotionPaths
                 for (B3D_Element e : scene.getElements())
-                {
                     if (e instanceof B3D_MotionEvent)
                     {
                         MotionEvent m = ElementToObjectConverter.convertMotionEvent((B3D_MotionEvent) e);
@@ -1148,7 +1149,6 @@ public class CurrentData
                         });
                         elementsAdded++;
                     }
-                }
                 System.out.println(elementsAdded + " Elemente registriert von " + scene.getElements().size());
                 editorWindow.getTree().sync();
                 return null;

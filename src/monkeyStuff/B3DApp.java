@@ -130,7 +130,6 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     private String insertAssetName = null;
     //Make the last selected LightModel invisible again (might need rework)
     private LightModel lastSelectedLightModel = null;
-    private float viewDistance;
     /*ui*/
     private Screen screen;
     private Menu texturesMenu;
@@ -191,7 +190,6 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     {
         Wizard.setApp(this);
         initialScene = initScene;
-        viewDistance = camFrustumFar;
     }
 
     /**
@@ -295,6 +293,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         CurrentData.getEditorWindow().getFieldOfViewButton().setEnabled(true);
         CurrentData.getEditorWindow().getAddCamButton().setEnabled(true);
         CurrentData.getAnimationScriptDialog().setVisible(CurrentData.getConfiguration().animationDialogVisible);
+        cam.setFrustum(CurrentData.getConfiguration().fov[0], CurrentData.getConfiguration().fov[1], CurrentData.getConfiguration().fov[2], CurrentData.getConfiguration().fov[3], CurrentData.getConfiguration().fov[4], CurrentData.getConfiguration().fov[5]);
         CurrentData.setDefaultFieldOfView(new Float[]
         {
             cam.getFrustumBottom(),
@@ -492,14 +491,11 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             viewPort.setBackgroundColor(ColorRGBA.Black);
             CurrentData.getProject().getScene().setViewPortColor(ColorRGBA.Black);
         } else
-        {
             viewPort.setBackgroundColor(CurrentData.getProject().getScene().getViewPortColor());
-        }
         setPauseOnLostFocus(false);
         cam.setLocation(new Vector3f(0, 0, 0));
         flyCam.setDragToRotate(true);
         flyCam.setMoveSpeed(CurrentData.getConfiguration().camspeed);
-        cam.setFrustumFar(viewDistance);
     }
 
     private void initComponents()
@@ -509,9 +505,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         camNode.setControlDir(ControlDirection.SpatialToCamera);
         rootNode.attachChild(sceneNode);
         if (!CurrentData.getConfiguration().showscenery)
-        {
             rootNode.attachChild(editorNode);
-        }
         editorNode.attachChild(motionEventNode);
         editorNode.addLight(new AmbientLight());
         editorNode.addLight(editorNodeCamLight);
@@ -1219,24 +1213,15 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     private void updateAdditionalCameras()
     {
         for (AdditionalCameraDialog acd : additionalCameraDialogs)
-        {
             if (acd.initialized())
             {
                 if (acd.getControlPanel().getFilterChecker().isChecked())
                 {
                     if (!acd.getViewPort().getProcessors().contains(acd.getFilterPostProcessor()))
-                    {
                         acd.getViewPort().addProcessor(acd.getFilterPostProcessor());
-                    }
-                } else
-                {
-                    if (acd.getViewPort().getProcessors().contains(acd.getFilterPostProcessor()))
-                    {
-                        acd.getViewPort().removeProcessor(acd.getFilterPostProcessor());
-                    }
-                }
+                } else if (acd.getViewPort().getProcessors().contains(acd.getFilterPostProcessor()))
+                    acd.getViewPort().removeProcessor(acd.getFilterPostProcessor());
             }
-        }
     }
 
     private void updateDragging()
@@ -1433,12 +1418,9 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                     try
                     {
                         if (putOnTextureElement.getMaterial().getPropertyList().has(value.toString()))
-                        {
                             putOnTextureElement.getMaterial().getPropertyList().change(value.toString(), insertAssetName);
-                        } else
-                        {
+                        else
                             putOnTextureElement.getMaterial().getPropertyList().add(value.toString(), "Texture", insertAssetName);
-                        }
                         screen.removeElement(cancelButton);
                         screen.removeElement(selectButton);
                         screen.removeElement(texturesMenu);
@@ -1452,9 +1434,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             }
         };
         for (String texture : textures)
-        {
             texturesMenu.addMenuItem(texture, texture, null);
-        }
         selectButton = new ButtonAdapter(screen, inputManager.getCursorPosition())
         {
             @Override
@@ -1489,24 +1469,18 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         updateSelection();
         updateObjectScales();
         if (selectedObject instanceof WaterFilterWithGetters)
-        {
             updateYArrow();
-        } else
+        else
         {
             arrowNode.attachChild(xArrow);
             arrowNode.attachChild(zArrow);
         }
         if (CurrentData.getConfiguration().showallmotionpaths && !allPathsShown)
-        {
             updateAllMotionPathGeometrys();
-        }
         if (updateMotionPath && Wizard.getObjects().getB3D_Element(selectedUUID) instanceof B3D_MotionEvent)
-        {
             updateMotionPathGeometrys();
-        } else if (!(Wizard.getObjects().getB3D_Element(selectedUUID) instanceof B3D_MotionEvent))
-        {
+        else if (!(Wizard.getObjects().getB3D_Element(selectedUUID) instanceof B3D_MotionEvent))
             motionEventNode.detachAllChildren();
-        }
     }
 
     private void updateLightScatteringModels()
@@ -1525,12 +1499,9 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             {
                 nodeModel.update(nodeModel.getNode().equals(selectedObject));
                 if (!editorNode.hasChild(nodeModel.getModel()) && nodeModel.getNode() == selectedObject)
-                {
                     editorNode.attachChild(nodeModel.getModel());
-                } else if (nodeModel.getNode() != selectedObject)
-                {
+                else if (nodeModel.getNode() != selectedObject)
                     editorNode.detachChild(nodeModel.getModel());
-                }
             }
         }
     }
@@ -1593,16 +1564,12 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     {
         //Name of a Node: b3D_Spatial_MotionPath.getUUID()+"-MP"
         if (motionEventNode.getChild(b3D_Spatial_MotionPath.getUUID() + "-MP") != null)
-        {
             motionEventNode.detachChild(motionEventNode.getChild(b3D_Spatial_MotionPath.getUUID() + "-MP"));
-        }
         Node pathNode = new Node(b3D_Spatial_MotionPath.getUUID() + "-MP");
         pathNode.attachChild(mpm.getSymbol());
         Vector3f[] waypoints = new Vector3f[mpm.getMotionEvent().getPath().getNbWayPoints()];
         for (int i = 0; i < mpm.getMotionEvent().getPath().getNbWayPoints(); i++)
-        {
             waypoints[i] = mpm.getMotionEvent().getPath().getWayPoint(i);
-        }
         Spline spline = new Spline(Spline.SplineType.CatmullRom, waypoints, b3D_Spatial_MotionPath.getMotionPath().getCurveTension(), b3D_Spatial_MotionPath.getMotionPath().isCycled());
         Curve curve = new Curve(spline, 100);
         Geometry curveGeometry = new Geometry("Curve", curve);
@@ -1629,16 +1596,10 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     {
         arrowNode.setLocalScale(cam.getLocation().distance(arrowNode.getLocalTranslation()) / 55);
         for (MotionPathModel mpm : motionPathModels)
-        {
             mpm.getSymbol().setLocalScale(cam.getLocation().distance(mpm.getSymbol().getWorldTranslation()) / 55);
-        }
         for (LightModel lm : lightModels)
-        {
             if (lm.getRepresentative() != null)
-            {
                 lm.getRepresentative().setLocalScale(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().distance(lm.getRepresentative().getWorldTranslation()) / 60);
-            }
-        }
     }
 
     private void updatePairing()
@@ -1673,15 +1634,10 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     public void startPairing()
     {
         if (newB3DChild != null)
-        {
             if (newB3DParent == null)
-            {
                 pairWithSceneNode();
-            } else
-            {
+            else
                 pair();
-            }
-        }
     }
 
     private void pair()

@@ -26,7 +26,6 @@ import java.awt.BasicStroke;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -50,10 +49,8 @@ import java.util.concurrent.Callable;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
 import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.VerticalLayout;
 import other.ElementToObjectConverter;
@@ -74,7 +71,10 @@ public class MotionPathTaskPane extends EditTaskPane
     {
         "Path", "Rotation", "Path And Rotation", "Look At", "None"
     });
-    private JComboBox loopModeComboBox = new JComboBox(new Integer[3]);
+    private JComboBox loopModeComboBox = new JComboBox(new String[]
+    {
+        "Don't Loop", "Cycle", "Lopp"
+    });
     private BColorButton colorButton;
     private MotionEvent motionEvent;
     private Float4Panel rotationPanel = new Float4Panel(Vector4f.ZERO);
@@ -90,7 +90,6 @@ public class MotionPathTaskPane extends EditTaskPane
      */
     public MotionPathTaskPane(MotionPathModel mpm, B3D_MotionEvent b3d_MotionEvent)
     {
-        loopModeComboBox.setRenderer(new LoopModeRenderer());
         motionPathModel = mpm;
         motionEvent = mpm.getMotionEvent();
         this.b3D_MotionEvent = b3d_MotionEvent;
@@ -504,37 +503,6 @@ public class MotionPathTaskPane extends EditTaskPane
         CurrentData.getEditorWindow().getB3DApp().updateSelectedMotionPath();
     }
 
-    private class LoopModeRenderer extends JLabel implements ListCellRenderer
-    {
-
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
-        {
-            if (isSelected)
-            {
-                setBackground(list.getSelectionBackground());
-                setForeground(list.getSelectionForeground());
-            } else
-            {
-                setBackground(list.getBackground());
-                setForeground(list.getForeground());
-            }
-            if (index == 0)
-            {
-                setText("Don't Loop");
-                setIcon(new ImageIcon("dat//img//menu//noLoop.png"));
-            } else if (index == 1)
-            {
-                setText("Cycle");
-                setIcon(new ImageIcon("dat//img//menu//cycle.png"));
-            } else
-            {
-                setText("Loop");
-                setIcon(new ImageIcon("dat//img//menu//loop.png"));
-            }
-            return this;
-        }
-    }
-
     private class PlayTaskPane extends JXTaskPane
     {
 
@@ -849,8 +817,9 @@ public class MotionPathTaskPane extends EditTaskPane
 
     public void stop()
     {
-        if (!camNodeDetached){
-                        System.out.println("Detaching cam?");
+        if (!camNodeDetached)
+        {
+            System.out.println("Detaching cam?");
             if (motionEvent.getSpatial() instanceof CameraNode)
             {
                 CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
@@ -864,7 +833,8 @@ public class MotionPathTaskPane extends EditTaskPane
                         return null;
                     }
                 });
-            }}
+            }
+        }
         cycleChecker.setEnabled(true);
         motionEvent.stop();
         playTaskPane.getPlayButton().setEnabled(true);
@@ -875,46 +845,5 @@ public class MotionPathTaskPane extends EditTaskPane
     public MotionEvent getMotionEvent()
     {
         return motionEvent;
-    }
-
-    private class Controller implements ActionListener, ItemListener, KeyListener, FocusListener
-    {
-
-        public void actionPerformed(ActionEvent e)
-        {
-            if (e.getActionCommand().equals("selectWayPoint"))
-            {
-            }
-        }
-
-        public void itemStateChanged(ItemEvent e)
-        {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        public void keyTyped(KeyEvent e)
-        {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        public void keyPressed(KeyEvent e)
-        {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        public void keyReleased(KeyEvent e)
-        {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        public void focusGained(FocusEvent e)
-        {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        public void focusLost(FocusEvent e)
-        {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
     }
 }

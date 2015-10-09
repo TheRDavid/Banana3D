@@ -27,6 +27,7 @@ public class Configuration implements Serializable
     public static final int SLOW_GUI = 250, DEFAULT_GUI = 100, FAST_GUI = 4;
     public int framerate = 100, guiSPeed = DEFAULT_GUI;
     public int colorDepth = 8, mutlisampling = 0, depthBits = 24;
+    public float[] fov ={1,2000,-.45738515f,.45738515f,.41421357f,-.41421357f};
 
     /**
      * Saves settings to the config-file

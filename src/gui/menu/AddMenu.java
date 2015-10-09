@@ -877,38 +877,41 @@ public class AddMenu extends JMenu
                 public void actionPerformed(ActionEvent e)
                 {
                     final String name = new AssetChooserDialog(AssetButton.AssetType.Texture, true).getSelectedAssetName();
-                    final int selection = JOptionPane.showOptionDialog(
-                            object3DMenu,
-                            "Should this object only link to the Heightmap-Image or store the actual values?",
-                            "Select", JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.QUESTION_MESSAGE,
-                            null,
-                            new String[]
+                    if (name != null)
                     {
-                        "Only link to asset file", "Store the height values"
-                    },
-                            "Only link to asset file");
-                    if (name != null && selection != JOptionPane.CLOSED_OPTION)
-                        CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                        final int selection = JOptionPane.showOptionDialog(
+                                object3DMenu,
+                                "Should this object only link to the Heightmap-Image or store the actual values?",
+                                "Select", JOptionPane.OK_CANCEL_OPTION,
+                                JOptionPane.QUESTION_MESSAGE,
+                                null,
+                                new String[]
                         {
-                            public Void call() throws Exception
+                            "Only link to asset file", "Store the height values"
+                        },
+                                "Only link to asset file");
+                        if (selection != JOptionPane.CLOSED_OPTION)
+                            CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
                             {
-                                Texture heightMapImage = CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture(name);
-                                ImageBasedHeightMap heightmap = new ImageBasedHeightMap(heightMapImage.getImage());
-                                heightmap.load();
-                                TerrainQuad terrain = new TerrainQuad("Terrain", 65, heightmap.getSize()+1, heightmap.getHeightMap());
-                                terrain.setUserData("angles", new Vector3f());
-                                terrain.setUserData("scale", new Vector3f(1, 1, 1));
-                                terrain.setMaterial(new Material(CurrentData.getEditorWindow().getB3DApp().getAssetManager(),
-                                        "Common/MatDefs/Terrain/TerrainLighting.j3md"));
-                                if (selection == 0)
-                                    terrain.setUserData("heightmapLink", name);
-                                b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(terrain);
-                                Wizard.getObjects().add(terrain, element);
-                                CurrentData.getEditorWindow().getB3DApp().getSelectedNode().attachChild(terrain);
-                                return null;
-                            }
-                        });
+                                public Void call() throws Exception
+                                {
+                                    Texture heightMapImage = CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture(name);
+                                    ImageBasedHeightMap heightmap = new ImageBasedHeightMap(heightMapImage.getImage());
+                                    heightmap.load();
+                                    TerrainQuad terrain = new TerrainQuad("Terrain", 65, heightmap.getSize() + 1, heightmap.getHeightMap());
+                                    terrain.setUserData("angles", new Vector3f());
+                                    terrain.setUserData("scale", new Vector3f(1, 1, 1));
+                                    terrain.setMaterial(new Material(CurrentData.getEditorWindow().getB3DApp().getAssetManager(),
+                                            "Common/MatDefs/Terrain/TerrainLighting.j3md"));
+                                    if (selection == 0)
+                                        terrain.setUserData("heightmapLink", name);
+                                    b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(terrain);
+                                    Wizard.getObjects().add(terrain, element);
+                                    CurrentData.getEditorWindow().getB3DApp().getSelectedNode().attachChild(terrain);
+                                    return null;
+                                }
+                            });
+                    }
                 }
             });
             nodeItem.addActionListener(new ActionListener()

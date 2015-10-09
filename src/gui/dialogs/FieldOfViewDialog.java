@@ -39,13 +39,19 @@ public class FieldOfViewDialog extends BasicDialog
             @Override
             public void actionPerformed(ActionEvent e)
             {
+                float[] fov =
+                {
+                    Float.parseFloat(nearTextField.getText()),
+                    Float.parseFloat(farTextField.getText()),
+                    Float.parseFloat(leftTextField.getText()),
+                    Float.parseFloat(rightTextField.getText()),
+                    Float.parseFloat(topTextField.getText()),
+                    Float.parseFloat(bottomTextField.getText())
+                };
                 CurrentData.getEditorWindow().getB3DApp().getCamera().setFrustum(
-                        Float.parseFloat(nearTextField.getText()),
-                        Float.parseFloat(farTextField.getText()),
-                        Float.parseFloat(leftTextField.getText()),
-                        Float.parseFloat(rightTextField.getText()),
-                        Float.parseFloat(topTextField.getText()),
-                        Float.parseFloat(bottomTextField.getText()));
+                        fov[0], fov[1], fov[2], fov[3], fov[4], fov[5]);
+                CurrentData.getConfiguration().fov = fov;
+                CurrentData.getConfiguration().save();
                 dispose();
             }
         });
