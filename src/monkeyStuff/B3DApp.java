@@ -78,10 +78,7 @@ import org.lwjgl.input.Mouse;
 import other.B3D_Scene;
 import other.ObjectToElementConverter;
 import tonegod.gui.controls.buttons.ButtonAdapter;
-import tonegod.gui.controls.extras.Indicator;
 import tonegod.gui.controls.menuing.Menu;
-import tonegod.gui.core.Element;
-import tonegod.gui.core.Element.Orientation;
 import tonegod.gui.core.Screen;
 
 public class B3DApp extends SimpleApplication implements ActionListener, AnalogListener
@@ -180,6 +177,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     private float time = 0;
     private boolean waterTexturesSynced = false, returnToNormalSpeed = false;
     private Vector<Spatial> spatials = new Vector<Spatial>();
+    private NodeModel currentNodeModel;
 
     /**
      * Just settin variables
@@ -1493,16 +1491,18 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
 
     private void updateNodes()
     {
+        currentNodeModel = null;
         synchronized (nodeModels)
         {
             for (NodeModel nodeModel : nodeModels)
             {
-                nodeModel.update(nodeModel.getNode().equals(selectedObject));
-                if (!editorNode.hasChild(nodeModel.getModel()) && nodeModel.getNode() == selectedObject)
-                    editorNode.attachChild(nodeModel.getModel());
-                else if (nodeModel.getNode() != selectedObject)
-                    editorNode.detachChild(nodeModel.getModel());
+                if (nodeModel.getNode().equals(selectedObject))
+                    currentNodeModel = nodeModel;
+                editorNode.detachChild(nodeModel.getModel());
+                editorNode.detachChild(nodeModel.getLineNode());
             }
+            if (currentNodeModel != null)
+                currentNodeModel.update(true);
         }
     }
 

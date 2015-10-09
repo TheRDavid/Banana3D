@@ -498,15 +498,11 @@ public class CurrentData
                 {
                     CurrentData.getEditorWindow().getB3DApp().getViewPort().setBackgroundColor(Wizard.defaultViewportBackground);
                     for (MotionPathModel mpm : CurrentData.getEditorWindow().getB3DApp().getMotionPathModels())
-                    {
                         CurrentData.getEditorWindow().getB3DApp().getEditorNode().detachChild(mpm.getSymbol());
-                    }
                     CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().removeAllElements();
                     //Lights
                     for (LightModel lm : CurrentData.getEditorWindow().getB3DApp().getLightModels())
-                    {
                         CurrentData.getEditorWindow().getB3DApp().getEditorNode().detachChild(lm.getNode());
-                    }
                     CurrentData.getEditorWindow().getB3DApp().getLightModels().removeAllElements();
                     //Nodes
                     for (NodeModel nm : CurrentData.getEditorWindow().getB3DApp().getNodeModels())
@@ -519,9 +515,7 @@ public class CurrentData
                     //Filters
                     CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().removeAllFilters();
                     for (LightScatteringModel lsm : CurrentData.getEditorWindow().getB3DApp().getLightScatteringModels())
-                    {
                         CurrentData.getEditorWindow().getB3DApp().getEditorNode().detachChild(lsm.getSymbol());
-                    }
                     CurrentData.getEditorWindow().getB3DApp().getLightScatteringModels().removeAllElements();
                     //Physics
                     CurrentData.getEditorWindow().getB3DApp().getBulletAppState().getPhysicsSpace().removeAll(CurrentData.getEditorWindow().getB3DApp().getSceneNode());
@@ -529,9 +523,7 @@ public class CurrentData
                     CurrentData.getEditorWindow().getB3DApp().getSceneNode().detachAllChildren();
                     //Lights (again! wheee!)
                     for (Light light : CurrentData.getEditorWindow().getB3DApp().getSceneNode().getWorldLightList())
-                    {
                         CurrentData.getEditorWindow().getB3DApp().getSceneNode().removeLight(light);
-                    }
                     //Clear the ElementList
                     Wizard.getObjects().clear();
                     //Nothing is really selected
@@ -637,7 +629,6 @@ public class CurrentData
 
     public static void execCreateTwin()
     {
-        System.out.println("Creating Twin!");
         editorWindow.getB3DApp().enqueue(new Callable<Void>()
         {
             @Override
@@ -656,8 +647,7 @@ public class CurrentData
                         newElement.getAnimations().add((B3D_Animation) copy);
                     }
                     final Object newObject = ElementToObjectConverter.convertToObject(newElement);
-                    System.out.println("Element: " + newElement + " -> " + newObject);
-                    System.out.println("called it");
+                    System.out.println("New Element: " + newElement + " -> " + newObject);
                     /* if (newObject instanceof Node)
                      {
                      CurrentData.getEditorWindow().getB3DApp().setSelectedNode(((Node) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getParent());
@@ -670,6 +660,8 @@ public class CurrentData
                             @Override
                             public Void call() throws Exception
                             {
+                                if (newObject instanceof Node)
+                                    registerSubNodeModels((Node) newObject);
                                 Wizard.getObjects().add(newObject, newElement);
                                 //Just use hashcode ((Spatial) newObject).setUserData("index", newElement.getUUID());
                                 CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild((Spatial) newObject);
@@ -692,48 +684,7 @@ public class CurrentData
                         Wizard.getObjects().add(newObject, newElement);
                     }
                     editorWindow.getB3DApp().setSyncTree(true);
-                } /*  if (Wizard.getObjects().getB3D_Element(CurrentData.getEditorWindow().getB3DApp().getSelectedUUID()) instanceof B3D_Spatial
-                 && ((Spatial) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getControl(LightControl.class) != null)
-                 {
-                 new Thread(new Runnable()
-                 {
-                 @Override
-                 public void run()
-                 {
-                 //Yeah, it's bad... but it friggin works (prevents crash that I juST DON'T UNDERSTAND)
-                 try
-                 {
-                 Thread.sleep(1000);
-                 } catch (InterruptedException ex)
-                 {
-                 Logger.getLogger(CurrentData.class.getName()).log(Level.SEVERE, null, ex);
-                 }
-                 //If there is a LightControl, ask the user how to deal with it
-                 LightControlDuplicateDialog lcdd = new LightControlDuplicateDialog();
-                 String action = lcdd.getAction();
-                 if (action.equals("Transfer"))
-                 {
-                 ((Spatial) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).removeControl(LightControl.class);
-                 } else if (action.equals("Remain"))
-                 {
-                 ((Spatial) newObject).removeControl(LightControl.class);
-                 } else
-                 {
-                 ((Spatial) newObject).removeControl(LightControl.class);
-                 //duplicate Light
-                 Light l = ElementToObjectConverter.convertLight(
-                 ObjectToElementConverter.convertLight(
-                 ((Spatial) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getControl(LightControl.class).getLight()));
-                 CurrentData.getEditorWindow().getB3DApp().getSceneNode().addLight(l);
-                 //create new LightControl (with new Light)
-                 LightControl newLightControl = new LightControl(l);
-                 ((Spatial) newObject).addControl(newLightControl);
-                 editorWindow.getB3DApp().getControls().add(newLightControl);
-                 }
-                 editorWindow.getB3DApp().setSyncTree(true);
-                 }
-                 }).start();
-                 }*/ else
+                } else
                     ObserverDialog.getObserverDialog().printMessage("Filters can not be duplicated (because of reasons)");
                 return null;
             }
@@ -1129,6 +1080,8 @@ public class CurrentData
                         Wizard.getObjects().add(s, e);
                         getEditorWindow().getB3DApp().getSceneNode().attachChild(s);
                         elementsAdded++;
+                        if (s instanceof Node)
+                            registerSubNodeModels((Node) s);
                     }
                 //MotionPaths
                 for (B3D_Element e : scene.getElements())
@@ -1154,6 +1107,17 @@ public class CurrentData
                 return null;
             }
         });
+    }
+
+    private static void registerSubNodeModels(Node s)
+    {
+        for (Spatial spat : s.getChildren())
+            if (spat instanceof Node)
+            {
+                Node n = (Node) spat;
+                editorWindow.getB3DApp().getNodeModels().add(new NodeModel(n));
+                registerSubNodeModels(n);
+            }
     }
 
     public static void updateAssetRegister()

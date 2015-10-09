@@ -93,9 +93,7 @@ public class OpenProjectDialog extends BasicDialog
             names[i] = sceneFiles[i].getName();
         fileList.setModel(new DefaultListModel<String>());
         for (String name : names)
-        {
             ((DefaultListModel) fileList.getModel()).addElement(name);
-        }
     }
 
     public File getSceneFile()
@@ -118,10 +116,18 @@ public class OpenProjectDialog extends BasicDialog
                 String name = JOptionPane.showInputDialog("Scene Name:");
                 if (name == null)
                     return;
-                B3D_Scene newScene = new B3D_Scene(name);
                 sceneFile = new File(projectFile.getParentFile().getAbsolutePath() + "//" + name + ".b3ds");
-                Wizard.saveFile(sceneFile.getAbsolutePath(), newScene);
-                dispose();
+                if (sceneFile.exists()
+                        && JOptionPane.showConfirmDialog(
+                        rootPane,
+                        "A file with that name already exists and will be overwirtten!\nDo you want to continue?",
+                        "Warning",
+                        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+                {
+                    B3D_Scene newScene = new B3D_Scene(name);
+                    Wizard.saveFile(sceneFile.getAbsolutePath(), newScene);
+                    dispose();
+                }
             } else if (e.getActionCommand().equals("rename"))
             {
                 String newName = JOptionPane.showInputDialog("Rename to ...");
@@ -157,13 +163,11 @@ public class OpenProjectDialog extends BasicDialog
         public void mouseClicked(MouseEvent e)
         {
             if (e.getClickCount() == 2)
-            {
                 if (fileList.getSelectedIndex() != -1)
                 {
                     sceneFile = sceneFiles[fileList.getSelectedIndex()];
                     dispose();
                 }
-            }
         }
 
         public void mousePressed(MouseEvent e)

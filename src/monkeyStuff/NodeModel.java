@@ -64,23 +64,19 @@ public class NodeModel
         model.setLocalScale(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().distance(model.getWorldTranslation()) / 60);
         if (selected)
         {
+            CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(model);
             for (Spatial spatial : node.getChildren())
             {
                 if (spatial instanceof Node)
-                {
                     for (NodeModel nm : CurrentData.getEditorWindow().getB3DApp().getNodeModels())
-                    {
                         if (nm.getNode().equals(spatial))
-                        {
                             nm.update(true);
-                        }
-                    }
-                }
                 lineGeometry = new Geometry("connection", new Line(Vector3f.ZERO, spatial.getWorldTranslation().subtract(model.getWorldTranslation())));
                 lineGeometry.setLocalTranslation(model.getWorldTranslation());
                 lineGeometry.setMaterial(lineMaterial);
                 lineNode.attachChild(lineGeometry);
             }
+            CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(lineNode);
         }
     }
 

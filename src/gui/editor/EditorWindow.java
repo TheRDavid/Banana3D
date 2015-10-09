@@ -232,8 +232,7 @@ public class EditorWindow extends JFrame
 
     /**
      * Should be called after every resize. Arranges the components of the
-     * Editor Window so the Tree and EditPanel have their minimum size
-     * necessary.
+     * Editor Window so the Tree and EditPanel have their minimum size guaranteed.
      */
     public void arrangeComponentSizes()
     {
@@ -241,9 +240,9 @@ public class EditorWindow extends JFrame
         upperPanel.setPreferredSize(new Dimension(180, 30));
         treeScrollPane.setPreferredSize(new Dimension(320, getHeight() - 100));
         if (isUndecorated())
-            middlePanel.setPreferredSize(new Dimension(getContentPane().getWidth() - tree.getPreferredSize().width - editPane.getPreferredSize().width, getHeight() - 60));
+            middlePanel.setPreferredSize(new Dimension(getContentPane().getWidth() - tree.getWidth() - editPane.getWidth(), getHeight()-60));
         else
-            middlePanel.setPreferredSize(new Dimension(getWidth() - tree.getPreferredSize().width - editPane.getPreferredSize().width, getHeight() - 110));
+            middlePanel.setPreferredSize(new Dimension(getContentPane().getWidth() - tree.getWidth() - editPane.getWidth(), getHeight()-110));
         toolbar.setPreferredSize(new Dimension(middlePanel.getWidth(), 110));
         playPanel.setPreferredSize(new Dimension(
                 middlePanel.getPreferredSize().width,

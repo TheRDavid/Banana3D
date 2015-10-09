@@ -411,23 +411,15 @@ public class MotionPathTaskPane extends EditTaskPane
     private void updateObjectComboBox()
     {
         if (objectComboBox.getActionListeners().length > 0)
-        {
             objectComboBox.removeActionListener(objectComboBox.getActionListeners()[0]);
-        }
         objectComboBox.removeAllItems();
         updateSpatialList();
         objectComboBox.addItem("Camera");
         for (Spatial s : allSpatials)
-        {
             objectComboBox.addItem(s.getName());
-        }
         for (int i = 0; i < allSpatials.size(); i++)
-        {
             if (allSpatials.get(i).getName().equals(motionEvent.getSpatial().getName()))
-            {
                 objectComboBox.setSelectedIndex(i + 1);
-            }
-        }
         objectComboBox.addActionListener(new ActionListener()
         {
             @Override
@@ -446,7 +438,11 @@ public class MotionPathTaskPane extends EditTaskPane
                     int spatialID = allSpatials.elementAt(objectComboBox.getSelectedIndex() - 1).hashCode();
                     b3D_MotionEvent.setObjectProbablyUUID(Wizard.getObjectReferences().getUUID(spatialID));
                     Wizard.getObjects().remove(motionEvent.hashCode(), b3D_MotionEvent.getUUID());
+                    for (MotionPathModel mpm : CurrentData.getEditorWindow().getB3DApp().getMotionPathModels())
+                        if (mpm.getMotionEvent().equals(motionEvent))
+                            CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().remove(mpm);
                     motionEvent = ElementToObjectConverter.convertMotionEvent(b3D_MotionEvent);
+                    CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().add(new MotionPathModel(motionEvent));
                     Wizard.getObjects().add(motionEvent, b3D_MotionEvent);
                 }
             }
@@ -471,9 +467,7 @@ public class MotionPathTaskPane extends EditTaskPane
         taskPane.add("br left", new JLabel("Direction Type:"));
         taskPane.add("tab hfill", directionTypeComboBox);
         if (directionTypeComboBox.getSelectedIndex() == 1 || directionTypeComboBox.getSelectedIndex() == 2)
-        {
             taskPane.add("br hfill", setRotationPanel);
-        }
         taskPane.add("br left", new JLabel("Symbol Color:"));
         taskPane.add("tab hfill", colorButton);
     }
@@ -493,9 +487,7 @@ public class MotionPathTaskPane extends EditTaskPane
             wayPointTaskPane.updateRunningMark();
         }
         if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Spatial)
-        {
             wayPointTaskPane.updateSelectionMark();
-        }
         playTaskPane.getPlayButton().setEnabled(!motionEvent.getPlayState().equals(PlayState.Playing));
         playTaskPane.getPauseButton().setEnabled(!motionEvent.getPlayState().equals(PlayState.Paused)
                 && !motionEvent.getPlayState().equals(PlayState.Stopped));
