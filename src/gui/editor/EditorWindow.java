@@ -232,17 +232,18 @@ public class EditorWindow extends JFrame
 
     /**
      * Should be called after every resize. Arranges the components of the
-     * Editor Window so the Tree and EditPanel have their minimum size guaranteed.
+     * Editor Window so the Tree and EditPanel have their minimum size
+     * guaranteed.
      */
     public void arrangeComponentSizes()
     {
         editPane.setPreferredSize(new Dimension(530, getHeight() - 20));
         upperPanel.setPreferredSize(new Dimension(180, 30));
-        treeScrollPane.setPreferredSize(new Dimension(320, getHeight() - 100));
+        treeScrollPane.setPreferredSize(new Dimension(320, treeScrollPane.getParent().getHeight() - sortModeComboBox.getHeight() - treePanel.getComponent(1).getHeight()));
         if (isUndecorated())
-            middlePanel.setPreferredSize(new Dimension(getContentPane().getWidth() - tree.getWidth() - editPane.getWidth(), getHeight()-60));
+            middlePanel.setPreferredSize(new Dimension(getContentPane().getWidth() - tree.getWidth() - editPane.getWidth(), getHeight() - 60));
         else
-            middlePanel.setPreferredSize(new Dimension(getContentPane().getWidth() - tree.getWidth() - editPane.getWidth(), getHeight()-110));
+            middlePanel.setPreferredSize(new Dimension(getContentPane().getWidth() - tree.getWidth() - editPane.getWidth(), getHeight() - 110));
         toolbar.setPreferredSize(new Dimension(middlePanel.getWidth(), 110));
         playPanel.setPreferredSize(new Dimension(
                 middlePanel.getPreferredSize().width,
@@ -252,6 +253,9 @@ public class EditorWindow extends JFrame
             b3DSimpleApplication.restart();
             canvasContext.getCanvas().setPreferredSize(playPanel.getPreferredSize());
         }
+        repaint();
+        revalidate();
+        validate();
     }
 
     /**
