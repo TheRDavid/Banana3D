@@ -10,6 +10,7 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.shape.Line;
 import components.BSlider;
 import components.Float3Panel;
+import general.UserActionManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -20,6 +21,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.concurrent.Callable;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -52,6 +55,7 @@ public class DirectionalLightTaskPane extends EditTaskPane
             {
                 lightModel.getLight().setColor(Wizard.makeColorRGBA(colorButton.getColor()));
                 lightModel.getSymbol().getMaterial().setColor("Color", lightModel.getLight().getColor());
+                UserActionManager.addState(lightModel.getLight(), "Edit " + lightModel.getLight().getName());
             }
         });
         taskPane.add("br", new JLabel("Color:"));
@@ -213,6 +217,17 @@ public class DirectionalLightTaskPane extends EditTaskPane
                         updateDirection(sliderPanel.getVector());
                     }
                 });
+                MouseAdapter rotationAdapter = new MouseAdapter()
+                {
+                    @Override
+                    public void mouseReleased(MouseEvent e)
+                    {
+                        UserActionManager.addState(lightModel.getLight(), "Rotate " + lightModel.getLight().getName());
+                    }
+                };
+                xSlider.addMouseListener(rotationAdapter);
+                ySlider.addMouseListener(rotationAdapter);
+                zSlider.addMouseListener(rotationAdapter);
             }
 
             /**

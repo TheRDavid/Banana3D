@@ -133,12 +133,9 @@ public class ElementTree extends JXTree
                         try
                         {
                             if (nodeIndexes.get(tempNode) == null)
-                            {
                                 CurrentData.getEditorWindow().getB3DApp().setSelectedNode(CurrentData.getEditorWindow().getB3DApp().getSceneNode());
-                            } else
-                            {
+                            else
                                 CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(nodeIndexes.get(tempNode));
-                            }
                         } catch (NullPointerException npe)
                         {
                             npe.printStackTrace();
@@ -568,7 +565,7 @@ public class ElementTree extends JXTree
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    CurrentData.execDelete();
+                    CurrentData.execDelete(true);
                 }
             });
             playItem.addActionListener(new ActionListener()

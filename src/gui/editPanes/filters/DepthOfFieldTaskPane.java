@@ -3,6 +3,7 @@ package gui.editPanes.filters;
 import gui.editPanes.EditTaskPane;
 import com.jme3.post.filters.DepthOfFieldFilter;
 import components.BTextField;
+import general.UserActionManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,6 +37,7 @@ public class DepthOfFieldTaskPane extends EditTaskPane
                 dofFilter.setBlurScale(Float.parseFloat(blurScaleField.getText()));
                 dofFilter.setFocusDistance(Float.parseFloat(focusDistanceField.getText()));
                 dofFilter.setFocusRange(Float.parseFloat(focusRangeField.getText()));
+                UserActionManager.addState(dofFilter, "Edit " + dofFilter.getName());
             }
         });
         taskPane.add("left", new JLabel("Blur Scale:"));

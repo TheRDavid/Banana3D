@@ -1,6 +1,7 @@
 package gui.menu;
 
 import general.CurrentData;
+import general.UserActionManager;
 import other.Wizard;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -11,6 +12,8 @@ import javax.swing.*;
 public class EditMenu extends JMenu
 {
 
+    private JMenuItem undoItem = new JMenuItem("Undo", new ImageIcon("dat//img//menu//undo.png"));
+    private JMenuItem redoItem = new JMenuItem("Redo", new ImageIcon("dat//img//menu//redo.png"));
     private JMenuItem twinItem = new JMenuItem("Duplicate", new ImageIcon("dat//img//menu//duplicate.png"));
     private JMenuItem deleteItem = new JMenuItem("Delete", new ImageIcon("dat//img//menu//delete.png"));
     private JMenuItem animateItem = new JMenuItem("Edit Animations", new ImageIcon("dat//img//menu//random.png"));
@@ -20,8 +23,12 @@ public class EditMenu extends JMenu
 
     public EditMenu()
     {
+        undoItem.setEnabled(false);
+        redoItem.setEnabled(false);
         initShortcuts();
         setText("Edit");
+        add(undoItem);
+        add(redoItem);
         add(twinItem);
         add(deleteItem);
         add(animateItem);
@@ -34,6 +41,20 @@ public class EditMenu extends JMenu
 
     private void initActions()
     {
+        undoItem.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                UserActionManager.undo();
+            }
+        });
+        redoItem.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                UserActionManager.redo();
+            }
+        });
         animateItem.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -72,7 +93,7 @@ public class EditMenu extends JMenu
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                CurrentData.execDelete();
+                CurrentData.execDelete(true);
             }
         });
         resetSceneItem.addActionListener(new ActionListener()
@@ -90,5 +111,15 @@ public class EditMenu extends JMenu
         twinItem.setAccelerator(KeyStroke.getKeyStroke("control T"));
         deleteItem.setAccelerator(KeyStroke.getKeyStroke("DELETE"));
         findItem.setAccelerator(KeyStroke.getKeyStroke("control F"));
+    }
+
+    public JMenuItem getUndoItem()
+    {
+        return undoItem;
+    }
+
+    public JMenuItem getRedoItem()
+    {
+        return redoItem;
     }
 }

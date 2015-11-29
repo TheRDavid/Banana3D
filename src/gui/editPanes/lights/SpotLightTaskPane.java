@@ -11,6 +11,7 @@ import com.jme3.scene.shape.Line;
 import components.BSlider;
 import components.BTextField;
 import components.Float3Panel;
+import general.UserActionManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -21,6 +22,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.concurrent.Callable;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -65,6 +68,7 @@ public class SpotLightTaskPane extends EditTaskPane
                     }
                 });
                 super.setVector(vec);
+                UserActionManager.addState(lightModel.getLight(), "Move " + lightModel.getLight().getName());
             }
         };
         positionPanel.addFieldKeyListener(new KeyListener()
@@ -90,6 +94,7 @@ public class SpotLightTaskPane extends EditTaskPane
                 Mesh mesh = new Line(lightModel.getRepresentative().getLocalTranslation(), lightModel.getRepresentative().getLocalTranslation().add(((SpotLight) lightModel.getLight()).getDirection().mult(((SpotLight) lightModel.getLight()).getSpotRange())));
                 mesh.setPointSize(5);
                 lightModel.getSymbol().setMesh(mesh);
+                UserActionManager.addState(lightModel.getLight(), "Move " + lightModel.getLight().getName());
             }
         });
         colorButton = new BColorButton(Wizard.makeColor(lightModel.getLight().getColor()));
@@ -109,6 +114,7 @@ public class SpotLightTaskPane extends EditTaskPane
                 ((SpotLight) lightModel.getLight()).setSpotRange(Float.parseFloat(spotRangeField.getText()));
                 ((SpotLight) lightModel.getLight()).setSpotInnerAngle(Float.parseFloat(innerAngleField.getText()));
                 ((SpotLight) lightModel.getLight()).setSpotOuterAngle(Float.parseFloat(outerAngleField.getText()));
+                UserActionManager.addState(lightModel.getLight(), "Edit " + lightModel.getLight().getName());
             }
         });
         taskPane.add("br left", new JLabel("Color:"));
@@ -183,6 +189,7 @@ public class SpotLightTaskPane extends EditTaskPane
                         float z = float3Panel.getVector().getZ();
                         Vector3f newDirection = new Vector3f(x, y, z);
                         sliderPanel.setVector3f(newDirection);
+                        UserActionManager.addState(lightModel.getLight(), "Rotate " + lightModel.getLight().getName());
                         updateLightDirection(newDirection);
                     }
                 }
@@ -258,6 +265,17 @@ public class SpotLightTaskPane extends EditTaskPane
                         updateLightDirection(sliderPanel.getVector());
                     }
                 });
+                MouseAdapter rotationAdapter = new MouseAdapter()
+                {
+                    @Override
+                    public void mouseReleased(MouseEvent e)
+                    {
+                        UserActionManager.addState(lightModel.getLight(), "Rotate " + lightModel.getLight().getName());
+                    }
+                };
+                xSlider.addMouseListener(rotationAdapter);
+                ySlider.addMouseListener(rotationAdapter);
+                zSlider.addMouseListener(rotationAdapter);
             }
 
             /**

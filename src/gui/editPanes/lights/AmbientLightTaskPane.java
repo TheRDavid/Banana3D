@@ -3,6 +3,7 @@ package gui.editPanes.lights;
 import gui.components.BColorButton;
 import gui.editPanes.EditTaskPane;
 import com.jme3.light.AmbientLight;
+import general.UserActionManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -31,6 +32,7 @@ public class AmbientLightTaskPane extends EditTaskPane
             public void actionPerformed(ActionEvent e)
             {
                 ambientLight.setColor(Wizard.makeColorRGBA(colorButton.getColor()));
+                UserActionManager.addState(ambientLight, "Edit " + ambientLight.getName());
             }
         });
         taskPane.add("br", new JLabel("Color:"));

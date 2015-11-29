@@ -7,11 +7,14 @@ import com.jme3.post.filters.LightScatteringFilter;
 import components.BSlider;
 import components.BTextField;
 import components.Float3Panel;
+import general.UserActionManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -53,12 +56,9 @@ public class LightScatteringTaskPane extends EditTaskPane
             {
                 lightScatteringFilter.setLightPosition(positionPanel.getVector());
                 for (LightScatteringModel lsm : CurrentData.getEditorWindow().getB3DApp().getLightScatteringModels())
-                {
                     if (lsm.getScatteringFilter().equals(lightScatteringFilter))
-                    {
                         lsm.getSymbol().setLocalTranslation(lightScatteringFilter.getLightPosition());
-                    }
-                }
+                UserActionManager.addState(lightScatteringFilter, "Move " + lightScatteringFilter.getName());
             }
         });
         samplesSlider = new BSlider(Integer.class, 10, 150, lightScatteringFilter.getNbSamples());
@@ -68,6 +68,14 @@ public class LightScatteringTaskPane extends EditTaskPane
             public void stateChanged(ChangeEvent e)
             {
                 lightScatteringFilter.setNbSamples(samplesSlider.getValue());
+            }
+        });
+        samplesSlider.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+                UserActionManager.addState(lightScatteringFilter, "Change Samples to " + samplesSlider.getValue());
             }
         });
         blurStartField.setText("" + scatteringFilter.getBlurStart());
@@ -86,6 +94,7 @@ public class LightScatteringTaskPane extends EditTaskPane
                 lightScatteringFilter.setLightDensity(Float.parseFloat(densityField.getText()));
                 lightScatteringFilter.setLightPosition(positionPanel.getVector());
                 lightScatteringFilter.setNbSamples(samplesSlider.getValue());
+                UserActionManager.addState(lightScatteringFilter, "Edit " + lightScatteringFilter.getName());
             }
         });
         taskPane.add("br left", new JLabel("Position:"));
@@ -105,8 +114,6 @@ public class LightScatteringTaskPane extends EditTaskPane
     public void updateData(boolean urgent)
     {
         if (!positionPanel.hasFocus())
-        {
             positionPanel.setVector(lightScatteringFilter.getLightPosition());
-        }
     }
 }

@@ -103,12 +103,8 @@ public class AddMenu extends JMenu
                 objects.add("Camera");
                 Vector<Spatial> allSpatials = new Vector<Spatial>();
                 for (Object o : Wizard.getObjects().getOriginalObjectsIterator())
-                {
                     if (o instanceof Spatial)
-                    {
                         allSpatials.add((Spatial) o);
-                    }
-                }
                 Collections.sort(allSpatials, new Comparator<Spatial>()
                 {
                     @Override
@@ -118,9 +114,7 @@ public class AddMenu extends JMenu
                     }
                 });
                 for (Spatial spatial : allSpatials)
-                {
                     objects.add(spatial.getName());
-                }
                 SelectDialog selectDialog = new SelectDialog("Moving Object", objects.toArray());
                 if (selectDialog.isOk())
                 {
@@ -163,9 +157,7 @@ public class AddMenu extends JMenu
                         if (CurrentData.getConfiguration().remindOfNodeChildrenAsMotionEventSpatial
                                 && !allSpatials.get(selectDialog.getSelectedIndex() - 1).getParent().equals(
                                 CurrentData.getEditorWindow().getB3DApp().getSceneNode()))
-                        {
                             new ChildMotionEventDialog();
-                        }
                     }
                     motionEvent.getPath().addWayPoint(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation());
                     motionEvent.getPath().addWayPoint(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().add(5, 0, 0));
@@ -332,13 +324,11 @@ public class AddMenu extends JMenu
                     Vector<String> names = new Vector<String>();
                     Vector<DirectionalLight> lights = new Vector<DirectionalLight>();
                     for (Light l : CurrentData.getEditorWindow().getB3DApp().getSceneNode().getWorldLightList())
-                    {
                         if (l instanceof DirectionalLight)
                         {
                             names.add(l.getName());
                             lights.add((DirectionalLight) l);
                         }
-                    }
                     if (!names.isEmpty())
                     {
                         SelectDialog selectResolutionDialog = new SelectDialog("Shadow Resolution", new String[]
@@ -397,13 +387,11 @@ public class AddMenu extends JMenu
                     Vector<String> names = new Vector<String>();
                     Vector<PointLight> lights = new Vector<PointLight>();
                     for (Light l : CurrentData.getEditorWindow().getB3DApp().getSceneNode().getWorldLightList())
-                    {
                         if (l instanceof PointLight)
                         {
                             names.add(l.getName());
                             lights.add((PointLight) l);
                         }
-                    }
                     if (!names.isEmpty())
                     {
                         SelectDialog selectResolutionDialog = new SelectDialog("Shadow Resolution", new String[]
@@ -448,9 +436,7 @@ public class AddMenu extends JMenu
                             }
                         });
                     } else
-                    {
                         JOptionPane.showMessageDialog(CurrentData.getEditorWindow(), "You need a Point Light for this");
-                    }
                 }
             });
             slShadowItem.addActionListener(new ActionListener()
@@ -512,9 +498,7 @@ public class AddMenu extends JMenu
                             }
                         });
                     } else
-                    {
                         JOptionPane.showMessageDialog(CurrentData.getEditorWindow(), "You need a Spot Light for this");
-                    }
                 }
             });
             bloomItem.addActionListener(new ActionListener()
@@ -928,9 +912,7 @@ public class AddMenu extends JMenu
                             node.setUserData("angles", new Vector3f());
                             node.setUserData("scale", new Vector3f(1, 1, 1));
                             if (CurrentData.getEditorWindow().getB3DApp().getSelectedNode().equals(CurrentData.getEditorWindow().getB3DApp().getSceneNode()))
-                            {
                                 node.setLocalTranslation(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().add(CurrentData.getEditorWindow().getB3DApp().getCamera().getDirection().mult(10)));
-                            }
                             //ConvertMode does not matter here, this spatial can not possibly have a LightControl already
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(node);
                             Wizard.getObjects().add(node, element);
@@ -960,9 +942,7 @@ public class AddMenu extends JMenu
                                 s.setUserData("modelName", name);
                                 s.setName(name);
                                 if (CurrentData.getEditorWindow().getB3DApp().getSelectedNode().equals(CurrentData.getEditorWindow().getB3DApp().getSceneNode()))
-                                {
                                     s.setLocalTranslation(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().add(CurrentData.getEditorWindow().getB3DApp().getCamera().getDirection().mult(10)));
-                                }
                                 /*Set UserData to all children*/
                                 if (s instanceof Node)
                                 {
@@ -1028,9 +1008,7 @@ public class AddMenu extends JMenu
                             g.setUserData("angles", new Vector3f());
                             g.setUserData("scale", new Vector3f(1, 1, 1));
                             if (CurrentData.getEditorWindow().getB3DApp().getSelectedNode().equals(CurrentData.getEditorWindow().getB3DApp().getSceneNode()))
-                            {
                                 g.setLocalTranslation(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().add(CurrentData.getEditorWindow().getB3DApp().getCamera().getDirection().mult(10)));
-                            }
                             g.setMaterial(new Material(CurrentData.getEditorWindow().getB3DApp().getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md"));
                             //ConvertMode does not matter here, this spatial can not possibly have a LightControl already
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(g);
@@ -1055,9 +1033,7 @@ public class AddMenu extends JMenu
                             g.setUserData("angles", new Vector3f());
                             g.setUserData("scale", new Vector3f(1, 1, 1));
                             if (CurrentData.getEditorWindow().getB3DApp().getSelectedNode().equals(CurrentData.getEditorWindow().getB3DApp().getSceneNode()))
-                            {
                                 g.setLocalTranslation(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().add(CurrentData.getEditorWindow().getB3DApp().getCamera().getDirection().mult(10)));
-                            }
                             g.setMaterial(new Material(CurrentData.getEditorWindow().getB3DApp().getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md"));
                             //ConvertMode does not matter here, this spatial can not possibly have a LightControl already
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(g);
@@ -1082,9 +1058,7 @@ public class AddMenu extends JMenu
                             g.setUserData("angles", new Vector3f());
                             g.setUserData("scale", new Vector3f(1, 1, 1));
                             if (CurrentData.getEditorWindow().getB3DApp().getSelectedNode().equals(CurrentData.getEditorWindow().getB3DApp().getSceneNode()))
-                            {
                                 g.setLocalTranslation(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().add(CurrentData.getEditorWindow().getB3DApp().getCamera().getDirection().mult(10)));
-                            }
                             g.setMaterial(new Material(CurrentData.getEditorWindow().getB3DApp().getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md"));
                             //ConvertMode does not matter here, this spatial can not possibly have a LightControl already
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(g);
@@ -1109,9 +1083,7 @@ public class AddMenu extends JMenu
                             g.setUserData("angles", new Vector3f());
                             g.setUserData("scale", new Vector3f(1, 1, 1));
                             if (CurrentData.getEditorWindow().getB3DApp().getSelectedNode().equals(CurrentData.getEditorWindow().getB3DApp().getSceneNode()))
-                            {
                                 g.setLocalTranslation(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().add(CurrentData.getEditorWindow().getB3DApp().getCamera().getDirection().mult(10)));
-                            }
                             g.setMaterial(new Material(CurrentData.getEditorWindow().getB3DApp().getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md"));
                             //ConvertMode does not matter here, this spatial can not possibly have a LightControl already
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(g);

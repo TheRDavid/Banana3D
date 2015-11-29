@@ -4,6 +4,7 @@ import gui.components.BColorButton;
 import gui.editPanes.EditTaskPane;
 import com.shaderblow.filter.oldfilm.OldFilmFilter;
 import components.BTextField;
+import general.UserActionManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,6 +47,7 @@ public class OldFilmTaskPane extends EditTaskPane
                 oldFilmFilter.setNoiseDensity(Float.parseFloat(noiseDensityField.getText()));
                 oldFilmFilter.setScratchDensity(Float.parseFloat(scratchDensityField.getText()));
                 oldFilmFilter.setVignettingValue(Float.parseFloat(vignetteValueField.getText()));
+                UserActionManager.addState(oldFilmFilter, "Edit " + oldFilmFilter.getName());
             }
         });
         taskPane.add("br right", applyButton);

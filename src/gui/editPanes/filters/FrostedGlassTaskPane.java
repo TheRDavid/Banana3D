@@ -5,6 +5,7 @@ import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import com.shaderblow.filter.frostedglass.FrostedGlassFilter;
 import components.BTextField;
+import general.UserActionManager;
 import other.ObjectToElementConverter;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -37,7 +38,7 @@ public class FrostedGlassTaskPane extends EditTaskPane
                         CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().removeFilter(
                                 filter);
                         B3D_FrostedGlass oldB3D_FrostedGlass = (B3D_FrostedGlass) Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(filter.hashCode()));
-                        Wizard.getObjects().remove(filter.hashCode(),Wizard.getObjectReferences().getUUID(filter.hashCode()));
+                        Wizard.getObjects().remove(filter.hashCode(), Wizard.getObjectReferences().getUUID(filter.hashCode()));
                         filter.setRandomFactor(Float.parseFloat(randomFactorField.getText()));
                         filter.setRandomScale(Float.parseFloat(randomScaleField.getText()));
                         CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(
@@ -49,6 +50,7 @@ public class FrostedGlassTaskPane extends EditTaskPane
                         CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(b3D_FrostedGlass.getUUID());
                         CurrentData.getEditorWindow().getTree().sync();
                         CurrentData.getEditorWindow().getEditPane().arrange(false);
+                        UserActionManager.addState(filter, "Edit " + filter.getName());
                         return null;
                     }
                 });

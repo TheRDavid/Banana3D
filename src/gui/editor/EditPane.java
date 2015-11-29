@@ -381,6 +381,8 @@ public class EditPane extends JScrollPane
                 }
             }
             repaint();
+            revalidate();
+            repaint();
         }
     }
 

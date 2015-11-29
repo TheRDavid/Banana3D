@@ -6,6 +6,8 @@ import dialogs.BasicDialog;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -117,8 +119,7 @@ public class OpenProjectDialog extends BasicDialog
                 if (name == null)
                     return;
                 sceneFile = new File(projectFile.getParentFile().getAbsolutePath() + "//" + name + ".b3ds");
-                if (sceneFile.exists()
-                        && JOptionPane.showConfirmDialog(
+                if (!sceneFile.exists() || JOptionPane.showConfirmDialog(
                         rootPane,
                         "A file with that name already exists and will be overwirtten!\nDo you want to continue?",
                         "Warning",

@@ -3,6 +3,7 @@ package gui.editPanes.filters;
 import gui.editPanes.EditTaskPane;
 import com.jme3.post.ssao.SSAOFilter;
 import components.BTextField;
+import general.UserActionManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,6 +40,7 @@ public class SSAOTaskPane extends EditTaskPane
                 ssaoFilter.setIntensity(Float.parseFloat(intensityField.getText()));
                 ssaoFilter.setSampleRadius(Float.parseFloat(sampleRadiusField.getText()));
                 ssaoFilter.setScale(Float.parseFloat(scaleField.getText()));
+                UserActionManager.addState(ssaoFilter, "Edit " + ssaoFilter.getName());
             }
         });
         taskPane.add("br left", new JLabel("Bias:"));

@@ -713,22 +713,16 @@ public class CurrentData
             public Void call() throws Exception
             {
                 if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Spatial)
-                {
                     CurrentData.getEditorWindow().getB3DApp().getCamera().lookAt(((Spatial) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getWorldTranslation(), Vector3f.UNIT_Y);
-                } else if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Light)
+                else if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Light)
                 {
                     /*Only Spot-And PointLight have that Item*/
                     if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof PointLight)
-                    {
                         CurrentData.getEditorWindow().getB3DApp().getCamera().lookAt(((PointLight) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getPosition(), Vector3f.UNIT_Y);
-                    } else
-                    {
+                    else
                         CurrentData.getEditorWindow().getB3DApp().getCamera().lookAt(((SpotLight) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getPosition(), Vector3f.UNIT_Y);
-                    }
                 } else if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof MotionEvent)
-                {
                     CurrentData.getEditorWindow().getB3DApp().getCamera().lookAt(((MotionEvent) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getPath().getWayPoint(0), Vector3f.UNIT_Y);
-                }
                 return null;
             }
         });
@@ -739,12 +733,9 @@ public class CurrentData
         if (CurrentData.getEditorWindow().getEditPane().getCurrentEditPane() instanceof MotionPathTaskPane)
         {
             if (((MotionPathTaskPane) CurrentData.getEditorWindow().getEditPane().getCurrentEditPane()).getMotionEvent().getPlayState().equals(PlayState.Playing))
-            {
                 ((MotionPathTaskPane) CurrentData.getEditorWindow().getEditPane().getCurrentEditPane()).pause();
-            } else
-            {
+            else
                 ((MotionPathTaskPane) CurrentData.getEditorWindow().getEditPane().getCurrentEditPane()).play();
-            }
         }
     }
 
@@ -763,7 +754,7 @@ public class CurrentData
         }
     }
 
-    public static void execDelete()
+    public static void execDelete(final boolean registerUserAction)
     {
         if (CurrentData.getEditorWindow().getB3DApp().getSelectedUUID() != null && !(CurrentData.getEditorWindow().getB3DApp().getSelectedUUID().equals(Wizard.NULL_SELECTION)))
         {
@@ -773,9 +764,7 @@ public class CurrentData
             {
                 if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Node && !(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof TerrainQuad)
                         && editorWindow.getB3DApp().getSelectedNode() == CurrentData.getEditorWindow().getB3DApp().getSelectedObject())
-                {
                     editorWindow.getB3DApp().setSelectedNode(editorWindow.getB3DApp().getSceneNode());
-                }
                 CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
                 {
                     @Override
@@ -784,30 +773,27 @@ public class CurrentData
                         Spatial spatial = ((Spatial) CurrentData.getEditorWindow().getB3DApp().getSelectedObject());
                         //Is there a LightControl depending on this Spatial? If so, delete it.
                         for (LightControl lc : editorWindow.getB3DApp().getLightControls())
-                        {
                             if (lc.getSpatial() == spatial)
                             {
                                 editorWindow.getB3DApp().getLightControls().remove(lc);
                                 lc.getSpatial().removeControl(lc);
                             }
-                        }
                         spatial.getParent().detachChild(spatial);
                         if (spatial.getControl(RigidBodyControl.class) != null)
-                        {
                             CurrentData.getEditorWindow()
                                     .getB3DApp().getBulletAppState().getPhysicsSpace().remove(spatial);
-                        }
                         Wizard.getObjects().remove(spatial.hashCode());
                         CurrentData.getEditorWindow().getB3DApp().setSelectedElement(Wizard.NULL_SELECTION, null);
                         CurrentData.getEditorWindow().getEditPane().arrange(false);
                         editorWindow.getTree().sync();
+                        if (registerUserAction)
+                            UserActionManager.addState(null, "Delete " + spatial.getName());
                         return null;
                     }
                 });
                 if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Node && !(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof TerrainQuad))
                 {
                     for (final NodeModel nodeModel : CurrentData.getEditorWindow().getB3DApp().getNodeModels())
-                    {
                         if (nodeModel.getNode().equals(CurrentData.getEditorWindow().getB3DApp().getSelectedObject()))
                         {
                             final Vector<NodeModel> toRemove = new Vector<NodeModel>();
@@ -819,12 +805,8 @@ public class CurrentData
                                     synchronized (CurrentData.getEditorWindow().getB3DApp().getNodeModels())
                                     {
                                         for (NodeModel nm : CurrentData.getEditorWindow().getB3DApp().getNodeModels())
-                                        {
                                             if (nm.getNode().hasAncestor(nodeModel.getNode()))
-                                            {
                                                 toRemove.add(nm);
-                                            }
-                                        }
                                         toRemove.add(nodeModel);
                                     }
                                     for (NodeModel n : toRemove)
@@ -838,7 +820,6 @@ public class CurrentData
                                 }
                             });
                         }
-                    }
                 }
             } else if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Light)
             {
@@ -857,12 +838,15 @@ public class CurrentData
                                 ((LightControl) lc).getSpatial().removeControl(((LightControl) lc));
                             }
                         }
+                        Light light = (Light) CurrentData.getEditorWindow().getB3DApp().getSelectedObject();
                         Wizard.getObjects().remove(CurrentData.getEditorWindow().getB3DApp().getSelectedUUID());
                         CurrentData.getEditorWindow().getB3DApp().getSceneNode().removeLight(
-                                (Light) CurrentData.getEditorWindow().getB3DApp().getSelectedObject());
+                                light);
                         CurrentData.getEditorWindow().getEditPane().arrange(false);
                         CurrentData.getEditorWindow().getB3DApp().setSelectedElement(Wizard.NULL_SELECTION, null);
                         editorWindow.getTree().sync();
+                        if (registerUserAction)
+                            UserActionManager.addState(null, "Delete " + light.getName());
                         return null;
                     }
                 });
@@ -899,6 +883,8 @@ public class CurrentData
                         CurrentData.getEditorWindow().getB3DApp().setSelectedElement(Wizard.NULL_SELECTION, null);
                         CurrentData.getEditorWindow().getEditPane().arrange(false);
                         editorWindow.getTree().sync();
+                        if (registerUserAction)
+                            UserActionManager.addState(null, "Delete " + filter.getName());
                         return null;
                     }
                 });
@@ -912,13 +898,16 @@ public class CurrentData
                     {
                         if (((B3D_MotionEvent) Wizard.getObjects().getB3D_Element(CurrentData.getEditorWindow().getB3DApp().getSelectedUUID())).getObjectProbablyUUID().equals(B3D_MotionEvent.Cam.CAM_ID))
                             CurrentData.getEditorWindow().getB3DApp().detachCam();
-                        ((MotionEvent) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).stop();
+                        MotionEvent me = ((MotionEvent) CurrentData.getEditorWindow().getB3DApp().getSelectedObject());
+                        me.stop();
                         synchronized (CurrentData.getEditorWindow().getB3DApp().getMotionPathModels())
                         {
                             try
                             {
                                 for (MotionPathModel mpm : CurrentData.getEditorWindow().getB3DApp().getMotionPathModels())
                                     CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().remove(mpm);
+                                if (registerUserAction)
+                                    UserActionManager.addState(null, "Delete " + Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(me.hashCode())).getName());
                                 Wizard.getObjects().remove(CurrentData.getEditorWindow().getB3DApp().getSelectedObject().hashCode());
                                 CurrentData.getEditorWindow().getB3DApp().setSelectedElement(Wizard.NULL_SELECTION, null);
                                 CurrentData.getEditorWindow().getEditPane().arrange(false);
@@ -1026,6 +1015,74 @@ public class CurrentData
         });
     }
 
+    public static void addToScene(final Object object, B3D_Element element)
+    {
+        boolean added = false;
+        if (object instanceof Filter)
+        {
+            Wizard.getObjects().add(object, element);
+            ArrayList<Filter> filters = new ArrayList<Filter>(CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().getFilterList());
+            filters.add((Filter) object);
+            ArrayList<B3D_Filter> filterElements = new ArrayList<B3D_Filter>();
+            for (Filter f : filters)
+                filterElements.add((B3D_Filter) Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(f.hashCode())));
+            CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().removeAllFilters();
+            Collections.sort(filterElements, new Comparator<B3D_Filter>()
+            {
+                public int compare(B3D_Filter o1, B3D_Filter o2)
+                {
+                    return o1.getFilterIndex() - o2.getFilterIndex();
+                }
+            });
+            if (object instanceof LightScatteringFilter)
+                CurrentData.getEditorWindow().getB3DApp().getLightScatteringModels().add(new LightScatteringModel((LightScatteringFilter) object));
+
+            for (B3D_Filter f : filterElements)
+                for (Filter filter : filters)
+                    if (Wizard.getObjectReferences().getUUID(filter.hashCode()).equals(f.getUUID()))
+                        CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(filter);
+            added = true;
+        } else if (object instanceof Light)
+        {
+            Wizard.getObjects().add(object, element);
+            CurrentData.getEditorWindow().getB3DApp().getSceneNode().addLight((Light) object);
+            added = true;
+        } else if (object instanceof Spatial)
+        {
+            Wizard.getObjects().add(object, element);
+            CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+            {
+                @Override
+                public Void call() throws Exception
+                {
+                    CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild((Spatial) object);
+                    return null;
+                }
+            });
+            added = true;
+
+        } else if (object instanceof MotionEvent)
+        {
+            Wizard.getObjects().add(object, element);
+            final MotionPathModel mpm = new MotionPathModel((MotionEvent) object);
+            getEditorWindow().getB3DApp().getMotionPathModels().add(mpm);
+            CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+            {
+                @Override
+                public Void call() throws Exception
+                {
+                    CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(mpm.getSymbol());
+                    return null;
+                }
+            });
+            added = true;
+        }
+        if (!added)
+            new Exception("Could not recover " + element.getName()).printStackTrace();
+        CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
+
+    }
+
     /**
      * Loads the content of a given B3D_Scene
      *
@@ -1080,10 +1137,10 @@ public class CurrentData
                     {
                         Spatial s = ElementToObjectConverter.convertSpatial((B3D_Spatial) e);
                         Wizard.getObjects().add(s, e);
-                        getEditorWindow().getB3DApp().getSceneNode().attachChild(s);
                         elementsAdded++;
                         if (s instanceof Node)
                             registerSubNodeModels((Node) s);
+                        getEditorWindow().getB3DApp().getSceneNode().attachChild(s);
                     }
                 //MotionPaths
                 for (B3D_Element e : scene.getElements())

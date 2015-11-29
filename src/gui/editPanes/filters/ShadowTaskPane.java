@@ -13,6 +13,7 @@ import components.BComboBox;
 import components.BSlider;
 import components.BTextField;
 import components.Checker;
+import general.UserActionManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,6 +51,7 @@ public class ShadowTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         shadowFilter.setFlushQueues(flushQueuesChecker.isChecked());
+                        UserActionManager.addState(shadowFilter, "Flush Queues: " + flushQueuesChecker.isChecked());
                         return null;
                     }
                 });
@@ -84,6 +86,14 @@ public class ShadowTaskPane extends EditTaskPane
             public void stateChanged(ChangeEvent e)
             {
                 shadowFilter.setShadowIntensity(intensitySlider._getValue());
+            }
+        });
+        intensitySlider.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+                UserActionManager.addState(shadowFilter, "Change Intensity to: " + intensitySlider._getValue());
             }
         });
         taskPane.setLayout(new RiverLayout());
@@ -131,6 +141,7 @@ public class ShadowTaskPane extends EditTaskPane
                     }
                     shadowFilter.setEdgesThickness(Integer.parseInt(edgeThicknessField.getText()));
                     shadowFilter.setFlushQueues(flushQueuesChecker.isChecked());
+                    UserActionManager.addState(shadowFilter, "Edit " + shadowFilter.getName());
                 }
             }
         });

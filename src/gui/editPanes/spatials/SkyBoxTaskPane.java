@@ -96,7 +96,7 @@ public class SkyBoxTaskPane extends EditTaskPane
                     final Spatial skyObject = skyBox;
                     UUID elementUUID = Wizard.getObjectReferences().getUUID(skyObject.hashCode());
                     final b3dElements.B3D_Element skyElement = Wizard.getObjects().getB3D_Element(elementUUID);
-                    CurrentData.execDelete();
+                    CurrentData.execDelete(false);
                     CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Integer>()
                     {
                         @Override

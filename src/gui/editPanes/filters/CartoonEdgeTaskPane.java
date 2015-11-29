@@ -4,6 +4,7 @@ import gui.components.BColorButton;
 import gui.editPanes.EditTaskPane;
 import com.jme3.post.filters.CartoonEdgeFilter;
 import components.BTextField;
+import general.UserActionManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -50,6 +51,7 @@ public class CartoonEdgeTaskPane extends EditTaskPane
                 cartoonEdgeFilter.setEdgeWidth(Float.parseFloat(edgeWidthField.getText()));
                 cartoonEdgeFilter.setNormalSensitivity(Float.parseFloat(normalSensivityField.getText()));
                 cartoonEdgeFilter.setNormalThreshold(Float.parseFloat(normalTresholdField.getText()));
+                UserActionManager.addState(cartoonEdgeFilter, "Edit " + cartoonEdgeFilter.getName());
             }
         });
         taskPane.add("left", new JLabel("Edge Color:"));

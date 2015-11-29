@@ -12,6 +12,7 @@ import com.jme3.system.JmeCanvasContext;
 import components.BButton;
 import components.StatusBar;
 import dialogs.ObserverDialog;
+import general.UserActionManager;
 import other.B3D_Scene;
 import java.awt.*;
 import java.awt.event.*;
@@ -372,27 +373,19 @@ public class EditorWindow extends JFrame
             private void reduce()
             {
                 if (strong && !(alpha + weakning * 3 > 1))
-                {
                     alpha += weakning * 3;
-                } else
-                {
+                else
                     alpha -= weakning / 2;
-                }
                 diff = Math.random();
                 diff -= (diff - .8f) * 3;
                 if (transition < 0)
-                {
                     transitionDone = true;
-                    transition = duration * 6;
-                }
+                transition = duration * 6;
                 if (transitionDone)
-                {
                     ellipse2D.setFrame(ellipse2D.x + diff, ellipse2D.y - 3, ellipse2D.width, ellipse2D.height);
-                } else
-                {
+                else
                     ellipse2D.setFrame(ellipse2D.x + diff / transition, ellipse2D.y - 3, ellipse2D.width, ellipse2D.height);
-                    transition--;
-                }
+                transition--;
             }
         }
 
@@ -472,6 +465,14 @@ public class EditorWindow extends JFrame
                     {
                         CurrentData.execNewScene();
                         ret = true;
+                    } else if ((e.getKeyCode() == KeyEvent.VK_Z) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
+                    {
+                        UserActionManager.undo();
+                        ret = true;
+                    } else if ((e.getKeyCode() == KeyEvent.VK_Y) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
+                    {
+                        UserActionManager.redo();
+                        ret = true;
                     } else if ((e.getKeyCode() == KeyEvent.VK_R) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
                     {
                         CurrentData.execRename();
@@ -509,7 +510,7 @@ public class EditorWindow extends JFrame
                         ret = true;
                     } else if ((e.getKeyCode() == KeyEvent.VK_DELETE) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
                     {
-                        CurrentData.execDelete();
+                        CurrentData.execDelete(true);
                         ret = true;
                     } else if ((e.getKeyCode() == KeyEvent.VK_F6))
                     {
