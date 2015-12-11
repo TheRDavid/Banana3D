@@ -12,7 +12,7 @@ import com.jme3.system.JmeCanvasContext;
 import components.BButton;
 import components.StatusBar;
 import dialogs.ObserverDialog;
-import general.UserActionManager;
+import general.UAManager;
 import other.B3D_Scene;
 import java.awt.*;
 import java.awt.event.*;
@@ -467,11 +467,11 @@ public class EditorWindow extends JFrame
                         ret = true;
                     } else if ((e.getKeyCode() == KeyEvent.VK_Z) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
                     {
-                        UserActionManager.undo();
+                        UAManager.undo();
                         ret = true;
                     } else if ((e.getKeyCode() == KeyEvent.VK_Y) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
                     {
-                        UserActionManager.redo();
+                        UAManager.redo();
                         ret = true;
                     } else if ((e.getKeyCode() == KeyEvent.VK_R) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
                     {

@@ -11,6 +11,7 @@ import components.CancelButton;
 import components.OKButton;
 import dialogs.BasicDialog;
 import dialogs.ObserverDialog;
+import general.UAManager;
 import java.awt.BasicStroke;
 import other.Wizard;
 import java.awt.BorderLayout;
@@ -88,6 +89,7 @@ public class CreateSkyBoxDialog extends BasicDialog
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
+                    UAManager.curr(null, null);
                     CreateSkyBoxDialog.this.dispose();
                     final Spatial skyBoxSpatial = SkyFactory.createSky(
                             CurrentData.getEditorWindow().getB3DApp().getAssetManager(),
@@ -106,6 +108,7 @@ public class CreateSkyBoxDialog extends BasicDialog
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(skyBoxSpatial);
                             Wizard.getObjects().add(skyBoxSpatial, element);
                             CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(skyBoxSpatial);
+                            UAManager.add(skyBoxSpatial, "Add Skybox");
                             return null;
                         }
                     });
@@ -329,6 +332,7 @@ public class CreateSkyBoxDialog extends BasicDialog
             CreateSkyBoxDialog.this.dispose();
             try
             {
+                UAManager.curr(null, null);
                 final Spatial skyBoxSpatial = SkyFactory.createSky(CurrentData.getEditorWindow().getB3DApp().getAssetManager(),
                         CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture(westLabel.getChooser().getSelectedAssetName()),
                         CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture(eastLabel.getChooser().getSelectedAssetName()),
@@ -355,6 +359,7 @@ public class CreateSkyBoxDialog extends BasicDialog
                     {
                         //Just use hashcode skyBoxSpatial.setUserData("ID", element.getUUID());
                         CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(skyBoxSpatial);
+                        UAManager.add(skyBoxSpatial, "Add Skybox");
                         return null;
                     }
                 });

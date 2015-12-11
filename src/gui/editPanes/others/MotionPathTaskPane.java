@@ -22,6 +22,7 @@ import components.Float3Panel;
 import components.Float4Panel;
 import dialogs.ObserverDialog;
 import dialogs.SelectDialog;
+import general.UAManager;
 import java.awt.BasicStroke;
 import other.Wizard;
 import java.awt.BorderLayout;
@@ -41,6 +42,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.UUID;
@@ -94,9 +96,7 @@ public class MotionPathTaskPane extends EditTaskPane
         motionEvent = mpm.getMotionEvent();
         this.b3D_MotionEvent = b3d_MotionEvent;
         if (motionEvent.getRotation() != null)
-        {
             rotationPanel.setFloats(motionEvent.getRotation());
-        }
         wayPointTaskPane = new WayPointTaskPane(motionEvent.getPath());
         setRotationPanel.add(new JLabel("Rotation:"));
         setRotationPanel.add(rotationPanel);
@@ -126,7 +126,6 @@ public class MotionPathTaskPane extends EditTaskPane
                         float yDiff = vec.y - motionPathModel.getSymbol().getLocalTranslation().y;
                         float zDiff = vec.z - motionPathModel.getSymbol().getLocalTranslation().z;
                         motionPathModel.getSymbol().setLocalTranslation(vec);
-                        updateLocations();
                         for (int i = 0; i < motionPathModel.getMotionEvent().getPath().getNbWayPoints(); i++)
                         {
                             if (!motionPathModel.getMotionEvent().getPath().isCycle() || i != 0)
@@ -158,10 +157,12 @@ public class MotionPathTaskPane extends EditTaskPane
             {
                 if (e.getKeyCode() == KeyEvent.VK_TAB || e.getKeyCode() == KeyEvent.VK_ENTER)
                 {
+                    updateLocations();
                     positionPanel.setVector(new Vector3f(
                             Float.parseFloat(positionPanel.getxField().getText()),
                             Float.parseFloat(positionPanel.getyField().getText()),
                             Float.parseFloat(positionPanel.getzField().getText())));
+                    UAManager.add(motionEvent, "Move " + b3D_MotionEvent.getName());
                 }
             }
         });
@@ -200,6 +201,7 @@ public class MotionPathTaskPane extends EditTaskPane
                 {
                     motionEvent.setSpeed(Float.parseFloat(speedField.getText()));
                     CurrentData.getEditorWindow().getB3DApp().updateSelectedMotionPath();
+                    UAManager.add(motionEvent, "Change Speed of " + b3D_MotionEvent.getName() + " to " + speedField.getText());
                 } catch (NumberFormatException nfe)
                 {
                     ObserverDialog.getObserverDialog().printMessage("Fail: NumberFormatException -> Speed value in MotionTaskPane invalid");
@@ -226,6 +228,7 @@ public class MotionPathTaskPane extends EditTaskPane
                     motionEvent.getPath().setCurveTension(Float.parseFloat(curveTensionField.getText()));
                     b3D_MotionEvent.getMotionPath().setCurveTension(Float.parseFloat(curveTensionField.getText()));
                     CurrentData.getEditorWindow().getB3DApp().updateSelectedMotionPath();
+                    UAManager.add(motionEvent, "Change Curve Tension of " + b3D_MotionEvent.getName() + " to " + curveTensionField.getText());
                 } catch (NumberFormatException nfe)
                 {
                     ObserverDialog.getObserverDialog().printMessage("Fail: NumberFormatException -> CurveTension value in MotionTaskPane invalid");
@@ -241,6 +244,7 @@ public class MotionPathTaskPane extends EditTaskPane
                 b3D_MotionEvent.getMotionPath().setCycle(cycleChecker.isChecked());
                 wayPointTaskPane.updatePanels(!cycleChecker.isChecked());
                 CurrentData.getEditorWindow().getB3DApp().updateSelectedMotionPath();
+                UAManager.add(motionEvent, "Change Curve Tension of " + b3D_MotionEvent.getName() + " to " + curveTensionField.getText());
             }
         });
         rotationPanel.addFieldKeyListener(new KeyListener()
@@ -438,9 +442,11 @@ public class MotionPathTaskPane extends EditTaskPane
                     int spatialID = allSpatials.elementAt(objectComboBox.getSelectedIndex() - 1).hashCode();
                     b3D_MotionEvent.setObjectProbablyUUID(Wizard.getObjectReferences().getUUID(spatialID));
                     Wizard.getObjects().remove(motionEvent.hashCode(), b3D_MotionEvent.getUUID());
+                    ArrayList<MotionPathModel> tempMpms = new ArrayList<MotionPathModel>();
                     for (MotionPathModel mpm : CurrentData.getEditorWindow().getB3DApp().getMotionPathModels())
                         if (mpm.getMotionEvent().equals(motionEvent))
-                            CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().remove(mpm);
+                            tempMpms.add(mpm);
+                    CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().removeAll(tempMpms);
                     motionEvent = ElementToObjectConverter.convertMotionEvent(b3D_MotionEvent);
                     CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().add(new MotionPathModel(motionEvent));
                     Wizard.getObjects().add(motionEvent, b3D_MotionEvent);
@@ -583,18 +589,14 @@ public class MotionPathTaskPane extends EditTaskPane
         private void updateRunningMark()
         {
             for (WayPointPanel wpp : wayPointPanels)
-            {
                 wpp.setRunningMark(false);
-            }
             wayPointPanels.get(motionEvent.getCurrentWayPoint()).setRunningMark(true);
         }
 
         private void updateSelectionMark()
         {
             for (WayPointPanel wpp : wayPointPanels)
-            {
                 wpp.setSelectionMark(false);
-            }
             try
             {
                 wayPointPanels.get((Integer) ((Spatial) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getUserData("waypointNumber")).setSelectionMark(true);
@@ -636,6 +638,7 @@ public class MotionPathTaskPane extends EditTaskPane
                     {
                         motionPath.getWayPoint(index).set(locationPanel.getVector());
                         CurrentData.getEditorWindow().getB3DApp().updateSelectedMotionPath();
+                        UAManager.add(motionEvent, "Move Waypoint " + index + " of " + b3D_MotionEvent.getName());
                     }
                 });
                 plusButton.setEnabled(controlsEnabled);
@@ -647,6 +650,7 @@ public class MotionPathTaskPane extends EditTaskPane
                     {
                         motionPath.addWayPoint(locationPanel.getVector());
                         updatePanels(true);
+                        UAManager.add(motionEvent, "Add Waypoint to " + b3D_MotionEvent.getName());
                     }
                 });
                 deleteButton.addActionListener(new ActionListener()

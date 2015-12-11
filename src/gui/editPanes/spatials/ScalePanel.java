@@ -5,6 +5,7 @@ import general.CurrentData;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import components.Float3Panel;
+import general.UAManager;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -74,6 +75,7 @@ public class ScalePanel extends JPanel
                         {
                             tempSpatial.setLocalScale(scalePanel.getVector());
                             sliderPanel.setVector3f(scalePanel.getVector());
+                            UAManager.add(tempSpatial, "Scale " + tempSpatial.getName());
                             return null;
                         }
                     });

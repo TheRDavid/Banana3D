@@ -13,6 +13,7 @@ import components.BSlider;
 import components.BTextField;
 import components.Checker;
 import components.Float3Panel;
+import general.UAManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -76,6 +77,7 @@ public class EmitterTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         particleEmitter.getMaterial().getAdditionalRenderState().setDepthWrite(depthWriteChecker.isChecked());
+                        UAManager.add(particleEmitter, "Use Depth Write " + depthWriteChecker.isChecked());
                         return null;
                     }
                 });
@@ -87,9 +89,7 @@ public class EmitterTaskPane extends EditTaskPane
         typeGroup.add(triangleTypeRadioButton);
         typeGroup.add(pointTypeRadioButton);
         if (particleEmitter.getMeshType().equals(ParticleMesh.Type.Point))
-        {
             pointTypeRadioButton.setSelected(true);
-        }
         velocityVariationSlider._setValue(particleEmitter.getParticleInfluencer().getVelocityVariation());
         maxParticlesField.setText("" + particleEmitter.getMaxNumParticles());
         particlesPerSecondField.setText("" + particleEmitter.getParticlesPerSec());
@@ -112,6 +112,15 @@ public class EmitterTaskPane extends EditTaskPane
             public void mouseReleased(MouseEvent e)
             {
                 particleEmitter.setFiring(firingChecker.isChecked());
+                CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                {
+                    @Override
+                    public Void call() throws Exception
+                    {
+                        UAManager.add(particleEmitter, "Set Velocity Variation to " + velocityVariationSlider._getValue());
+                        return null;
+                    }
+                });
             }
         });
         velocityVariationSlider.addChangeListener(new ChangeListener()
@@ -120,6 +129,22 @@ public class EmitterTaskPane extends EditTaskPane
             public void stateChanged(ChangeEvent e)
             {
                 particleEmitter.getParticleInfluencer().setVelocityVariation(velocityVariationSlider._getValue());
+            }
+        });
+        velocityVariationSlider.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+                CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                {
+                    @Override
+                    public Void call() throws Exception
+                    {
+                        UAManager.add(particleEmitter, "Set Velocity Variation to " + velocityVariationSlider._getValue());
+                        return null;
+                    }
+                });
             }
         });
         applyButton.addActionListener(new ActionListener()
@@ -141,42 +166,34 @@ public class EmitterTaskPane extends EditTaskPane
                         particleEmitter.setImagesY(Integer.parseInt(imgYField.getText()));
                         particleEmitter.setLowLife(Float.parseFloat(lowLifeField.getText()));
                         if (faceNormalPanel.getVector() != null)
-                        {
                             particleEmitter.setFaceNormal(faceNormalPanel.getVector());
-                        }
                         particleEmitter.setFacingVelocity(faceVelocityChecker.isChecked());
                         particleEmitter.setStartColor(Wizard.makeColorRGBA(startColorButton.getColor()));
                         particleEmitter.getParticleInfluencer().setInitialVelocity(directionVelocityPanel.getVector());
                         particleEmitter.getParticleInfluencer().setVelocityVariation(velocityVariationSlider._getValue());
                         if (triangleTypeRadioButton.isSelected())
-                        {
                             particleEmitter.setMeshType(ParticleMesh.Type.Triangle);
-                        } else
-                        {
+                        else
                             particleEmitter.setMeshType(ParticleMesh.Type.Point);
-                        }
                         particleEmitter.setNumParticles(Integer.parseInt(maxParticlesField.getText()));
                         particleEmitter.setParticlesPerSec(Float.parseFloat(particlesPerSecondField.getText()));
                         particleEmitter.setRotateSpeed(Float.parseFloat(rotateSpeedField.getText()));
                         particleEmitter.setStartSize(Float.parseFloat(startSizeField.getText()));
                         if (startShapeTaskPane.getPropsPanel() instanceof StartShapeTaskPane.PointShapePanel)
-                        {
                             particleEmitter.setShape(
                                     new EmitterPointShape(
                                     ((StartShapeTaskPane.PointShapePanel) startShapeTaskPane.getPropsPanel()).getPointPanel().getVector()));
-                        } else if (startShapeTaskPane.getPropsPanel() instanceof StartShapeTaskPane.BoxShapePanel)
-                        {
+                        else if (startShapeTaskPane.getPropsPanel() instanceof StartShapeTaskPane.BoxShapePanel)
                             particleEmitter.setShape(
                                     new EmitterBoxShape(
                                     ((StartShapeTaskPane.BoxShapePanel) startShapeTaskPane.getPropsPanel()).getMinPanel().getVector(),
                                     ((StartShapeTaskPane.BoxShapePanel) startShapeTaskPane.getPropsPanel()).getMaxPanel().getVector()));
-                        } else if (startShapeTaskPane.getPropsPanel() instanceof StartShapeTaskPane.SphereShapePanel)
-                        {
+                        else if (startShapeTaskPane.getPropsPanel() instanceof StartShapeTaskPane.SphereShapePanel)
                             particleEmitter.setShape(
                                     new EmitterSphereShape(
                                     ((StartShapeTaskPane.SphereShapePanel) startShapeTaskPane.getPropsPanel()).getCenterPanel().getVector(),
                                     Float.parseFloat(((StartShapeTaskPane.SphereShapePanel) startShapeTaskPane.getPropsPanel()).getRadiusField().getText())));
-                        }
+                        UAManager.add(particleEmitter, "Edit " + particleEmitter.getName());
                         return null;
                     }
                 });

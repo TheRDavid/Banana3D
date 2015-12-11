@@ -672,6 +672,8 @@ public class CurrentData
                                     System.out.println("Adding to Bullet");
                                     CurrentData.getEditorWindow().getB3DApp().getBulletAppState().getPhysicsSpace().add(newObject);
                                 }
+                                UAManager.curr(null, null);
+                                UAManager.add(newObject, "Add " + newElement.getName());
                                 return null;
                             }
                         });
@@ -679,11 +681,15 @@ public class CurrentData
                     {
                         System.out.println("add light");
                         Wizard.getObjects().add(newObject, newElement);
+                        UAManager.curr(null, null);
+                        UAManager.add(newObject, "Add " + newElement.getName());
                         CurrentData.getEditorWindow().getB3DApp().getSceneNode().addLight((Light) newObject);
                     } else if (newObject instanceof MotionEvent)
                     {
                         CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().add(new MotionPathModel((MotionEvent) newObject));
                         Wizard.getObjects().add(newObject, newElement);
+                        UAManager.curr(null, null);
+                        UAManager.add(newObject, "Add " + newElement.getName());
                     }
                     editorWindow.getB3DApp().setSyncTree(true);
                 } else
@@ -787,7 +793,7 @@ public class CurrentData
                         CurrentData.getEditorWindow().getEditPane().arrange(false);
                         editorWindow.getTree().sync();
                         if (registerUserAction)
-                            UserActionManager.addState(null, "Delete " + spatial.getName());
+                            UAManager.add(null, "Delete " + spatial.getName());
                         return null;
                     }
                 });
@@ -846,7 +852,7 @@ public class CurrentData
                         CurrentData.getEditorWindow().getB3DApp().setSelectedElement(Wizard.NULL_SELECTION, null);
                         editorWindow.getTree().sync();
                         if (registerUserAction)
-                            UserActionManager.addState(null, "Delete " + light.getName());
+                            UAManager.add(null, "Delete " + light.getName());
                         return null;
                     }
                 });
@@ -884,7 +890,7 @@ public class CurrentData
                         CurrentData.getEditorWindow().getEditPane().arrange(false);
                         editorWindow.getTree().sync();
                         if (registerUserAction)
-                            UserActionManager.addState(null, "Delete " + filter.getName());
+                            UAManager.add(null, "Delete " + filter.getName());
                         return null;
                     }
                 });
@@ -904,10 +910,12 @@ public class CurrentData
                         {
                             try
                             {
+                                ArrayList<MotionPathModel> tempMpms = new ArrayList<MotionPathModel>();
                                 for (MotionPathModel mpm : CurrentData.getEditorWindow().getB3DApp().getMotionPathModels())
-                                    CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().remove(mpm);
+                                    tempMpms.add(mpm);
+                                CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().removeAll(tempMpms);
                                 if (registerUserAction)
-                                    UserActionManager.addState(null, "Delete " + Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(me.hashCode())).getName());
+                                    UAManager.add(null, "Delete " + Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(me.hashCode())).getName());
                                 Wizard.getObjects().remove(CurrentData.getEditorWindow().getB3DApp().getSelectedObject().hashCode());
                                 CurrentData.getEditorWindow().getB3DApp().setSelectedElement(Wizard.NULL_SELECTION, null);
                                 CurrentData.getEditorWindow().getEditPane().arrange(false);

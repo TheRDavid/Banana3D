@@ -5,9 +5,12 @@ import com.jme3.math.*;
 import com.jme3.scene.*;
 import components.BSlider;
 import components.Float3Panel;
+import general.UAManager;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.concurrent.Callable;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -180,6 +183,17 @@ public class ScaleSliderPanel extends JPanel
                 }
             }
         });
+        MouseAdapter rotationAdapter = new MouseAdapter()
+        {
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+                UAManager.add(spatial, "Scale " + spatial.getName());
+            }
+        };
+        xSlider.addMouseListener(rotationAdapter);
+        ySlider.addMouseListener(rotationAdapter);
+        zSlider.addMouseListener(rotationAdapter);
     }
 
     private void updateScale()

@@ -13,7 +13,7 @@ import components.BTextField;
 import components.Checker;
 import components.Float3Panel;
 import components.OKButton;
-import general.UserActionManager;
+import general.UAManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -93,7 +93,7 @@ public class WaterTaskPane extends EditTaskPane
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                UserActionManager.addState(waterFilter, "Set Reflection Resolution to " + resolutionSlider.getValue());
+                UAManager.add(waterFilter, "Set Reflection Resolution to " + resolutionSlider.getValue());
             }
         });
         heightField.addFocusListener(new FocusListener()
@@ -123,7 +123,7 @@ public class WaterTaskPane extends EditTaskPane
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                UserActionManager.addState(waterFilter, "Set Wave Scale to " + waveScaleSlider._getValue() / 1000);
+                UAManager.add(waterFilter, "Set Wave Scale to " + waveScaleSlider._getValue() / 1000);
             }
         });
         maxAmplitudeSlider._setValue(waterFilter.getMaxAmplitude());
@@ -140,7 +140,7 @@ public class WaterTaskPane extends EditTaskPane
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                UserActionManager.addState(waterFilter, "Set max. Amplitude to " + maxAmplitudeSlider._getValue());
+                UAManager.add(waterFilter, "Set max. Amplitude to " + maxAmplitudeSlider._getValue());
             }
         });
         transparencySlider._setValue(-waterFilter.getWaterTransparency());
@@ -157,7 +157,7 @@ public class WaterTaskPane extends EditTaskPane
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                UserActionManager.addState(waterFilter, "Set Transparency to " + -transparencySlider._getValue());
+                UAManager.add(waterFilter, "Set Transparency to " + -transparencySlider._getValue());
             }
         });
         windXSlider._setValue(waterFilter.getWindDirection().getX());
@@ -184,7 +184,7 @@ public class WaterTaskPane extends EditTaskPane
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                UserActionManager.addState(waterFilter, "Change Wind Direction of " + waterFilter.getName());
+                UAManager.add(waterFilter, "Change Wind Direction of " + waterFilter.getName());
             }
         });
         windXSlider.addMouseListener(new MouseAdapter()
@@ -192,7 +192,7 @@ public class WaterTaskPane extends EditTaskPane
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                UserActionManager.addState(waterFilter, "Change Wind Direction of " + waterFilter.getName());
+                UAManager.add(waterFilter, "Change Wind Direction of " + waterFilter.getName());
             }
         });
         colorExtinctionPanel.setVector(waterFilter.getColorExtinction());
@@ -256,7 +256,7 @@ public class WaterTaskPane extends EditTaskPane
                 waterFilter.setWaveScale(-waveScaleSlider._getValue() / 1000);
                 waterFilter.setWindDirection(new Vector2f(windXSlider._getValue(), windZSlider._getValue()));
                 heightAltered = false;
-                UserActionManager.addState(waterFilter, "Edit " + waterFilter.getName());
+                UAManager.add(waterFilter, "Edit " + waterFilter.getName());
             }
         });
         taskPane.add("left", new JLabel("Height:"));
@@ -346,7 +346,7 @@ public class WaterTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         waterFilter.setUseCaustics(useCausistsChecker.isChecked());
-                        UserActionManager.addState(waterFilter, "Use Caustics " + useCausistsChecker.isChecked());
+                        UAManager.add(waterFilter, "Use Caustics " + useCausistsChecker.isChecked());
                         return null;
                     }
                 });
@@ -363,7 +363,7 @@ public class WaterTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         waterFilter.setUseFoam(useFoamChecker.isChecked());
-                        UserActionManager.addState(waterFilter, "Use Foam " + useFoamChecker.isChecked());
+                        UAManager.add(waterFilter, "Use Foam " + useFoamChecker.isChecked());
                         return null;
                     }
                 });
@@ -380,7 +380,7 @@ public class WaterTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         waterFilter.setUseHQShoreline(useHQShoreLineChecker.isChecked());
-                        UserActionManager.addState(waterFilter, "Use HQ Shoreline " + useHQShoreLineChecker.isChecked());
+                        UAManager.add(waterFilter, "Use HQ Shoreline " + useHQShoreLineChecker.isChecked());
                         return null;
                     }
                 });
@@ -397,7 +397,7 @@ public class WaterTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         waterFilter.setUseRefraction(useRefractionChecker.isChecked());
-                        UserActionManager.addState(waterFilter, "Use Refraction " + useRefractionChecker.isChecked());
+                        UAManager.add(waterFilter, "Use Refraction " + useRefractionChecker.isChecked());
                         return null;
                     }
                 });
@@ -414,7 +414,7 @@ public class WaterTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         waterFilter.setUseRipples(useRipplesChecker.isChecked());
-                        UserActionManager.addState(waterFilter, "Use Ripples " + useRipplesChecker.isChecked());
+                        UAManager.add(waterFilter, "Use Ripples " + useRipplesChecker.isChecked());
                         return null;
                     }
                 });
@@ -431,7 +431,7 @@ public class WaterTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         waterFilter.setUseSpecular(useSpecularChecker.isChecked());
-                        UserActionManager.addState(waterFilter, "Use Specular " + useSpecularChecker.isChecked());
+                        UAManager.add(waterFilter, "Use Specular " + useSpecularChecker.isChecked());
                         return null;
                     }
                 });
@@ -489,7 +489,7 @@ public class WaterTaskPane extends EditTaskPane
                         waterFilter.setNormalTexture((Texture2D) CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture("Common/MatDefs/Water/Textures/water_normalmap.dds"));
                     else
                         waterFilter.setNormalTexture((Texture2D) CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture(normalButton.getText()));
-                    UserActionManager.addState(waterFilter, "Edit Textures of " + waterFilter.getName());
+                    UAManager.add(waterFilter, "Edit Textures of " + waterFilter.getName());
                 }
             });
             causticsButton.setPreferredSize(new Dimension(220, 20));

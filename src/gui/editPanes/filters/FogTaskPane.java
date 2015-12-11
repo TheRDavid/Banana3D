@@ -4,7 +4,7 @@ import gui.components.BColorButton;
 import gui.editPanes.EditTaskPane;
 import com.jme3.post.filters.FogFilter;
 import components.BTextField;
-import general.UserActionManager;
+import general.UAManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -39,7 +39,7 @@ public class FogTaskPane extends EditTaskPane
                 fogFilter.setFogDensity(Float.parseFloat(densityField.getText()));
                 fogFilter.setFogDistance(Float.parseFloat(distanceField.getText()));
                 fogFilter.setFogColor(Wizard.makeColorRGBA(colorButton.getColor()));
-                UserActionManager.addState(fogFilter, "Edit " + fogFilter.getName());
+                UAManager.add(fogFilter, "Edit " + fogFilter.getName());
             }
         });
         taskPane.add("br left", new JLabel("Color:"));

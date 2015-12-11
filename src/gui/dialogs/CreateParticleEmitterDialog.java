@@ -2,13 +2,13 @@ package gui.dialogs;
 
 import gui.components.AssetButton;
 import general.CurrentData;
-import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import components.BButton;
 import components.CancelButton;
 import dialogs.BasicDialog;
+import general.UAManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -68,14 +68,12 @@ public class CreateParticleEmitterDialog extends BasicDialog
             @Override
             public void actionPerformed(ActionEvent e)
             {
+                UAManager.curr(null, null);
                 dispose();
                 if (pointType.isSelected())
-                {
                     emitter = new CustomParticleEmitter("Particle Emitter", ParticleMesh.Type.Point, 1500);
-                } else
-                {
+                else
                     emitter = new CustomParticleEmitter("Particle Emitter", ParticleMesh.Type.Triangle, 1500);
-                }
                 Material particleMat = new Material(CurrentData.getEditorWindow().getB3DApp().getAssetManager(),
                         "Common/MatDefs/Misc/Particle.j3md");
                 particleMat.setTexture("Texture", CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture(
@@ -85,9 +83,7 @@ public class CreateParticleEmitterDialog extends BasicDialog
                 emitter.setUserData("angles", new Vector3f());
                 emitter.setUserData("scale", new Vector3f(1, 1, 1));
                 if (CurrentData.getEditorWindow().getB3DApp().getSelectedNode().equals(CurrentData.getEditorWindow().getB3DApp().getSceneNode()))
-                {
-                    emitter.setLocalTranslation(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation());
-                }
+                    emitter.setLocalTranslation(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().add(CurrentData.getEditorWindow().getB3DApp().getCamera().getDirection().mult(10)));
                 CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
                 {
                     @Override
@@ -98,6 +94,7 @@ public class CreateParticleEmitterDialog extends BasicDialog
                         Wizard.getObjects().add(emitter, element);
                         // Just use hashcode  emitter.setUserData("ID", element.getUUID());
                         CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(emitter);
+                        UAManager.add(emitter, "Add Particle Effect");
                         return null;
                     }
                 });

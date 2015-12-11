@@ -1,7 +1,7 @@
 package gui.menu;
 
 import general.CurrentData;
-import general.UserActionManager;
+import general.UAManager;
 import other.Wizard;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -45,14 +45,14 @@ public class EditMenu extends JMenu
         {
             public void actionPerformed(ActionEvent e)
             {
-                UserActionManager.undo();
+                UAManager.undo();
             }
         });
         redoItem.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
-                UserActionManager.redo();
+                UAManager.redo();
             }
         });
         animateItem.addActionListener(new ActionListener()

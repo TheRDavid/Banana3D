@@ -13,7 +13,7 @@ import components.BComboBox;
 import components.BSlider;
 import components.BTextField;
 import components.Checker;
-import general.UserActionManager;
+import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,7 +51,7 @@ public class ShadowTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         shadowFilter.setFlushQueues(flushQueuesChecker.isChecked());
-                        UserActionManager.addState(shadowFilter, "Flush Queues: " + flushQueuesChecker.isChecked());
+                        UAManager.add(shadowFilter, "Set Flush Queues to " + flushQueuesChecker.isChecked());
                         return null;
                     }
                 });
@@ -93,7 +93,7 @@ public class ShadowTaskPane extends EditTaskPane
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                UserActionManager.addState(shadowFilter, "Change Intensity to: " + intensitySlider._getValue());
+                UAManager.add(shadowFilter, "Change Intensity to " + intensitySlider._getValue());
             }
         });
         taskPane.setLayout(new RiverLayout());
@@ -141,7 +141,7 @@ public class ShadowTaskPane extends EditTaskPane
                     }
                     shadowFilter.setEdgesThickness(Integer.parseInt(edgeThicknessField.getText()));
                     shadowFilter.setFlushQueues(flushQueuesChecker.isChecked());
-                    UserActionManager.addState(shadowFilter, "Edit " + shadowFilter.getName());
+                    UAManager.add(shadowFilter, "Edit " + shadowFilter.getName());
                 }
             }
         });

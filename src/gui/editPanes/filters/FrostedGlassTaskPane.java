@@ -5,7 +5,7 @@ import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import com.shaderblow.filter.frostedglass.FrostedGlassFilter;
 import components.BTextField;
-import general.UserActionManager;
+import general.UAManager;
 import other.ObjectToElementConverter;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -50,7 +50,7 @@ public class FrostedGlassTaskPane extends EditTaskPane
                         CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(b3D_FrostedGlass.getUUID());
                         CurrentData.getEditorWindow().getTree().sync();
                         CurrentData.getEditorWindow().getEditPane().arrange(false);
-                        UserActionManager.addState(filter, "Edit " + filter.getName());
+                        UAManager.add(filter, "Edit " + filter.getName());
                         return null;
                     }
                 });

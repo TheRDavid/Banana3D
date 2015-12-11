@@ -148,7 +148,7 @@ public class EditPane extends JScrollPane
      */
     public void arrange(boolean arrangeWHATEVERITTAKES)
     {
-        if (System.currentTimeMillis() - lastTime > 200)
+        if (System.currentTimeMillis() - lastTime > 100)
         {
             lastTime = System.currentTimeMillis();
             //Clear

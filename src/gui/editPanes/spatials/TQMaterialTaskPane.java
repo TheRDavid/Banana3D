@@ -20,6 +20,7 @@ import components.Float2Panel;
 import components.Float3Panel;
 import components.Float4Panel;
 import dialogs.ObserverDialog;
+import general.UAManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -263,6 +264,7 @@ public class TQMaterialTaskPane extends EditTaskPane
                     }
                     mat.getAdditionalRenderState().setWireframe(wired);
                     g.setMaterial(mat);
+                    UAManager.add(g, "Edit Material of " + g.getName());
                     return null;
                 }
             }

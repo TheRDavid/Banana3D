@@ -10,7 +10,7 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.shape.Line;
 import components.BSlider;
 import components.Float3Panel;
-import general.UserActionManager;
+import general.UAManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -55,7 +55,7 @@ public class DirectionalLightTaskPane extends EditTaskPane
             {
                 lightModel.getLight().setColor(Wizard.makeColorRGBA(colorButton.getColor()));
                 lightModel.getSymbol().getMaterial().setColor("Color", lightModel.getLight().getColor());
-                UserActionManager.addState(lightModel.getLight(), "Edit " + lightModel.getLight().getName());
+                UAManager.add(lightModel.getLight(), "Edit " + lightModel.getLight().getName());
             }
         });
         taskPane.add("br", new JLabel("Color:"));
@@ -222,7 +222,7 @@ public class DirectionalLightTaskPane extends EditTaskPane
                     @Override
                     public void mouseReleased(MouseEvent e)
                     {
-                        UserActionManager.addState(lightModel.getLight(), "Rotate " + lightModel.getLight().getName());
+                        UAManager.add(lightModel.getLight(), "Rotate " + lightModel.getLight().getName());
                     }
                 };
                 xSlider.addMouseListener(rotationAdapter);

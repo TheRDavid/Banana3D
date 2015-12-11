@@ -15,16 +15,20 @@ import components.BButton;
 import components.BComboBox;
 import components.Checker;
 import dialogs.SelectDialog;
+import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.concurrent.Callable;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -60,12 +64,39 @@ public class OtherTaskPane extends EditTaskPane
                 {
                     case 0:
                         addUserData();
+                        CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                        {
+                            @Override
+                            public Void call() throws Exception
+                            {
+                                UAManager.add(spatial, "Add User Data to " + spatial.getName());
+                                return null;
+                            }
+                        });
                         break;
                     case 1:
                         addLightControl();
+                        CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                        {
+                            @Override
+                            public Void call() throws Exception
+                            {
+                                UAManager.add(spatial, "Add Light Control to " + spatial.getName());
+                                return null;
+                            }
+                        });
                         break;
                     case 2:
                         addLightScatteringControl();
+                        CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                        {
+                            @Override
+                            public Void call() throws Exception
+                            {
+                                UAManager.add(spatial, "Add Light Scattering Control to " + spatial.getName());
+                                return null;
+                            }
+                        });
                         break;
                 }
             }
@@ -93,7 +124,6 @@ public class OtherTaskPane extends EditTaskPane
         Vector<String> names = new Vector<String>();
         Vector<Light> lights = new Vector<Light>();
         for (Light l : CurrentData.getEditorWindow().getB3DApp().getSceneNode().getWorldLightList())
-        {
             if (l instanceof PointLight || l instanceof SpotLight)
             {
                 names.add(l.getName());
@@ -105,7 +135,6 @@ public class OtherTaskPane extends EditTaskPane
                     lights.add((SpotLight) l);
                 }
             }
-        }
         if (lights.size() == 0)
         {
             JOptionPane.showMessageDialog(othersComboBox, "There are no position-dependent Lights in this scene!", "...", JOptionPane.ERROR_MESSAGE);
@@ -186,22 +215,13 @@ public class OtherTaskPane extends EditTaskPane
     {
         dataPanel.removeAll();
         for (int i = 0; i < spatial.getNumControls(); i++)
-        {
             if (spatial.getControl(i) instanceof LightControl)
-            {
                 dataPanel.add("br", new LightControlPanel((LightControl) spatial.getControl(i)));
-            } else if (spatial.getControl(i) instanceof LightScatteringMotionControl)
-            {
+            else if (spatial.getControl(i) instanceof LightScatteringMotionControl)
                 dataPanel.add("br", new LightScatteringMotionControlPanel((LightScatteringMotionControl) spatial.getControl(i)));
-            }
-        }
         for (String key : spatial.getUserDataKeys())
-        {
             if (!Wizard.getReservedUserData().contains(key))
-            {
                 dataPanel.add("br", new UserDataPanel(key));
-            }
-        }
         repaint();
         validate();
         revalidate();
@@ -231,6 +251,15 @@ public class OtherTaskPane extends EditTaskPane
                 {
                     spatial.removeControl(lightScatteringMotionControl);
                     arrangeDataPanel();
+                    CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                    {
+                        @Override
+                        public Void call() throws Exception
+                        {
+                            UAManager.add(spatial, "Remove Light Scattering Control from " + spatial.getName());
+                            return null;
+                        }
+                    });
                 }
             });
             enabledChecker.addMouseListener(new MouseAdapter()
@@ -239,6 +268,15 @@ public class OtherTaskPane extends EditTaskPane
                 public void mouseReleased(MouseEvent e)
                 {
                     lightScatteringMotionControl.setEnabled(enabledChecker.isChecked());
+                    CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                    {
+                        @Override
+                        public Void call() throws Exception
+                        {
+                            UAManager.add(spatial, enabledChecker.isChecked() ? "enable" : "disable" + " Light Scattering Control of " + spatial.getName());
+                            return null;
+                        }
+                    });
                 }
             });
             setLayout(new RiverLayout(10, 0));
@@ -293,13 +331,11 @@ public class OtherTaskPane extends EditTaskPane
             });
             lightChoiceComboBox = new JComboBox(lightNames);
             for (int i = 0; i < lights.size(); i++)
-            {
                 if (lights.get(i) == lControl.getLight())
                 {
                     lightChoiceComboBox.setSelectedIndex(i);
                     break;
                 }
-            }
             enabledChecker = new Checker();
             enabledChecker.setChecked(lControl.isEnabled());
             removeButton.addActionListener(new ActionListener()
@@ -309,6 +345,15 @@ public class OtherTaskPane extends EditTaskPane
                 {
                     spatial.removeControl(lControl);
                     arrangeDataPanel();
+                    CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                    {
+                        @Override
+                        public Void call() throws Exception
+                        {
+                            UAManager.add(spatial, "Remove Light Control from " + spatial.getName());
+                            return null;
+                        }
+                    });
                 }
             });
             enabledChecker.addMouseListener(new MouseAdapter()
@@ -317,6 +362,15 @@ public class OtherTaskPane extends EditTaskPane
                 public void mouseReleased(MouseEvent e)
                 {
                     lControl.setEnabled(enabledChecker.isChecked());
+                    CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                    {
+                        @Override
+                        public Void call() throws Exception
+                        {
+                            UAManager.add(spatial, enabledChecker.isChecked() ? "enable" : "disable" + " Light Control of " + spatial.getName());
+                            return null;
+                        }
+                    });
                 }
             });
             setLayout(new RiverLayout(10, 0));
@@ -351,6 +405,15 @@ public class OtherTaskPane extends EditTaskPane
                 {
                     spatial.setUserData(key, null);
                     arrangeDataPanel();
+                    CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                    {
+                        @Override
+                        public Void call() throws Exception
+                        {
+                            UAManager.add(spatial, "Remove User Data from " + spatial.getName());
+                            return null;
+                        }
+                    });
                 }
             });
             add(removeButton);
@@ -363,6 +426,22 @@ public class OtherTaskPane extends EditTaskPane
             {
                 setText(value);
                 setPreferredSize(new Dimension(200, 30));
+                addFocusListener(new FocusAdapter()
+                {
+                    @Override
+                    public void focusLost(FocusEvent e)
+                    {
+                        CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                        {
+                            @Override
+                            public Void call() throws Exception
+                            {
+                                UAManager.add(spatial, "Edit User Data (" + key + ") of " + spatial.getName());
+                                return null;
+                            }
+                        });
+                    }
+                });
                 getDocument().addDocumentListener(new DocumentListener()
                 {
                     @Override

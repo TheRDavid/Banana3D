@@ -15,6 +15,7 @@ import com.simsilica.lemur.geom.MBox;
 import components.BTextField;
 import components.Checker;
 import components.Float3Panel;
+import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -94,6 +95,7 @@ public class MeshTaskPane extends EditTaskPane
                             tempGeometry.setUserData("xSlices", (int) slicesPanel.getVector().getX());
                             tempGeometry.setUserData("ySlices", (int) slicesPanel.getVector().getY());
                             tempGeometry.setUserData("zSlices", (int) slicesPanel.getVector().getZ());
+                            UAManager.add(tempGeometry, "Edit Mesh of " + tempGeometry.getName());
                             return null;
                         }
                     });
@@ -139,6 +141,7 @@ public class MeshTaskPane extends EditTaskPane
                             b3D_Sphere.setRadialSamples(Integer.parseInt(radialSamplesTextField.getText()));
                             b3D_Sphere.setRadius(Float.parseFloat(radiusTextField.getText()));
                             b3D_Sphere.setzSamples(Integer.parseInt(zSamplesTextField.getText()));
+                            UAManager.add(tempGeometry, "Edit Mesh of " + tempGeometry.getName());
                             return null;
                         }
                     });
@@ -207,6 +210,7 @@ public class MeshTaskPane extends EditTaskPane
                             b3D_Cylinder.setHeight(Float.parseFloat(heightTextField.getText()));
                             b3D_Cylinder.setIsClosed(isClosedChecker.isChecked());
                             b3D_Cylinder.setIsInverted(isInvertedChecker.isChecked());
+                            UAManager.add(tempGeometry, "Edit Mesh of " + tempGeometry.getName());
                             return null;
                         }
                     });
@@ -257,6 +261,7 @@ public class MeshTaskPane extends EditTaskPane
                             b3D_Torus.setRadialSamples(Integer.parseInt(radialSamplesTextField.getText()));
                             b3D_Torus.setInnerRadius(Float.parseFloat(innerRadiusTextField.getText()));
                             b3D_Torus.setOuterRadius(Float.parseFloat(outerRadiusTextField.getText()));
+                            UAManager.add(tempGeometry, "Edit Mesh of " + tempGeometry.getName());
                             return null;
                         }
                     });

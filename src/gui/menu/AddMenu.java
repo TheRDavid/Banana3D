@@ -61,6 +61,7 @@ import com.shaderblow.filter.oldfilm.OldFilmFilter;
 import com.simsilica.lemur.geom.MBox;
 import dialogs.ObserverDialog;
 import dialogs.SelectDialog;
+import general.UAManager;
 import other.Wizard;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -98,6 +99,7 @@ public class AddMenu extends JMenu
             @Override
             public void actionPerformed(ActionEvent e)
             {
+                UAManager.curr(null, null);
                 b3dElements.B3D_Element element;
                 ArrayList<String> objects = new ArrayList<String>();
                 objects.add("Camera");
@@ -176,6 +178,7 @@ public class AddMenu extends JMenu
                     });
                     CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                     CurrentData.getEditorWindow().getB3DApp().updateSelectedMotionPath();
+                    UAManager.add(motionEvent, "Add Motion Event");
                 }
             }
         });
@@ -238,6 +241,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             BasicSSAO basicSSAO = new BasicSSAO();
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_BasicSSAO b3D_BasicSSAO = ObjectToElementConverter.convertBasicSSAO(
@@ -245,6 +249,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(basicSSAO);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(basicSSAO, b3D_BasicSSAO);
+                            UAManager.add(basicSSAO, "Add Basic SSAO");
                             return null;
                         }
                     });
@@ -255,6 +260,7 @@ public class AddMenu extends JMenu
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
+                    UAManager.curr(null, null);
                     CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Integer>()
                     {
                         @Override
@@ -267,6 +273,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(oldFilmFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(oldFilmFilter, b3D_OldFilm);
+                            UAManager.add(oldFilmFilter, "Add Old Film");
                             return null;
                         }
                     });
@@ -282,6 +289,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             ColorScaleFilterWithGetters csfwg = new ColorScaleFilterWithGetters();
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_ColorScale b3D_ColorScale = ObjectToElementConverter.convertColorScale(
@@ -289,6 +297,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(csfwg);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(csfwg, b3D_ColorScale);
+                            UAManager.add(colorScaleItem, "Add Color Scale");
                             return null;
                         }
                     });
@@ -304,6 +313,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             FrostedGlassFilter frostedGlassFilter = new FrostedGlassFilter();
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_FrostedGlass b3D_FrostedGlass = ObjectToElementConverter.convertFrostedGlass(
@@ -311,6 +321,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(frostedGlassFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(frostedGlassFilter, b3D_FrostedGlass);
+                            UAManager.add(frostedGlassFilter, "Add Frosted Glass");
                             return null;
                         }
                     });
@@ -364,19 +375,19 @@ public class AddMenu extends JMenu
                             @Override
                             public Integer call() throws Exception
                             {
+                                UAManager.curr(null, null);
                                 //ConvertMode does not matter here, the filter can not possibly have a LightControl
                                 B3D_Shadow b3D_Shadow = ObjectToElementConverter.convertDirectionalLightShadow(
                                         shadowFilter, CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().getFilterList().size());
                                 CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(shadowFilter);
                                 CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                                 Wizard.getObjects().add(shadowFilter, b3D_Shadow);
+                                UAManager.add(shadowFilter, "Add Shadow");
                                 return null;
                             }
                         });
                     } else
-                    {
                         JOptionPane.showMessageDialog(CurrentData.getEditorWindow(), "You need a Directional Light for this");
-                    }
                 }
             });
             plShadowItem.addActionListener(new ActionListener()
@@ -426,12 +437,14 @@ public class AddMenu extends JMenu
                             @Override
                             public Integer call() throws Exception
                             {
+                                UAManager.curr(null, null);
                                 //ConvertMode does not matter here, the filter can not possibly have a LightControl
                                 B3D_Shadow b3D_Shadow = ObjectToElementConverter.convertPointLightShadow(
                                         shadowFilter, CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().getFilterList().size());
                                 CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(shadowFilter);
                                 CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                                 Wizard.getObjects().add(shadowFilter, b3D_Shadow);
+                                UAManager.add(shadowFilter, "Add Shadow");
                                 return null;
                             }
                         });
@@ -488,12 +501,14 @@ public class AddMenu extends JMenu
                             @Override
                             public Integer call() throws Exception
                             {
+                                UAManager.curr(null, null);
                                 //ConvertMode does not matter here, the filter can not possibly have a LightControl
                                 B3D_Shadow b3D_Shadow = ObjectToElementConverter.convertSpotLightShadow(
                                         shadowFilter, CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().getFilterList().size());
                                 CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(shadowFilter);
                                 CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                                 Wizard.getObjects().add(shadowFilter, b3D_Shadow);
+                                UAManager.add(shadowFilter, "Add Shadow");
                                 return null;
                             }
                         });
@@ -511,6 +526,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             BloomFilter bloomFilter = new BloomFilter();
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_Bloom b3D_Bloom = ObjectToElementConverter.convertBloom(
@@ -518,6 +534,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(bloomFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(bloomFilter, b3D_Bloom);
+                            UAManager.add(bloomFilter, "Add Bloom");
                             return null;
                         }
                     });
@@ -533,6 +550,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             CartoonEdgeFilter cartoonFilter = new CartoonEdgeFilter();
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_Cartoon b3D_Cartoon = ObjectToElementConverter.convertCartoon(
@@ -540,6 +558,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(cartoonFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(cartoonFilter, b3D_Cartoon);
+                            UAManager.add(cartoonFilter, "Add Cartoon Edges");
                             return null;
                         }
                     });
@@ -555,6 +574,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             CrossHatchFilter crossHatchFilter = new CrossHatchFilter();
                             Float[] llevels = new Float[5];
                             llevels[0] = crossHatchFilter.getLuminance1();
@@ -568,6 +588,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(crossHatchFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(crossHatchFilter, b3D_Crosshatch);
+                            UAManager.add(crossHatchFilter, "Add Crosshatch");
                             return null;
                         }
                     });
@@ -583,6 +604,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             DepthOfFieldFilter depthOfFieldFilter = new DepthOfFieldFilter();
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_DepthOfField b3D_DepthOfField = ObjectToElementConverter.convertDOF(
@@ -590,6 +612,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(depthOfFieldFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(depthOfFieldFilter, b3D_DepthOfField);
+                            UAManager.add(depthOfFieldFilter, "Add Depth of Field");
                             return null;
                         }
                     });
@@ -605,6 +628,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             FogFilter fogFilter = new FogFilter();
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_Fog b3D_Fog = ObjectToElementConverter.convertFog(
@@ -612,6 +636,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(fogFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(fogFilter, b3D_Fog);
+                            UAManager.add(fogFilter, "Add Fog");
                             return null;
                         }
                     });
@@ -627,6 +652,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             LightScatteringFilter scatteringFilter = new LightScatteringFilter(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().clone());
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_LightScattering b3D_LightScattering = ObjectToElementConverter.convertLightScattering(
@@ -635,6 +661,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(scatteringFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(scatteringFilter, b3D_LightScattering);
+                            UAManager.add(scatteringFilter, "Add Light Scattering");
                             return null;
                         }
                     });
@@ -650,6 +677,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             PosterizationFilter posterizationFilter = new PosterizationFilter();
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_Posterization b3D_Posterization = ObjectToElementConverter.convertPosterization(
@@ -657,6 +685,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(posterizationFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(posterizationFilter, b3D_Posterization);
+                            UAManager.add(posterizationFilter, "Add Posterization");
                             return null;
                         }
                     });
@@ -672,6 +701,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             SSAOFilter ssaoFilter = new SSAOFilter();
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_SSAO b3d_ssao = ObjectToElementConverter.convertSSAO(
@@ -679,6 +709,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(ssaoFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(ssaoFilter, b3d_ssao);
+                            UAManager.add(ssaoFilter, "Add SSAO");
                             return null;
                         }
                     });
@@ -694,6 +725,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             WaterFilterWithGetters waterFilter = new WaterFilterWithGetters(CurrentData.getEditorWindow().getB3DApp().getSceneNode(), Vector3f.ZERO);
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_Water b3d_water = ObjectToElementConverter.convertWater(
@@ -701,6 +733,7 @@ public class AddMenu extends JMenu
                             CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().addFilter(waterFilter);
                             CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
                             Wizard.getObjects().add(waterFilter, b3d_water);
+                            UAManager.add(waterFilter, "Add Water");
                             return null;
                         }
                     });
@@ -740,11 +773,13 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             AmbientLight tempLight = new AmbientLight();
                             tempLight.setName("Ambient");
                             CurrentData.getEditorWindow().getB3DApp().getSceneNode().addLight(tempLight);
                             //ConvertMode does not matter here, the light can not possibly have a LightControl
                             Wizard.getObjects().add(tempLight, ObjectToElementConverter.convertLight(tempLight));
+                            UAManager.add(tempLight, "Add Ambient Light");
                             return null;
                         }
                     });
@@ -760,12 +795,14 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             DirectionalLight tempLight = new DirectionalLight();
                             tempLight.setDirection(CurrentData.getEditorWindow().getB3DApp().getCamera().getDirection());
                             tempLight.setName("Directional");
                             CurrentData.getEditorWindow().getB3DApp().getSceneNode().addLight(tempLight);
                             //ConvertMode does not matter here, the light can not possibly have a LightControl
                             Wizard.getObjects().add(tempLight, ObjectToElementConverter.convertLight(tempLight));
+                            UAManager.add(tempLight, "Add Directional Light");
                             return null;
                         }
                     });
@@ -781,6 +818,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             PointLight tempLight = new PointLight();
                             tempLight.setPosition(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation());
                             tempLight.setRadius(10);
@@ -788,6 +826,7 @@ public class AddMenu extends JMenu
                             //ConvertMode does not matter here, the light can not possibly have a LightControl
                             Wizard.getObjects().add(tempLight, ObjectToElementConverter.convertLight(tempLight));
                             CurrentData.getEditorWindow().getB3DApp().getSceneNode().addLight(tempLight);
+                            UAManager.add(tempLight, "Add Point Light");
                             return null;
                         }
                     });
@@ -803,6 +842,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             SpotLight tempLight = new SpotLight();
                             tempLight.setPosition(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation());
                             tempLight.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD);
@@ -813,6 +853,7 @@ public class AddMenu extends JMenu
                             //ConvertMode does not matter here, the light can not possibly have a LightControl
                             Wizard.getObjects().add(tempLight, ObjectToElementConverter.convertLight(tempLight));
                             CurrentData.getEditorWindow().getB3DApp().getSceneNode().addLight(tempLight);
+                            UAManager.add(tempLight, "Add Spot Light");
                             return null;
                         }
                     });
@@ -879,6 +920,7 @@ public class AddMenu extends JMenu
                             {
                                 public Void call() throws Exception
                                 {
+                                    UAManager.curr(null, null);
                                     Texture heightMapImage = CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture(name);
                                     ImageBasedHeightMap heightmap = new ImageBasedHeightMap(heightMapImage.getImage());
                                     heightmap.load();
@@ -892,6 +934,7 @@ public class AddMenu extends JMenu
                                     b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(terrain);
                                     Wizard.getObjects().add(terrain, element);
                                     CurrentData.getEditorWindow().getB3DApp().getSelectedNode().attachChild(terrain);
+                                    UAManager.add(terrain, "Add Terrain");
                                     return null;
                                 }
                             });
@@ -908,6 +951,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Void call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             Node node = new Node("Node");
                             node.setUserData("angles", new Vector3f());
                             node.setUserData("scale", new Vector3f(1, 1, 1));
@@ -917,6 +961,7 @@ public class AddMenu extends JMenu
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(node);
                             Wizard.getObjects().add(node, element);
                             CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(node);
+                            UAManager.add(node, "Add Node");
                             return null;
                         }
                     });
@@ -935,6 +980,7 @@ public class AddMenu extends JMenu
                         {
                             try
                             {
+                                UAManager.curr(null, null);
                                 /*Model itself*/
                                 Spatial s = CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadModel(name);
                                 s.setUserData("angles", new Vector3f());
@@ -963,6 +1009,7 @@ public class AddMenu extends JMenu
                                 Wizard.getObjects().add(s, element);
                                 //Just use hashcode s.setUserData("ID", element.getUUID());
                                 CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(s);
+                                UAManager.add(s, "Add " + name);
                             } catch (java.lang.NullPointerException npe)
                             {
                                 System.err.println(npe);
@@ -1001,6 +1048,7 @@ public class AddMenu extends JMenu
                         public Integer call() throws Exception
                         {
                             /*Lemur*/
+                            UAManager.curr(null, null);
                             Geometry g = new Geometry("Box", new MBox(1, 1, 1f, 1, 1, 1));
                             g.setUserData("xSlices", 1);
                             g.setUserData("ySlices", 1);
@@ -1014,7 +1062,9 @@ public class AddMenu extends JMenu
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(g);
                             Wizard.getObjects().add(g, element);
                             //Just use hashcode g.setUserData("ID", element.getUUID());
-                            return CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(g);
+                            CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(g);
+                            UAManager.add(g, "Add Box");
+                            return null;
                         }
                     });
                 }
@@ -1029,6 +1079,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             Geometry g = new Geometry("Sphere", new Sphere(10, 10, 1));
                             g.setUserData("angles", new Vector3f());
                             g.setUserData("scale", new Vector3f(1, 1, 1));
@@ -1039,7 +1090,9 @@ public class AddMenu extends JMenu
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(g);
                             Wizard.getObjects().add(g, element);
                             //Just use hashcode g.setUserData("ID", element.getUUID());
-                            return CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(g);
+                            CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(g);
+                            UAManager.add(g, "Add Sphere");
+                            return null;
                         }
                     });
                 }
@@ -1054,6 +1107,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             Geometry g = new Geometry("Cylinder", new Cylinder(10, 10, 1, 1, 1, true, false));
                             g.setUserData("angles", new Vector3f());
                             g.setUserData("scale", new Vector3f(1, 1, 1));
@@ -1064,7 +1118,9 @@ public class AddMenu extends JMenu
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(g);
                             Wizard.getObjects().add(g, element);
                             //Just use hashcode g.setUserData("ID", element.getUUID());
-                            return CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(g);
+                            CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(g);
+                            UAManager.add(g, "Add Cylinder");
+                            return null;
                         }
                     });
                 }
@@ -1079,6 +1135,7 @@ public class AddMenu extends JMenu
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             Geometry g = new Geometry("Torus", new Torus(10, 10, 1, 2));
                             g.setUserData("angles", new Vector3f());
                             g.setUserData("scale", new Vector3f(1, 1, 1));
@@ -1089,7 +1146,9 @@ public class AddMenu extends JMenu
                             b3dElements.B3D_Element element = ObjectToElementConverter.convertToElement(g);
                             Wizard.getObjects().add(g, element);
                             //Just use hashcode  g.setUserData("ID", element.getUUID());
-                            return CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(g);
+                            CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(g);
+                            UAManager.add(g, "Add Torus");
+                            return null;
                         }
                     });
                 }

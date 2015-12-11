@@ -4,7 +4,7 @@ import gui.components.BColorButton;
 import gui.editPanes.EditTaskPane;
 import com.jme3.post.filters.CrossHatchFilter;
 import components.BTextField;
-import general.UserActionManager;
+import general.UAManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -68,7 +68,7 @@ public class CrosshatchTaskPane extends EditTaskPane
                         Float.parseFloat(luminance3Field.getText()),
                         Float.parseFloat(luminance4Field.getText()),
                         Float.parseFloat(luminance5Field.getText()));
-                UserActionManager.addState(crossHatchFilter, "Edit " + crossHatchFilter.getName());
+                UAManager.add(crossHatchFilter, "Edit " + crossHatchFilter.getName());
             }
         });
         taskPane.add("left", new JLabel("Line Color:"));

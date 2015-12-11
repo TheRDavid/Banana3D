@@ -5,7 +5,7 @@ import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import components.BTextField;
 import components.Checker;
-import general.UserActionManager;
+import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,7 +42,7 @@ public class ColorScaleTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         filter.setMultiply(multiplyChecker.isChecked());
-                        UserActionManager.addState(filter, "Multiply: " + multiplyChecker.isChecked());
+                        UAManager.add(filter, "Set Multiply to " + multiplyChecker.isChecked());
                         return null;
                     }
                 });
@@ -59,7 +59,7 @@ public class ColorScaleTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         filter.setOverlay(overlayChecker.isChecked());
-                        UserActionManager.addState(filter, "Overlay: " + overlayChecker.isChecked());
+                        UAManager.add(filter, "Set Overlay to " + overlayChecker.isChecked());
                         return null;
                     }
                 });
@@ -94,7 +94,7 @@ public class ColorScaleTaskPane extends EditTaskPane
                         filter.setFilterColor(Wizard.makeColorRGBA(colorButton.getColor()));
                         filter.setMultiply(multiplyChecker.isChecked());
                         filter.setOverlay(overlayChecker.isChecked());
-                        UserActionManager.addState(filter, "Edit " + filter.getName());
+                        UAManager.add(filter, "Edit " + filter.getName());
                         return null;
                     }
                 });

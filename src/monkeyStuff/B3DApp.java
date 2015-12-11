@@ -61,7 +61,7 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.texture.Texture2D;
 import com.jme3.ui.Picture;
 import dialogs.ObserverDialog;
-import general.UserActionManager;
+import general.UAManager;
 import other.Wizard;
 import java.io.File;
 import java.util.ArrayList;
@@ -116,7 +116,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             CurrentData.getConfiguration().gridy,
             CurrentData.getConfiguration().gridgap));
     //Element & Object that are focused
-    private UUID selectedUUID;
+    private UUID selectedUUID = Wizard.NULL_SELECTION;
     private Object selectedObject;
     //Tree needs an update?
     private boolean treeSyncNeeded = false;
@@ -335,9 +335,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     public void simpleUpdate(float tpf)
     {
         if (returnToNormalSpeed)
-        {
             flyingEditor.setMoveSpeed(CurrentData.getConfiguration().camspeed);
-        }
         if (!waterTexturesSynced)
         {
             syncWaterTextures();
@@ -354,16 +352,12 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                 {
                     s.setLocalTranslation((Vector3f) s.getUserData("correctedTranslation"));
                     if (s.getControl(RigidBodyControl.class) != null)
-                    {
                         s.getControl(RigidBodyControl.class).setPhysicsLocation((Vector3f) s.getWorldTranslation());
-                    }
                     s.setUserData("correctedTranslation", null);
                 }
             }
             if (!bulletAppState.isEnabled() && s.getControl(RigidBodyControl.class) != null)
-            {
                 bulletAppState.getPhysicsSpace().add(s);
-            }
             if (s.getUserData("adjust") != null)
             {
                 B3D_Spatial b3D_Spatial = (B3D_Spatial) Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(s.hashCode()));
@@ -374,19 +368,13 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         }
         checkForShortcut(tpf);
         if (!CurrentData.isAppRunning())
-        {
             CurrentData.setAppRunning(true);
-        }
         if (newParent != null)
-        {
             updatePairing();
-        }
         updateEditNode();
         updateDragging();
         if (treeSyncNeeded)
-        {
             if (--treeWait == 0)
-            {
                 SwingUtilities.invokeLater(new Runnable()
                 {
                     @Override
@@ -397,8 +385,6 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                         treeWait = 10;
                     }
                 });
-            }
-        }
         mousePicture.setLocalTranslation(inputManager.getCursorPosition().x - 20, inputManager.getCursorPosition().y - 20, 10);
         updateAdditionalCameras();
         returnToNormalSpeed = true;
@@ -427,10 +413,10 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                     });
                 } else if (currentMove.equals(undoCombo))
                 {
-                    UserActionManager.undo();
+                    UAManager.undo();
                 } else if (currentMove.equals(redoCombo))
                 {
-                    UserActionManager.redo();
+                    UAManager.redo();
                 } else if (currentMove.equals(saveSceneCombo))
                 {
                     CurrentData.execSaveScene(CurrentData.getProject().getMainFolder().getAbsolutePath() + "/" + CurrentData.getProject().getScene().getName() + ".b3ds");
@@ -540,7 +526,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         selectedUUID = uuid;
         System.out.println("Selected UUID: " + uuid);
         if (selectedUUID != null && !selectedUUID.equals(Wizard.NULL_SELECTION))
-            UserActionManager.setCurrentElement(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)), uuid);
+            UAManager.curr(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)), uuid);
         setSelectedObject(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)));
     }
 
@@ -607,7 +593,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         selectedUUID = uuid;
         System.out.println("Selected UUID: " + uuid);
         if (selectedUUID != null && !selectedUUID.equals(Wizard.NULL_SELECTION))
-            UserActionManager.setCurrentElement(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)), uuid);
+            UAManager.curr(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)), uuid);
         if (spatial == null)
         {
             setSelectedObject(null);
@@ -625,7 +611,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
      */
     public void setSelectedObject(Object object, Spatial spatial)
     {
-        UserActionManager.setCurrentElement(object, Wizard.getObjectReferences().getUUID(object.hashCode()));
+        UAManager.curr(object, Wizard.getObjectReferences().getUUID(object.hashCode()));
         CurrentData.getEditorWindow().getTree().setCodeSelect(true);
         if (lastSelectedLightModel != null)
         {
@@ -1185,7 +1171,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                     }
                 } else if (interactionType.equals(InteractionType.InsertModel))
                 {
-                    UserActionManager.setCurrentElement(null, Wizard.NULL_SELECTION);
+                    UAManager.curr(null, Wizard.NULL_SELECTION);
                     Spatial s = CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadModel(insertAssetName);
                     s.setUserData("angles", new Vector3f());
                     s.setUserData("scale", new Vector3f(1, 1, 1));
@@ -1210,7 +1196,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                     Wizard.getObjects().add(s, ObjectToElementConverter.convertToElement(s));
                     sceneNode.attachChild(s);
                     setInteractionType(InteractionType.Default, null);
-                    UserActionManager.addState(s, "Add " + s.getName());
+                    UAManager.add(s, "Add " + s.getName());
                 }
             }
         } else if (name.equals("mouseMiddle") && isPressed)
@@ -1417,10 +1403,11 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                         }
                     }
                 }
-            } else if (!Mouse.isButtonDown(1) && wasDragging && !selectedUUID.equals(Wizard.NULL_SELECTION))
+            } else if (!Mouse.isButtonDown(1) && wasDragging && !Wizard.NULL_SELECTION.equals(selectedUUID) && selectedUUID != null)
             {
                 System.out.println("Add State for: " + selectedUUID);
-                UserActionManager.addState(selectedObject, "Move " + Wizard.getObjects().getB3D_Element(selectedUUID).getName());
+                // selectedObject might be a waypoint or some shit
+                UAManager.add(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(selectedUUID)), "Move " + Wizard.getObjects().getB3D_Element(selectedUUID).getName());
                 wasDragging = false;
             }
         }
@@ -1470,7 +1457,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                             putOnTextureElement.getMaterial().getPropertyList().change(value.toString(), insertAssetName);
                         else
                             putOnTextureElement.getMaterial().getPropertyList().add(value.toString(), "Texture", insertAssetName);
-                        UserActionManager.addState(selectedObject, "Set " + value.toString() + " of " + putOnTextureElement.getName() + " to " + insertAssetName);
+                        UAManager.add(selectedObject, "Set " + value.toString() + " of " + putOnTextureElement.getName() + " to " + insertAssetName);
                         screen.removeElement(cancelButton);
                         screen.removeElement(selectButton);
                         screen.removeElement(texturesMenu);
@@ -1578,7 +1565,6 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         } else
         {
             if (Wizard.getObjects().getB3D_Element(selectedUUID) instanceof B3D_MotionEvent)
-            {
                 for (MotionPathModel mpm : motionPathModels)
                 {
                     int motionEventID = Wizard.getObjectReferences().getID(selectedUUID);
@@ -1588,10 +1574,8 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                         updateMotionPath((B3D_MotionEvent) Wizard.getObjects().getB3D_Element(selectedUUID), mpm);
                     }
                 }
-            } else
-            {
+            else
                 motionEventNode.detachAllChildren();
-            }
             updateMotionPath = false;
             allPathsShown = false;
         }

@@ -9,7 +9,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.shape.Sphere;
 import components.BTextField;
 import components.Float3Panel;
-import general.UserActionManager;
+import general.UAManager;
 import other.Wizard;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -144,7 +144,7 @@ public class PointLightTaskPane extends EditTaskPane
                 lightModel.getRepresentative().setLocalTranslation(positionPanel.getVector());
                 lightModel.getSymbol().setMesh(new Sphere(15, 15, pLight.getRadius()));
                 lightModel.getSymbol().setLocalTranslation(positionPanel.getVector());
-                UserActionManager.addState(lightModel.getLight(), "Edit " + lightModel.getLight().getName());
+                UAManager.add(lightModel.getLight(), "Edit " + lightModel.getLight().getName());
                 return null;
             }
         });

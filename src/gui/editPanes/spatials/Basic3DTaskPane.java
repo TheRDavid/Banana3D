@@ -10,6 +10,7 @@ import com.jme3.scene.Spatial;
 import components.BSlider;
 import components.Float3Panel;
 import dialogs.ObserverDialog;
+import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -19,6 +20,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -106,6 +109,7 @@ public class Basic3DTaskPane extends EditTaskPane
             @Override
             public void keyReleased(KeyEvent e)
             {
+                UAManager.add(basicSpatial, "Move " + basicSpatial.getName());
             }
         });
         taskPane.setLayout(new RiverLayout());
@@ -136,6 +140,7 @@ public class Basic3DTaskPane extends EditTaskPane
                         basicSpatial.setUserData("angles", rotationPanel.getVector());
                         basicSpatial.setLocalTranslation(positionPanel.getVector().getX(), positionPanel.getVector().getY(), positionPanel.getVector().getZ());
                         basicSpatial.setLocalScale(scalePanel.getVector());
+                UAManager.add(basicSpatial, "Edit " + basicSpatial.getName());
                         return null;
                     }
                 });
@@ -204,6 +209,7 @@ public class Basic3DTaskPane extends EditTaskPane
                     if (e.getKeyCode() == KeyEvent.VK_ENTER)
                     {
                         updateSliderAndSpatial();
+                UAManager.add(basicSpatial, "Rotate " + basicSpatial.getName());
                     }
                 }
             });
@@ -318,6 +324,17 @@ public class Basic3DTaskPane extends EditTaskPane
                         updateRotation(getVector());
                     }
                 });
+                MouseAdapter rotationAdapter = new MouseAdapter()
+                {
+                    @Override
+                    public void mouseReleased(MouseEvent e)
+                    {
+                        UAManager.add(basicSpatial, "Rotate " + basicSpatial.getName());
+                    }
+                };
+                xSlider.addMouseListener(rotationAdapter);
+                ySlider.addMouseListener(rotationAdapter);
+                zSlider.addMouseListener(rotationAdapter);
             }
 
             private void updateRotation(Vector3f vec)
@@ -458,5 +475,4 @@ public class Basic3DTaskPane extends EditTaskPane
                     + rounder.format(basicSpatial.getWorldScale().getZ()));
         }
     }
-    
 }

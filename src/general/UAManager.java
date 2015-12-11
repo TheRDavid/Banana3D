@@ -1,9 +1,11 @@
 package general;
 
 import b3dElements.B3D_Element;
+import java.awt.Toolkit;
 import java.io.Serializable;
 import java.util.Stack;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import other.ElementToObjectConverter;
 import other.ObjectToElementConverter;
 import other.Wizard;
@@ -12,13 +14,13 @@ import other.Wizard;
  *
  * @author David
  */
-public class UserActionManager implements Serializable
+public class UAManager implements Serializable
 {
 
     private static B3D_Element current;
     private static Stack<UserAction> undoStack = new Stack<UserAction>(), redoStack = new Stack<UserAction>();
 
-    public static void setCurrentElement(Object o, UUID uuid)
+    public static void curr(Object o, UUID uuid)
     {
         System.out.println("setCurrentElement " + o);
         if (o != null)
@@ -29,9 +31,10 @@ public class UserActionManager implements Serializable
             current = null;
     }
 
-    public static void addState(Object o, String name)
+    public static void add(Object o, String name)
     {
-        System.out.println("addState");
+        ObjectToElementConverter.convertMode = ObjectToElementConverter.ConvertMode.SAVING;
+        System.out.println("addState [ " + name + " ] \t(" + o + ")");
         redoStack.clear();
         B3D_Element e = null;
         if (o != null)
@@ -42,32 +45,38 @@ public class UserActionManager implements Serializable
             e.setUuid(Wizard.getObjectReferences().getUUID(o.hashCode()));
         undoStack.push(new UserAction(current, e, name));
         if (e != null)
-            setCurrentElement(o, e.getUUID());
+            curr(o, e.getUUID());
         else
-            setCurrentElement(o, null);
+            curr(o, null);
         CurrentData.getEditorWindow().getMainMenu().getEditMenu().getUndoItem().setEnabled(true);
-        CurrentData.getEditorWindow().getMainMenu().getEditMenu().getUndoItem().setText(name);
+        CurrentData.getEditorWindow().getMainMenu().getEditMenu().getUndoItem().setText("Undo: " + name);
     }
 
     public static void undo()
     {
         if (undoStack.isEmpty())
+        {
+            Toolkit.getDefaultToolkit().beep();
             return;
+        }
         update(redoStack.push(undoStack.pop()), 0);
         CurrentData.getEditorWindow().getMainMenu().getEditMenu().getRedoItem().setEnabled(true);
-        CurrentData.getEditorWindow().getMainMenu().getEditMenu().getRedoItem().setText(redoStack.peek().name);
+        CurrentData.getEditorWindow().getMainMenu().getEditMenu().getRedoItem().setText("Redo: " + redoStack.peek().name);
         if (undoStack.isEmpty())
         {
             CurrentData.getEditorWindow().getMainMenu().getEditMenu().getUndoItem().setEnabled(false);
             CurrentData.getEditorWindow().getMainMenu().getEditMenu().getUndoItem().setText("Undo");
         } else
-            CurrentData.getEditorWindow().getMainMenu().getEditMenu().getUndoItem().setText(undoStack.peek().name);
+            CurrentData.getEditorWindow().getMainMenu().getEditMenu().getUndoItem().setText("Undo: " + undoStack.peek().name);
     }
 
     public static void redo()
     {
         if (redoStack.isEmpty())
+        {
+            Toolkit.getDefaultToolkit().beep();
             return;
+        }
         update(undoStack.push(redoStack.pop()), 1);
         CurrentData.getEditorWindow().getMainMenu().getEditMenu().getUndoItem().setEnabled(true);
         CurrentData.getEditorWindow().getMainMenu().getEditMenu().getUndoItem().setText(undoStack.peek().name);
@@ -83,6 +92,7 @@ public class UserActionManager implements Serializable
     // 0 = undo, 1 = redo
     private static void update(UserAction ua, int direction)
     {
+        ObjectToElementConverter.convertMode = ObjectToElementConverter.ConvertMode.SAVING;
         B3D_Element primaryElement = (direction == 0) ? ua.before : ua.after, secondaryElement = (direction == 1) ? ua.before : ua.after;
         if (primaryElement != null)
         {
@@ -92,6 +102,7 @@ public class UserActionManager implements Serializable
                 CurrentData.addToScene(newObject, primaryElement);
             else
             {
+                // Update Element
                 B3D_Element oldElement = Wizard.getObjects().getB3D_Element(primaryElement.getUUID());
                 Object oldObject = Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(oldElement.getUUID()));
                 Wizard.completelyCopyValues(newObject, oldObject);
@@ -103,6 +114,15 @@ public class UserActionManager implements Serializable
             CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(((direction == 1) ? ua.before : ua.after).getUUID());
             CurrentData.execDelete(false);
         }
+        // Maybe callables are still being used, lets arrange EditPane after those
+        CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+        {
+            public Void call() throws Exception
+            {
+                CurrentData.getEditorWindow().getEditPane().arrange(true);
+                return null;
+            }
+        });
     }
 
     public static class UserAction<T extends B3D_Element> implements Serializable

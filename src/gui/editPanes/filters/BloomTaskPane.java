@@ -3,7 +3,7 @@ package gui.editPanes.filters;
 import gui.editPanes.EditTaskPane;
 import com.jme3.post.filters.BloomFilter;
 import components.BTextField;
-import general.UserActionManager;
+import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,7 +43,7 @@ public class BloomTaskPane extends EditTaskPane
                 bloomFilter.setExposureCutOff(Float.parseFloat(exposureCuttOffField.getText()));
                 bloomFilter.setExposurePower(Float.parseFloat(exposurePowerField.getText()));
                 bloomFilter.setDownSamplingFactor(Float.parseFloat(downSamplingFactorField.getText()));
-                UserActionManager.addState(bloomFilter, "Edit " + bloomFilter.getName());
+                UAManager.add(bloomFilter, "Edit " + bloomFilter.getName());
             }
         });
         taskPane.add("left", new JLabel("Intensity:"));

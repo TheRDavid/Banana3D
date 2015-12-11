@@ -6,7 +6,7 @@ import general.CurrentData;
 import com.shaderblow.filter.basicssao.BasicSSAO;
 import components.BTextField;
 import components.Checker;
-import general.UserActionManager;
+import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
@@ -59,7 +59,7 @@ public class BasicSSAOTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         basicSSAO.setSmoothMore(smoothMoreChecker.isChecked());
-                        UserActionManager.addState(basicSSAO, "Smooth More: " + smoothMoreChecker.isChecked());
+                        UAManager.add(basicSSAO, "Set Smooth More to " + smoothMoreChecker.isChecked());
                         return null;
                     }
                 });
@@ -76,7 +76,7 @@ public class BasicSSAOTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         basicSSAO.setUseAo(useAOChecker.isChecked());
-                        UserActionManager.addState(basicSSAO, "Use AO: " + useAOChecker.isChecked());
+                        UAManager.add(basicSSAO, "Set AO to " + useAOChecker.isChecked());
                         return null;
                     }
                 });
@@ -93,7 +93,7 @@ public class BasicSSAOTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         basicSSAO.setUseOnlyAo(useOnlyAOChecker.isChecked());
-                        UserActionManager.addState(basicSSAO, "Use Only AO: " + useOnlyAOChecker.isChecked());
+                        UAManager.add(basicSSAO, "Set Only AO to " + useOnlyAOChecker.isChecked());
                         return null;
                     }
                 });
@@ -110,7 +110,7 @@ public class BasicSSAOTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         basicSSAO.setUseDetailPass(useDetailPassChecker.isChecked());
-                        UserActionManager.addState(basicSSAO, "Use Detail Pass: " + useDetailPassChecker.isChecked());
+                        UAManager.add(basicSSAO, "Set Detail Pass to " + useDetailPassChecker.isChecked());
                         return null;
                     }
                 });
@@ -127,7 +127,7 @@ public class BasicSSAOTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         basicSSAO.setUseDistanceFalloff(useDistanceFalloffChecker.isChecked());
-                        UserActionManager.addState(basicSSAO, "Use Distance Falloff: " + useDistanceFalloffChecker.isChecked());
+                        UAManager.add(basicSSAO, "Set Distance Falloff to " + useDistanceFalloffChecker.isChecked());
                         return null;
                     }
                 });
@@ -144,7 +144,7 @@ public class BasicSSAOTaskPane extends EditTaskPane
                     public Void call() throws Exception
                     {
                         basicSSAO.setUseSmoothing(useSmoothingChecker.isChecked());
-                        UserActionManager.addState(basicSSAO, "Use Smoothing: " + useSmoothingChecker.isChecked());
+                        UAManager.add(basicSSAO, "Set Smoothing to " + useSmoothingChecker.isChecked());
                         return null;
                     }
                 });
@@ -192,7 +192,7 @@ public class BasicSSAOTaskPane extends EditTaskPane
                         CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(newB3D_BasicSSAO.getUUID());
                         CurrentData.getEditorWindow().getTree().sync();
                         CurrentData.getEditorWindow().getEditPane().arrange(true);
-                        UserActionManager.addState(basicSSAO, "Edit " + basicSSAO.getName());
+                        UAManager.add(basicSSAO, "Edit " + basicSSAO.getName());
                         return null;
                     }
                 });
