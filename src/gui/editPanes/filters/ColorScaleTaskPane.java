@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 import javax.swing.JLabel;
 import monkeyStuff.ColorScaleFilterWithGetters;
 import other.Wizard;
+import se.datadosen.component.RiverLayout;
 
 public class ColorScaleTaskPane extends EditTaskPane
 {
@@ -65,6 +66,7 @@ public class ColorScaleTaskPane extends EditTaskPane
                 });
             }
         });
+        taskPane.setLayout(new RiverLayout());
         taskPane.add("left", new JLabel("Color:"));
         taskPane.add("tab hfill", colorButton);
         taskPane.add("br left", new JLabel("Color Density:"));

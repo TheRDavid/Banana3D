@@ -1,11 +1,11 @@
 1.0
-Undo / Redo
 Protokoll
 Installer
 Neuer Startbildschirm
 
 
 1.x
+Globale Einstellungen (Physics Speed, ViewportColor, Framerate (max), etc) in extra Element verpacken (und somit bei un - / redo mit einbeziehen)
 Screenshot preview of scenes when loading
 All Textfields use input when no longer focused and SHOW THAT
 Create Single Materials
@@ -25,6 +25,10 @@ Shadow edit resolution
 Mehrfachauswahl (Gemeinsamkeiten suchen)
 	-Objekte (derselben Ebene) zu Node zusammenfügen
 	-UserActionGroups (mehrfachauswahl -> Aktion)
+	-filter index change undo/redo
+	-dissolve Node
+	-clear physics
+Filter besseres Rename
 Sound
 Shaders
 Dezentralisierte Darstellung

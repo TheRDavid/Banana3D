@@ -101,6 +101,9 @@ public class UAManager implements Serializable
             {
                 // Recover Element
                 System.out.println("UPDATE RECOVER");
+                if (primaryElement instanceof B3D_Filter)
+                    ((B3D_Filter) primaryElement).changeFilterIndex(CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().getFilterList().size());
+
                 CurrentData.addToScene(newObject, primaryElement);
                 CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(primaryElement.getUUID());
                 CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
@@ -119,15 +122,6 @@ public class UAManager implements Serializable
                 CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(oldElement.getUUID());
                 Object oldObject = Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(oldElement.getUUID()));
                 Wizard.completelyCopyValues(newObject, oldObject);
-                if (oldElement instanceof B3D_Filter)
-                    CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
-                    {
-                        public Void call() throws Exception
-                        {
-                            CurrentData.getEditorWindow().getB3DApp().sortFilters();
-                            return null;
-                        }
-                    });
                 CurrentData.getEditorWindow().getTree().sync();
             }
         } else if (secondaryElement != null)

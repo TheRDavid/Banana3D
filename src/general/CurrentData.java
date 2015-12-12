@@ -455,7 +455,7 @@ public class CurrentData
                     B3D_Element newB3D_Element = ObjectToElementConverter.convertToElement(o);
                     newB3D_Element.setUuid(oldB3D_Element.getUUID());
                     if (oldB3D_Element instanceof B3D_Filter)
-                        ((B3D_Filter) newB3D_Element).setFilterIndex(((B3D_Filter) oldB3D_Element).getFilterIndex());
+                        ((B3D_Filter) newB3D_Element).changeFilterIndex(((B3D_Filter) oldB3D_Element).getFilterIndex());
                     newB3D_Element.setAnimations((ArrayList<B3D_Animation>) oldB3D_Element.getAnimations().clone());
                     scene.getElements().add(newB3D_Element);
                 }

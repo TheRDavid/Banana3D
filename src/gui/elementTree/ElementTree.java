@@ -259,10 +259,9 @@ public class ElementTree extends JXTree
                         nodeIndexes.put(tempNode, element.getUUID());
                         lightsNode.add(tempNode);
                     } else if (element instanceof B3D_Filter)
-                    {
                         //Sorting filters by FilterIndex of the elements and adding them to the treenode after in a loop
                         filterList.add((B3D_Filter) element);
-                    } else
+                    else
                     {
                         DefaultMutableTreeNode tempNode = new DefaultMutableTreeNode(element.getName(), false);
                         nodeIndexes.put(tempNode, element.getUUID());
@@ -510,22 +509,16 @@ public class ElementTree extends JXTree
                         public Void call() throws Exception
                         {
                             if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Spatial)
-                            {
                                 CurrentData.getEditorWindow().getB3DApp().getCamera().setLocation(((Spatial) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getWorldTranslation());
-                            } else if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Light)
+                            else if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Light)
                             {
                                 /*Only Spot-And PointLight have that Item*/
                                 if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof PointLight)
-                                {
                                     CurrentData.getEditorWindow().getB3DApp().getCamera().setLocation(((PointLight) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getPosition());
-                                } else
-                                {
+                                else
                                     CurrentData.getEditorWindow().getB3DApp().getCamera().setLocation(((SpotLight) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getPosition());
-                                }
                             } else if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof MotionEvent)
-                            {
                                 CurrentData.getEditorWindow().getB3DApp().getCamera().setLocation(((MotionEvent) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getPath().getWayPoint(0));
-                            }
                             return null;
                         }
                     });
@@ -586,7 +579,6 @@ public class ElementTree extends JXTree
                         {
                             CurrentData.getEditorWindow().getB3DApp().sortFilters();
                             Filter f = (Filter) CurrentData.getEditorWindow().getB3DApp().getSelectedObject();
-                            UAManager.add(f, "Change Filter Index of " + f.getName());
                             return null;
                         }
                     });
@@ -616,7 +608,6 @@ public class ElementTree extends JXTree
                         {
                             CurrentData.getEditorWindow().getB3DApp().sortFilters();
                             Filter f = (Filter) CurrentData.getEditorWindow().getB3DApp().getSelectedObject();
-                            UAManager.add(f, "Change Filter Index of " + f.getName());
                             return null;
                         }
                     });
@@ -651,9 +642,7 @@ public class ElementTree extends JXTree
                             CurrentData.getEditorWindow().getB3DApp().setSelectedNode(node.getParent());
                             ArrayList<Spatial> spatials = new ArrayList<Spatial>();
                             for (Spatial spatial : node.getChildren())
-                            {
                                 spatials.add(spatial);
-                            }
                             for (Spatial spatial : spatials)
                             {
                                 CurrentData.getEditorWindow().getB3DApp().setSelectedNode(node.getParent());
@@ -661,10 +650,8 @@ public class ElementTree extends JXTree
                             }
                             node.removeFromParent();
                             if (node.getControl(RigidBodyControl.class) != null)
-                            {
                                 CurrentData.getEditorWindow()
                                         .getB3DApp().getBulletAppState().getPhysicsSpace().remove(node);
-                            }
                             Wizard.getObjects().remove(node.hashCode());
                             CurrentData.getEditorWindow().getB3DApp().setSelectedElement(Wizard.NULL_SELECTION, null);
                             CurrentData.getEditorWindow().getEditPane().arrange(false);
@@ -718,15 +705,11 @@ public class ElementTree extends JXTree
                     add(enableItem);
                     add(renameItem);
                     if (((B3D_Filter) selectedElement).getFilterIndex() > 0)
-                    {
                         add(filterUpItem);
-                    }
                     int index = ((B3D_Filter) selectedElement).getFilterIndex();
                     int size = CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().getFilterList().size();
                     if (index < (size - 1))
-                    {
                         add(filterDownItem);
-                    }
                     add(deleteItem);
                     add(animateItem);
                     add(copyIDItem);
@@ -734,17 +717,12 @@ public class ElementTree extends JXTree
                 {
                     int motivionEventID = Wizard.getObjectReferences().getID(selectedElement.getUUID());
                     if (((MotionEvent) Wizard.getObjects().getOriginalObject(motivionEventID)).getPlayState().equals(PlayState.Playing))
-                    {
                         playItem.setText("Pause");
-                    } else
-                    {
+                    else
                         playItem.setText("Play");
-                    }
                     add(playItem);
                     if (!((MotionEvent) Wizard.getObjects().getOriginalObject(motivionEventID)).getPlayState().equals(PlayState.Stopped))
-                    {
                         add(stopItem);
-                    }
                     add(new JSeparator(JSeparator.HORIZONTAL));
                     add(duplicateItem);
                     add(lookAtItem);
@@ -754,13 +732,9 @@ public class ElementTree extends JXTree
                     add(animateItem);
                     add(copyIDItem);
                 } else
-                {
                     add(showAllMotionPathsItem);
-                }
             } else
-            {
                 add(showAllMotionPathsItem);
-            }
             show(ElementTree.this, x, y);
         }
     }
@@ -791,16 +765,13 @@ public class ElementTree extends JXTree
                         int objectID = Wizard.getObjectReferences().getID(selectedElement.getUUID());
                         Object actualObject = Wizard.getObjects().getOriginalObject(objectID);
                         if (actualObject instanceof Light)
-                        {
                             ((Light) actualObject).setName(tempNode.getUserObject().toString());
-                        } else if (actualObject instanceof Filter)
-                        {
+                        else if (actualObject instanceof Filter)
                             ((Filter) actualObject).setName(tempNode.getUserObject().toString());
-                        } else if (actualObject instanceof Spatial)
-                        {
+                        else if (actualObject instanceof Spatial)
                             ((Spatial) actualObject).setName(tempNode.getUserObject().toString());
-                        }
                         nameChangingLegit = true;
+                        UAManager.add(actualObject, "Rename to \"" + tempNode.getUserObject().toString() + "\"");
                         sync();
                     }
                     // CurrentData.getEditorWindow().getB3DApp().setSelectedElement(nodeIDs.get(tempNode));

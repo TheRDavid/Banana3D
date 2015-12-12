@@ -260,12 +260,12 @@ public class AddMenu extends JMenu
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    UAManager.curr(null, null);
                     CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Integer>()
                     {
                         @Override
                         public Integer call() throws Exception
                         {
+                            UAManager.curr(null, null);
                             OldFilmFilter oldFilmFilter = new OldFilmFilter();
                             //ConvertMode does not matter here, the filter can not possibly have a LightControl
                             B3D_OldFilm b3D_OldFilm = ObjectToElementConverter.convertOldFilm(
