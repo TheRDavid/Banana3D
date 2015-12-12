@@ -17,7 +17,6 @@ import other.B3D_Scene;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
-import java.util.Vector;
 import javax.swing.*;
 import org.jdesktop.swingx.VerticalLayout;
 import other.Wizard;
@@ -269,12 +268,8 @@ public class EditorWindow extends JFrame
         private ImageIcon playIcon;
         private ImageIcon playIcon2;
         private Point mousePosition = new Point();
-        private double pSize = 60;
         private boolean seriousNow = false;
-        private Vector<TranspEllipse> ellipses = new Vector<TranspEllipse>();
-        private boolean inc = false;
-        private float weakning = .005f;
-        private boolean strong = false;
+        private Ellipse2D.Double ellipse = new Ellipse2D.Double();
 
         public PlayPanel()
         {
@@ -297,95 +292,33 @@ public class EditorWindow extends JFrame
                     playIcon = null;
                     playIcon2 = null;
                     mousePosition = null;
-                    ellipses = null;
                 }
             }).start();
-            addMouseMotionListener(new MouseMotionListener()
+            addMouseMotionListener(new MouseMotionAdapter()
             {
-                @Override
-                public void mouseDragged(MouseEvent e)
-                {
-                    if (weakning > .0008f)
-                    {
-                        weakning -= .00002f;
-                        strong = true;
-                    }
-                }
-
                 @Override
                 public void mouseMoved(MouseEvent e)
                 {
-                    mousePosition = e.getPoint();
-                    repaint();
+                    ellipse.setFrame(e.getX() - pSize / 2, e.getY() - pSize / 2, pSize, pSize);
                 }
             });
         }
-        private float duration = 50;
-        private float transition = 3000;
-        private boolean transitionDone = false;
         private Graphics2D g2d;
         private AlphaComposite ac;
+        private int pSize = Toolkit.getDefaultToolkit().getScreenSize().width / 10;
 
         @Override
         public void paint(Graphics g)
         {
-            if (duration < 0)
-            {
-                transitionDone = false;
-                duration = Math.abs(transition) / 6;
-            } else
-            {
-                duration--;
-            }
-            strong = false;
             super.paint(g);
             g2d = (Graphics2D) g;
             if (!seriousNow)
             {
                 g.drawImage(playIcon.getImage(), getWidth() / 2 - playIcon.getIconWidth() / 2, getHeight() / 2 - playIcon.getIconHeight() / 2, playIcon.getIconWidth(), playIcon.getIconHeight(), null);
-                for (TranspEllipse transpEllipse : ellipses)
-                {
-                    if (transpEllipse.alpha > 0)
-                    {
-                        ac = AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, transpEllipse.alpha);
-                        g2d.setComposite(ac);
-                        g.setClip(transpEllipse.ellipse2D);
-                        g.drawImage(playIcon2.getImage(), getWidth() / 2 - playIcon.getIconWidth() / 2, getHeight() / 2 - playIcon.getIconHeight() / 2, playIcon.getIconWidth(), playIcon.getIconHeight(), null);
-                        transpEllipse.reduce();
-                    }
-                }
-                ellipses.add(new TranspEllipse(new Ellipse2D.Double(mousePosition.x - pSize, mousePosition.y - pSize, pSize * 2, pSize * 2)));
-            }
-        }
-
-        private class TranspEllipse
-        {
-
-            private float alpha = .1f;
-            private Ellipse2D.Double ellipse2D;
-            private double diff;
-
-            public TranspEllipse(Ellipse2D.Double e2dd)
-            {
-                ellipse2D = e2dd;
-            }
-
-            private void reduce()
-            {
-                if (strong && !(alpha + weakning * 3 > 1))
-                    alpha += weakning * 3;
-                else
-                    alpha -= weakning / 2;
-                diff = Math.random();
-                diff -= (diff - .8f) * 3;
-                if (transition < 0)
-                    transitionDone = true;
-                transition = duration * 6;
-                if (transitionDone)
-                    ellipse2D.setFrame(ellipse2D.x + diff, ellipse2D.y - 3, ellipse2D.width, ellipse2D.height);
-                else
-                    ellipse2D.setFrame(ellipse2D.x + diff / transition, ellipse2D.y - 3, ellipse2D.width, ellipse2D.height);
-                transition--;
+                ac = AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 1);
+                g2d.setComposite(ac);
+                g.setClip(ellipse);
+                g.drawImage(playIcon2.getImage(), getWidth() / 2 - playIcon.getIconWidth() / 2, getHeight() / 2 - playIcon.getIconHeight() / 2, playIcon.getIconWidth(), playIcon.getIconHeight(), null);
             }
         }
 
