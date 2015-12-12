@@ -33,9 +33,7 @@ import com.jme3.light.Light;
 import com.jme3.light.PointLight;
 import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Spline;
@@ -95,7 +93,6 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     private Node motionEventNode = new Node("Motion Events");
     private Node selectedNode = sceneNode;
     private BulletAppState bulletAppState;
-    private ChaseCamera chaseCamera;
     private CameraNode camNode;
     private Vector<NodeModel> nodeModels = new Vector<NodeModel>();
     private Vector<LightModel> lightModels = new Vector<LightModel>();
@@ -494,7 +491,6 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
 
     private void initComponents()
     {
-        chaseCamera = new ChaseCamera(cam);
         camNode = new CameraNode("CamNode", cam);
         camNode.setControlDir(ControlDirection.SpatialToCamera);
         rootNode.attachChild(sceneNode);
