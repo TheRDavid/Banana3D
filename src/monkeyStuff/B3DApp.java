@@ -103,14 +103,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     private Vector<LightScatteringModel> lightScatteringModels = new Vector<LightScatteringModel>();
     private Vector<AdditionalCameraDialog> additionalCameraDialogs = new Vector<AdditionalCameraDialog>();
     private Vector<MotionPathModel> motionPathModels = new Vector<MotionPathModel>();
-    private Node arrowNode = new Node("Arrows");
-    private Spatial xArrow;
-    private Spatial yArrow;
-    private Spatial zArrow;
-    private Material xArrowMaterial;
-    private Material yArrowMaterial;
-    private Material zArrowMaterial;
-    private Spatial selectedArrow;
+    private Gizmo gizmo;
     private Geometry gridGeometry = new Geometry("nonI_Grid", new Grid(
             CurrentData.getConfiguration().gridx,
             CurrentData.getConfiguration().gridy,
@@ -229,12 +222,10 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         if (Wizard.getObjectReferences().getUUID(pickedGeometry.hashCode()) == null)
         {
             if (pickedGeometry.getParent() != null)
-            {
                 checkPicking(pickedGeometry.getParent());
-            }
         } else
         {
-            selectedArrow = null;
+            gizmo.select(null);
             setSelectedUUID(Wizard.getObjectReferences().getUUID(pickedGeometry.hashCode()));
             setSelectedObject(selectedObject);
         }
@@ -296,6 +287,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     @Override
     public void simpleInitApp()
     {
+        gizmo = new Gizmo(assetManager);
         flyingEditor = new EditorCamera(cam);
         flyingEditor.registerWithInput(inputManager);
         CurrentData.getEditorWindow().getMainMenu().getExtrasMenu().getAutosaveEnabledItem().setSelected(
@@ -516,11 +508,9 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         gridGeometry.setShadowMode(RenderQueue.ShadowMode.Off);
         gridGeometry.setLocalTranslation(-10000, 0, -10000);
         mousePicture.setLocalScale(40, 40, 10);
+        editorNode.attachChild(gizmo);
         if (CurrentData.getConfiguration().showgrid)
-        {
             editorNode.attachChild(gridGeometry);
-        }
-        initArrows();
         correctGridLocation();
     }
 
@@ -710,85 +700,32 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                 {
                     Spatial tempSpatial = (Spatial) selectedObject;
                     if (!tempSpatial.getName().equals("SkyBox") && tempSpatial != null)
-                    {
-                        arrowNode.setLocalTranslation(tempSpatial.getWorldTranslation());
-                    }
+                        gizmo.setLocalTranslation(tempSpatial.getWorldTranslation());
                 } else if (selectedObject instanceof MotionEvent)
                 {
                     for (MotionPathModel mpm : motionPathModels)
-                    {
                         if (mpm.getMotionEvent().equals(selectedObject))
-                        {
-                            arrowNode.setLocalTranslation(mpm.getSymbol().getLocalTranslation());
-                        }
-                    }
+                            gizmo.setLocalTranslation(mpm.getSymbol().getLocalTranslation());
                 } else if (selectedObject instanceof Light)
                 {
                     for (int i = 0; i < lightModels.size(); i++)
-                    {
                         if (lightModels.get(i).getLight().equals(selectedObject))
-                        {
                             if (!(lightModels.get(i).getLight() instanceof AmbientLight))
-                            {
                                 /*Highlight LightModelRep.*/
-                                arrowNode.setLocalTranslation(lightModels.get(i).getRepresentative().getWorldTranslation());
-                            }
-                        }
-                    }
+                                gizmo.setLocalTranslation(lightModels.get(i).getRepresentative().getWorldTranslation());
                 } else if (selectedObject instanceof LightScatteringFilter)
                 {
                     for (LightScatteringModel lsm : lightScatteringModels)
-                    {
                         if (lsm.getScatteringFilter().equals(selectedObject))
-                        {
-                            arrowNode.setLocalTranslation(lsm.getSymbol().getWorldTranslation());
-                        }
-                    }
+                            gizmo.setLocalTranslation(lsm.getSymbol().getWorldTranslation());
                 } else if (selectedObject instanceof AdditionalCameraDialog)
                 {
                     Spatial tempSpatial = ((AdditionalCameraDialog) selectedObject).getRepresentative();
-                    arrowNode.setLocalTranslation(tempSpatial.getWorldTranslation());
+                    gizmo.setLocalTranslation(tempSpatial.getWorldTranslation());
                 }
                 return null;
             }
         });
-    }
-
-    private void initArrows()
-    {
-        xArrow = assetManager.loadModel("Models/arrow.j3o");
-        xArrow.setName("xArrow");
-        xArrow.rotate(0, 0, FastMath.DEG_TO_RAD * 90);
-        xArrow.setQueueBucket(RenderQueue.Bucket.Transparent);
-        yArrow = assetManager.loadModel("Models/arrow.j3o");
-        yArrow.setName("yArrow");
-        yArrow.setQueueBucket(RenderQueue.Bucket.Transparent);
-        zArrow = assetManager.loadModel("Models/arrow.j3o");
-        zArrow.setName("zArrow");
-        zArrow.rotate(FastMath.DEG_TO_RAD * 90, 0, 0);
-        zArrow.setQueueBucket(RenderQueue.Bucket.Transparent);
-        xArrowMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        xArrowMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-        xArrowMaterial.getAdditionalRenderState().setDepthTest(true);
-        xArrowMaterial.setColor("Color", new ColorRGBA(1, 0, 0, .3f));
-        yArrowMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        yArrowMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-        yArrowMaterial.getAdditionalRenderState().setDepthTest(true);
-        yArrowMaterial.setColor("Color", new ColorRGBA(0, 0, 1, .3f));
-        zArrowMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        zArrowMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-        zArrowMaterial.getAdditionalRenderState().setDepthTest(true);
-        zArrowMaterial.setColor("Color", new ColorRGBA(0, 1, 0, .3f));
-        xArrow.setMaterial(xArrowMaterial);
-        yArrow.setMaterial(yArrowMaterial);
-        zArrow.setMaterial(zArrowMaterial);
-        xArrow.setShadowMode(RenderQueue.ShadowMode.Off);
-        yArrow.setShadowMode(RenderQueue.ShadowMode.Off);
-        zArrow.setShadowMode(RenderQueue.ShadowMode.Off);
-        arrowNode.attachChild(xArrow);
-        arrowNode.attachChild(yArrow);
-        arrowNode.attachChild(zArrow);
-        editorNode.attachChild(arrowNode);
     }
 
     private void initInput()
@@ -1042,47 +979,31 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                 System.out.println("Angeklickt: " + pickedGeometry.getName());
                 if (interactionType.equals(InteractionType.Default) && isPressed)
                 {
-                    if (pickedGeometry.getParent().equals(arrowNode))
-                    {
-                        selectedArrow = pickedGeometry;
-                        if (selectedArrow.equals(xArrow))
-                        {
-                            selectedArrow.setLocalScale(1.5f);
-                            yArrow.setLocalScale(1);
-                            zArrow.setLocalScale(1);
-                        } else if (selectedArrow.equals(yArrow))
-                        {
-                            selectedArrow.setLocalScale(1.5f);
-                            xArrow.setLocalScale(1);
-                            zArrow.setLocalScale(1);
-                        } else
-                        {
-                            selectedArrow.setLocalScale(1.5f);
-                            xArrow.setLocalScale(1);
-                            yArrow.setLocalScale(1);
-                        }
-                    } else if (pickedGeometry.getName().equals("cam") && editorNode.hasChild(pickedGeometry))
+                    if (pickedGeometry.getParent().equals(gizmo))
+                        if (pickedGeometry == gizmo.getxArrow())
+                            gizmo.select(Gizmo.Arrow.X);
+                        else if (pickedGeometry == gizmo.getyArrow())
+                            gizmo.select(Gizmo.Arrow.Y);
+                        else
+                            gizmo.select(Gizmo.Arrow.Z);
+                    else if (pickedGeometry.getName().equals("cam") && editorNode.hasChild(pickedGeometry))
                     {
                         selectedUUID = Wizard.NULL_SELECTION;
                         for (AdditionalCameraDialog acd : additionalCameraDialogs)
-                        {
                             if (acd.getRepresentative().hasChild(pickedGeometry))
                             {
                                 selectedObject = acd;
                                 CurrentData.getEditorWindow().getEditPane().arrange(true);
                                 break;
                             }
-                        }
                     } else if (pickedGeometry.getName().equals("motionPathSymbol"))
                     {
                         for (MotionPathModel mpm : motionPathModels)
-                        {
                             if (pickedGeometry.equals(mpm.getSymbol()))
                             {
                                 setSelectedElement(Wizard.getObjectReferences().getUUID(mpm.getMotionEvent().hashCode()), mpm.getSymbol());
                                 CurrentData.getEditorWindow().getTree().updateSelection();
                             }
-                        }
                     } else if (pickedGeometry.getName().equals("LightModel"))
                     {
                         for (int i = 0; i < lightModels.size(); i++)
@@ -1208,27 +1129,14 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         {
             //??
         } else if (name.equals("mouseRight") && isPressed)
-        {
             setInteractionType(InteractionType.Default, null);
-        } else if (name.equals("keyX"))
-        {
-            selectedArrow = xArrow;
-            selectedArrow.setLocalScale(1.5f);
-            yArrow.setLocalScale(1);
-            zArrow.setLocalScale(1);
-        } else if (name.equals("keyY"))
-        {
-            selectedArrow = yArrow;
-            selectedArrow.setLocalScale(1.5f);
-            xArrow.setLocalScale(1);
-            zArrow.setLocalScale(1);
-        } else if (name.equals("keyZ"))
-        {
-            selectedArrow = zArrow;
-            selectedArrow.setLocalScale(1.5f);
-            yArrow.setLocalScale(1);
-            xArrow.setLocalScale(1);
-        }
+        else if (name.equals("keyX"))
+            gizmo.select(Gizmo.Arrow.X);
+        else if (name.equals("keyY"))
+            gizmo.select(Gizmo.Arrow.Y);
+        else if (name.equals("keyZ"))
+            gizmo.select(Gizmo.Arrow.Z);
+
     }
 
     @Override
@@ -1272,7 +1180,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                 Ray ray = new Ray(click3d, dir);
                 if (selectedObject instanceof WaterFilterWithGetters)
                 {
-                    yArrow.collideWith(ray, results);
+                    gizmo.getyArrow().collideWith(ray, results);
                     CollisionResult closest = results.getClosestCollision();
                     if (closest != null)
                     {
@@ -1303,30 +1211,30 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                     }
                     if (results.getCollision(resultNr) != null && selectedObject != null)
                     {
-                        final Vector3f arrowBefore = arrowNode.getLocalTranslation().clone();
+                        final Vector3f arrowBefore = gizmo.getLocalTranslation().clone();
                         float xDiff = 0, yDiff = 0, zDiff = 0;
-                        if (selectedArrow != null)
+                        if (gizmo.getSelectedArrow() != null)
                         {
-                            if (selectedArrow.equals(xArrow))
+                            if (gizmo.getSelectedArrow().equals(gizmo.getxArrow()))
                             {
-                                xDiff = results.getCollision(resultNr).getContactPoint().getX() - arrowNode.getLocalTranslation().getX();
-                                arrowNode.setLocalTranslation(new Vector3f(
+                                xDiff = results.getCollision(resultNr).getContactPoint().getX() - gizmo.getLocalTranslation().getX();
+                                gizmo.setLocalTranslation(new Vector3f(
                                         results.getCollision(resultNr).getContactPoint().getX(),
-                                        arrowNode.getLocalTranslation().getY(),
-                                        arrowNode.getLocalTranslation().getZ()));
-                            } else if (selectedArrow.equals(yArrow))
+                                        gizmo.getLocalTranslation().getY(),
+                                        gizmo.getLocalTranslation().getZ()));
+                            } else if (gizmo.getSelectedArrow().equals(gizmo.getyArrow()))
                             {
-                                yDiff = results.getCollision(resultNr).getContactPoint().getY() - arrowNode.getLocalTranslation().getY();
-                                arrowNode.setLocalTranslation(new Vector3f(
-                                        arrowNode.getLocalTranslation().getX(),
+                                yDiff = results.getCollision(resultNr).getContactPoint().getY() - gizmo.getLocalTranslation().getY();
+                                gizmo.setLocalTranslation(new Vector3f(
+                                        gizmo.getLocalTranslation().getX(),
                                         results.getCollision(resultNr).getContactPoint().getY(),
-                                        arrowNode.getLocalTranslation().getZ()));
+                                        gizmo.getLocalTranslation().getZ()));
                             } else
                             {
-                                zDiff = results.getCollision(resultNr).getContactPoint().getZ() - arrowNode.getLocalTranslation().getZ();
-                                arrowNode.setLocalTranslation(new Vector3f(
-                                        arrowNode.getLocalTranslation().getX(),
-                                        arrowNode.getLocalTranslation().getY(),
+                                zDiff = results.getCollision(resultNr).getContactPoint().getZ() - gizmo.getLocalTranslation().getZ();
+                                gizmo.setLocalTranslation(new Vector3f(
+                                        gizmo.getLocalTranslation().getX(),
+                                        gizmo.getLocalTranslation().getY(),
                                         results.getCollision(resultNr).getContactPoint().getZ()));
                             }
                             if (selectedObject instanceof Spatial)
@@ -1336,7 +1244,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                                 {
                                     int motionEventID = Wizard.getObjectReferences().getID(selectedUUID);
                                     MotionEvent motionEvent = (MotionEvent) Wizard.getObjects().getOriginalObject(motionEventID);
-                                    motionEvent.getPath().getWayPoint((Integer) tempSpatial.getUserData("waypointNumber")).set(arrowNode.getLocalTranslation());
+                                    motionEvent.getPath().getWayPoint((Integer) tempSpatial.getUserData("waypointNumber")).set(gizmo.getLocalTranslation());
                                     updateSelectedMotionPath();
                                 }
                                 Vector3f move = new Vector3f(xDiff, yDiff, zDiff);
@@ -1363,7 +1271,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                                 {
                                     if (mpm.getMotionEvent().equals(selectedObject))
                                     {
-                                        mpm.getSymbol().setLocalTranslation(arrowNode.getLocalTranslation());
+                                        mpm.getSymbol().setLocalTranslation(gizmo.getLocalTranslation());
                                         ((MotionPathTaskPane) CurrentData.getEditorWindow().getEditPane().getCurrentEditPane()).updateLocations();
                                         for (int i = 0; i < ((MotionEvent) selectedObject).getPath().getNbWayPoints(); i++)
                                         {
@@ -1382,16 +1290,16 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                                     {
                                         if (selectedObject instanceof SpotLight)
                                         {
-                                            lightModels.get(i).getRepresentative().setLocalTranslation(arrowNode.getLocalTranslation());
+                                            lightModels.get(i).getRepresentative().setLocalTranslation(gizmo.getLocalTranslation());
                                             Vector3f end = lightModels.get(i).getRepresentative().getWorldTranslation().add(
                                                     ((SpotLight) lightModels.get(i).getLight()).getDirection().mult(((SpotLight) lightModels.get(i).getLight()).getSpotRange()));
-                                            Mesh mesh = new Line(arrowNode.getLocalTranslation(), arrowNode.getLocalTranslation().add(((SpotLight) lightModels.get(i).getLight()).getDirection().mult(((SpotLight) lightModels.get(i).getLight()).getSpotRange())));
+                                            Mesh mesh = new Line(gizmo.getLocalTranslation(), gizmo.getLocalTranslation().add(((SpotLight) lightModels.get(i).getLight()).getDirection().mult(((SpotLight) lightModels.get(i).getLight()).getSpotRange())));
                                             mesh.setPointSize(5);
                                             lightModels.get(i).getSymbol().setMesh(mesh);
                                             ((SpotLight) selectedObject).setPosition(lightModels.get(i).getRepresentative().getLocalTranslation());
                                         } else if (selectedObject instanceof PointLight)
                                         {
-                                            lightModels.get(i).getRepresentative().setLocalTranslation(arrowNode.getLocalTranslation());
+                                            lightModels.get(i).getRepresentative().setLocalTranslation(gizmo.getLocalTranslation());
                                             ((PointLight) selectedObject).setPosition(lightModels.get(i).getRepresentative().getLocalTranslation());
                                             //Update Element
                                             ((B3D_PointLight) Wizard.getObjects().getB3D_Element(selectedUUID)).setPosition(lightModels.get(i).getRepresentative().getLocalTranslation());
@@ -1400,10 +1308,10 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                                 }
                             } else if (selectedObject instanceof LightScatteringFilter)
                             {
-                                ((LightScatteringFilter) selectedObject).setLightPosition(arrowNode.getLocalTranslation().clone());
+                                ((LightScatteringFilter) selectedObject).setLightPosition(gizmo.getLocalTranslation().clone());
                             } else if (selectedObject instanceof AdditionalCameraDialog)
                             {
-                                ((AdditionalCameraDialog) selectedObject).getRepresentative().setLocalTranslation(arrowNode.getLocalTranslation());
+                                ((AdditionalCameraDialog) selectedObject).getRepresentative().setLocalTranslation(gizmo.getLocalTranslation());
                             }
                         }
                     }
@@ -1514,8 +1422,8 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             updateYArrow();
         else
         {
-            arrowNode.attachChild(xArrow);
-            arrowNode.attachChild(zArrow);
+            gizmo.attachChild(gizmo.getxArrow());
+            gizmo.attachChild(gizmo.getzArrow());
         }
         if (CurrentData.getConfiguration().showallmotionpaths && !allPathsShown)
             updateAllMotionPathGeometrys();
@@ -1552,14 +1460,14 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
 
     private void updateYArrow()
     {
-        arrowNode.detachChild(xArrow);
-        arrowNode.detachChild(zArrow);
-        yArrow.setMaterial(yArrowMaterial);
+        gizmo.detachChild(gizmo.getxArrow());
+        gizmo.detachChild(gizmo.getzArrow());
+        gizmo.getyArrow().setMaterial(gizmo.getyArrowMaterial());
         WaterFilterWithGetters tempWaterFilter = (WaterFilterWithGetters) selectedObject;
-        arrowNode.setLocalTranslation(cam.getLocation().add(cam.getDirection().multLocal(cam.getLocation().getY() * 2.5f - tempWaterFilter.getWaterHeight())));
-        arrowNode.setLocalTranslation(arrowNode.getLocalTranslation().getX(),
+        gizmo.setLocalTranslation(cam.getLocation().add(cam.getDirection().multLocal(cam.getLocation().getY() * 2.5f - tempWaterFilter.getWaterHeight())));
+        gizmo.setLocalTranslation(gizmo.getLocalTranslation().getX(),
                 tempWaterFilter.getWaterHeight(),
-                arrowNode.getLocalTranslation().getZ());
+                gizmo.getLocalTranslation().getZ());
     }
 
     private void updateMotionPathGeometrys()
@@ -1635,7 +1543,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
 
     private void updateObjectScales()
     {
-        arrowNode.setLocalScale(cam.getLocation().distance(arrowNode.getLocalTranslation()) / 55);
+        gizmo.setLocalScale(cam.getLocation().distance(gizmo.getLocalTranslation()) / 55);
         for (MotionPathModel mpm : motionPathModels)
             mpm.getSymbol().setLocalScale(cam.getLocation().distance(mpm.getSymbol().getWorldTranslation()) / 55);
         for (LightModel lm : lightModels)
