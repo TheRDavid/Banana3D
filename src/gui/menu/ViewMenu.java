@@ -36,7 +36,7 @@ public class ViewMenu extends JMenu
         {
             @Override
             public void actionPerformed(ActionEvent e)
-            {
+            { 
                 int fps = Integer.parseInt(JOptionPane.showInputDialog(null, "Set Maximum FPS", CurrentData.getEditorWindow().getB3DApp().getSettings().getFrameRate()));
                 CurrentData.getEditorWindow().getB3DApp().getSettings().setFrameRate(fps);
                 CurrentData.getEditorWindow().getB3DApp().restart();
