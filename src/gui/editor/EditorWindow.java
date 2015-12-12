@@ -494,7 +494,7 @@ public class EditorWindow extends JFrame
                         ret = true;
                     } else if ((e.getKeyCode() == KeyEvent.VK_T) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
                     {
-                        CurrentData.execCreateTwin();
+                        CurrentData.execDuplicate();
                         ret = true;
                     } else if ((e.getKeyCode() == KeyEvent.VK_F) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
                     {

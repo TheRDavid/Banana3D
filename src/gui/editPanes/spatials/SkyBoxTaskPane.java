@@ -1,5 +1,6 @@
 package gui.editPanes.spatials;
 
+import b3dElements.spatials.geometries.B3D_MultipleTextureSkyBox;
 import gui.components.AssetButton;
 import gui.dialogs.AssetChooserDialog;
 import gui.editPanes.EditTaskPane;
@@ -8,6 +9,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.jme3.util.SkyFactory;
 import dialogs.ObserverDialog;
+import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +18,7 @@ import java.util.concurrent.Callable;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import other.ObjectToElementConverter;
 import other.Wizard;
 import se.datadosen.component.RiverLayout;
 
@@ -89,13 +92,11 @@ public class SkyBoxTaskPane extends EditTaskPane
             }
             addActionListener(new ActionListener()
             {
-                @Override
+                @Override 
                 public void actionPerformed(ActionEvent e)
                 {
                     setText(new AssetChooserDialog(AssetType.Texture, true).getSelectedAssetName());
-                    final Spatial skyObject = skyBox;
-                    UUID elementUUID = Wizard.getObjectReferences().getUUID(skyObject.hashCode());
-                    final b3dElements.B3D_Element skyElement = Wizard.getObjects().getB3D_Element(elementUUID);
+                    final UUID oldUUID = Wizard.getObjectReferences().getUUID(skyBox.hashCode());
                     CurrentData.execDelete(false);
                     CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Integer>()
                     {
@@ -104,6 +105,7 @@ public class SkyBoxTaskPane extends EditTaskPane
                         {
                             try
                             {
+                                CurrentData.getEditorWindow().getB3DApp().setSelectedElement(null);
                                 String name = skyBox.getName();
                                 skyBox = SkyFactory.createSky(
                                         Wizard.getAssetManager(),
@@ -122,10 +124,15 @@ public class SkyBoxTaskPane extends EditTaskPane
                                 skyBox.setUserData("angles", new Vector3f());
                                 skyBox.setUserData("scale", new Vector3f(1, 1, 1));
                                 skyBox.setName(name);
+                                B3D_MultipleTextureSkyBox skyElement = (B3D_MultipleTextureSkyBox) ObjectToElementConverter.convertToElement(skyBox);
+                                skyElement.setUuid(oldUUID);
+                                Wizard.getObjects().add(skyBox, skyElement);
                                 CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(skyBox);
-                                //Just use hashcode skyBox.setUserData("index", skyElement.getUUID());
-                                CurrentData.getEditorWindow().getTree().sync();
                                 CurrentData.getEditorWindow().getB3DApp().setSelectedElement(skyBox);
+                                //Just use hashcode skyBox.setUserData("index", skyElement.getUUID());
+                                //CurrentData.getEditorWindow().getTree().sync();
+                                UAManager.add(skyBox, "Edit Texture of " + skyBox.getName());
+                                CurrentData.getEditorWindow().getEditPane().arrange(true);
                             } catch (java.lang.IllegalArgumentException iae)
                             {
                                 SwingUtilities.invokeLater(new Runnable()
@@ -137,9 +144,6 @@ public class SkyBoxTaskPane extends EditTaskPane
                                         ObserverDialog.getObserverDialog().printMessage("Invalid Texture in SkyBoxTaskPane");
                                     }
                                 });
-                                Wizard.getObjects().add(skyObject, skyElement);
-                                CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild(skyObject);
-                                CurrentData.getEditorWindow().getB3DApp().setSelectedElement(skyBox);
                             }
                             return 0;
                         }

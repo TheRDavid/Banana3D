@@ -395,6 +395,7 @@ public class CurrentData
                             ((Filter) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).setName(newName);
                         selectedElement.setName(newName);
                         editorWindow.getB3DApp().setTreeSyncNeeded(true);
+                        UAManager.add(CurrentData.getEditorWindow().getB3DApp().getSelectedObject(), "Rename to \"" + newName+"\"");
                     }
                 }
             }
@@ -491,8 +492,8 @@ public class CurrentData
                     "Please confirm",
                     JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION;
         if (reset)
+        {
             //Remove everything
-            //MotionPaths
             editorWindow.getB3DApp().enqueue(new Callable<Void>()
             {
                 @Override
@@ -536,6 +537,8 @@ public class CurrentData
                     return null;
                 }
             });
+            UAManager.reset();
+        }
     }
 
     /**
@@ -629,7 +632,7 @@ public class CurrentData
         });
     }
 
-    public static void execCreateTwin()
+    public static void execDuplicate()
     {
         editorWindow.getB3DApp().enqueue(new Callable<Void>()
         {
@@ -639,7 +642,7 @@ public class CurrentData
                 ObjectToElementConverter.convertMode = ObjectToElementConverter.ConvertMode.CREATING_TWIN;
                 if (!(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Filter) && CurrentData.getEditorWindow().getB3DApp().getSelectedObject() != null)
                 {
-                    B3D_Element oldElement = Wizard.getObjects().getB3D_Element(
+                    final B3D_Element oldElement = Wizard.getObjects().getB3D_Element(
                             Wizard.getObjectReferences().getUUID(CurrentData.getEditorWindow().getB3DApp().getSelectedObject().hashCode()));
                     final B3D_Element newElement = ObjectToElementConverter.convertToElement(CurrentData.getEditorWindow().getB3DApp().getSelectedObject());
                     for (B3D_Animation animation : oldElement.getAnimations())
@@ -673,7 +676,7 @@ public class CurrentData
                                     CurrentData.getEditorWindow().getB3DApp().getBulletAppState().getPhysicsSpace().add(newObject);
                                 }
                                 UAManager.curr(null, null);
-                                UAManager.add(newObject, "Add " + newElement.getName());
+                                UAManager.add(newObject, "Duplicate " + oldElement.getName());
                                 return null;
                             }
                         });
@@ -682,14 +685,14 @@ public class CurrentData
                         System.out.println("add light");
                         Wizard.getObjects().add(newObject, newElement);
                         UAManager.curr(null, null);
-                        UAManager.add(newObject, "Add " + newElement.getName());
+                        UAManager.add(newObject, "Duplicate " + oldElement.getName());
                         CurrentData.getEditorWindow().getB3DApp().getSceneNode().addLight((Light) newObject);
                     } else if (newObject instanceof MotionEvent)
                     {
                         CurrentData.getEditorWindow().getB3DApp().getMotionPathModels().add(new MotionPathModel((MotionEvent) newObject));
                         Wizard.getObjects().add(newObject, newElement);
                         UAManager.curr(null, null);
-                        UAManager.add(newObject, "Add " + newElement.getName());
+                        UAManager.add(newObject, "Duplicate " + oldElement.getName());
                     }
                     editorWindow.getB3DApp().setSyncTree(true);
                 } else

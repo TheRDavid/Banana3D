@@ -274,8 +274,11 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                 return b3D_Filter1.getFilterIndex() - b3D_Filter2.getFilterIndex();
             }
         });
+        System.out.println("Sorting Filters:");
+        int count = 0;
         for (Filter f : filters)
         {
+            System.out.println("Next: " + f.getName() + " at " + count++);
             filterPostProcessor.addFilter(f);
         }
         viewPort.addProcessor(filterPostProcessor);
@@ -428,7 +431,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                     CurrentData.execRename();
                 } else if (currentMove.equals(twinCombo))
                 {
-                    CurrentData.execCreateTwin();
+                    CurrentData.execDuplicate();
                 } else if (currentMove.equals(findCombo))
                 {
                     CurrentData.execFind();
@@ -526,8 +529,10 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         selectedUUID = uuid;
         System.out.println("Selected UUID: " + uuid);
         if (selectedUUID != null && !selectedUUID.equals(Wizard.NULL_SELECTION))
+        {
             UAManager.curr(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)), uuid);
-        setSelectedObject(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)));
+            setSelectedObject(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)));
+        }
     }
 
     private void setSelectedObject(Object object)
@@ -1892,22 +1897,18 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
 
     public void removeAdditionalCamera(final AdditionalCameraDialog acd)
     {
-        System.out.println("Start removing");
         enqueue(new Callable<Void>()
         {
             @Override
             public Void call() throws Exception
             {
-                System.out.println("Inside call");
                 if (acd.equals(selectedObject))
                 {
                     selectedObject = null;
                     CurrentData.getEditorWindow().getEditPane().arrange(true);
                 }
-                System.out.println("Detaching representative");
                 editorNode.detachChild(acd.getRepresentative());
                 additionalCameraDialogs.remove(acd);
-                System.out.println("Done removing");
                 return null;
             }
         });

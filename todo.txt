@@ -1,47 +1,50 @@
 1.0
 Undo / Redo
 Protokoll
-Feature	Installer
+Installer
 Neuer Startbildschirm
 
 
 1.x
-Feature	Create Single Materials
-Feature	MotionPath Camera free rotation
-Verbesserung	Spezielles Icon für letzten Waypoint bei MotionPath Cycle
-Verbesserung	GUTEN AssetBrowser
--Merkt sich Position und Größe
-Feature	Einzelne B3D_Elemente speichern
-Feature	Mehr WaterFilter Einstellungen?
-Feature	Neues AnimationScript, SyntaxHighlight + Comments
-Feature	Von Blender über JMonkey zu Banana3D, Tutorial
+Screenshot preview of scenes when loading
+All Textfields use input when no longer focused and SHOW THAT
+Create Single Materials
+MotionPath Camera free rotation
+Spezielles Icon für letzten Waypoint bei MotionPath Cycle
+GUTEN AssetBrowser
+	-Merkt sich Position und Größe
+Einzelne B3D_Elemente speichern
+Mehr WaterFilter Einstellungen?
+Neues AnimationScript, SyntaxHighlight + Comments
+Von Blender über JMonkey zu Banana3D, Tutorial
 1.	-> .obj, .blend?
 2.	-> KEIN MATERIAL
 3.	-> KEIN UV
 4.	-> usw…
-Feature	Shadow edit resolution
-Feature	Mehrfachauswahl (Gemeinsamkeiten suchen)
--Objekte zu Node zusammenfügen
-Feature	Sound
-Feature	Shaders
-Feature	Dezentralisierte Darstellung
-Feature	Restore after physics (translation, rotation)
-Additional	TerrainEditor
+Shadow edit resolution
+Mehrfachauswahl (Gemeinsamkeiten suchen)
+	-Objekte (derselben Ebene) zu Node zusammenfügen
+	-UserActionGroups (mehrfachauswahl -> Aktion)
+Sound
+Shaders
+Dezentralisierte Darstellung
+Restore after physics (translation, rotation)
+TerrainEditor
 MeshEditor
-Feature	Import from XML
-Feature	Animationen á la Keyframes
-Verbesserung	Zeitanimations better parser
-Verbesserung	AnimationScript Anzeige durchlaufnummer
-Verbesserung	Besseres Bewegen von Objekten
-Feature	Objekte „Locken“ (wie in PS)
-Feature	Let user control setQueueBucket
-Feature	MotionPath jump to waypoint x
-Verbesserung	Auf JME 3.1 umsteigen
-Frage	MotionEvent Pause / Stop -> Difference?
-Feature	Aktion Rückgängig
-Feature	Texture Scale
-Feature	Model Animations
+Import from XML
+Animationen á la Keyframes
+Zeitanimations better parser
+AnimationScript Anzeige durchlaufnummer
+Besseres Bewegen von Objekten
+Objekte „Locken“ (wie in PS)
+Let user control setQueueBucket
+MotionPath jump to waypoint x
+Auf JME 3.1 umsteigen
+MotionEvent Pause / Stop -> Difference?
+Aktion Rückgängig
+Texture Scale
+Model Animations
 Bug	java.lang.UnsupportedOperationException: FrameBuffer already initialized.
-Feature	New meshes
-Verbesserung	Menu -> Search liefert bei mehreren Ergebnissen List zurück
-Verbesserung	Search: Tell if nothing was found
+New meshes
+Menu -> Search liefert bei mehreren Ergebnissen List zurück
+Search: Tell if nothing was found

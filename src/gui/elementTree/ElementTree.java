@@ -18,15 +18,12 @@ import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
 import com.jme3.light.PointLight;
 import com.jme3.light.SpotLight;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import com.jme3.post.Filter;
-import com.jme3.renderer.queue.RenderQueue;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import dialogs.ObserverDialog;
+import general.UAManager;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -45,12 +42,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Vector;
 import java.util.concurrent.Callable;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -67,7 +62,6 @@ import javax.swing.tree.TreeSelectionModel;
 import jme3tools.optimize.GeometryBatchFactory;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.search.TreeSearchable;
-import other.ObjectToElementConverter;
 import other.Wizard;
 
 public class ElementTree extends JXTree
@@ -164,9 +158,7 @@ public class ElementTree extends JXTree
             public void mouseReleased(MouseEvent e)
             {
                 if (SwingUtilities.isRightMouseButton(e))
-                {
                     setSelectionRow(getClosestRowForLocation(e.getX(), e.getY()));
-                }
                 if (e.getButton() == MouseEvent.BUTTON3)  //controls
                 {
                     if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() != null)
@@ -222,9 +214,7 @@ public class ElementTree extends JXTree
         {
             expansionStates = new HashMap<UUID, Boolean>(nodeIndexes.size());
             for (Map.Entry<DefaultMutableTreeNode, UUID> entry : nodeIndexes.entrySet())
-            {
                 expansionStates.put(entry.getValue(), isExpanded(new TreePath(entry.getKey().getPath())));
-            }
             nodeIndexes.clear();
             spatialsNode.removeAllChildren();
             lightsNode.removeAllChildren();
@@ -241,22 +231,15 @@ public class ElementTree extends JXTree
                     if (o1 != null && o2 != null && o1.getName() != null && o2.getName() != null)
                     {
                         if (CurrentData.getConfiguration().treesort.equals("a-z(cs)"))
-                        {
                             return o1.getName().compareTo(o2.getName());
-                        } else if (CurrentData.getConfiguration().treesort.equals("a-z(no_cs)"))
-                        {
+                        else if (CurrentData.getConfiguration().treesort.equals("a-z(no_cs)"))
                             return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-                        } else if (CurrentData.getConfiguration().treesort.equals("z-a(cs)"))
-                        {
+                        else if (CurrentData.getConfiguration().treesort.equals("z-a(cs)"))
                             return -o1.getName().compareTo(o2.getName());
-                        } else
-                        {
+                        else
                             return -o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-                        }
                     } else
-                    {
                         return 0;
-                    }
                 }
             });
             List<B3D_Filter> filterList = new ArrayList<B3D_Filter>();
@@ -266,12 +249,12 @@ public class ElementTree extends JXTree
                     {
                         if (((B3D_Spatial) element).getParentUUID().equals(Wizard.NULL_SELECTION))
                         {
-                            System.out.println("Handling " + element.getName() + " (" + element.getUUID() + ")");
+                            //System.out.println("Handling " + element.getName() + " (" + element.getUUID() + ")");
                             handleChild(spatialsNode, element);
                         }
                     } else if (element instanceof B3D_Light)
                     {
-                        System.out.println(element + " - " + element.getUUID());
+                        //System.out.println(element + " - " + element.getUUID());
                         DefaultMutableTreeNode tempNode = new DefaultMutableTreeNode(element.getName(), false);
                         nodeIndexes.put(tempNode, element.getUUID());
                         lightsNode.add(tempNode);
@@ -295,7 +278,7 @@ public class ElementTree extends JXTree
             });
             for (B3D_Filter filter : filterList)
             {
-                DefaultMutableTreeNode tempNode = new DefaultMutableTreeNode(filter.getName() + " - " + filter.getFilterIndex(), false);
+                DefaultMutableTreeNode tempNode = new DefaultMutableTreeNode("[" + filter.getFilterIndex() + "] " + filter.getName(), false);
                 nodeIndexes.put(tempNode, filter.getUUID());
                 filtersNode.add(tempNode);
             }
@@ -305,18 +288,10 @@ public class ElementTree extends JXTree
             expandPath(new TreePath(filtersNode.getPath()));
             expandPath(new TreePath(othersNode.getPath()));
             for (Map.Entry<UUID, Boolean> entry : expansionStates.entrySet())
-            {
                 if (entry.getValue())
-                {
                     for (Map.Entry<DefaultMutableTreeNode, UUID> e : nodeIndexes.entrySet())
-                    {
                         if (entry.getKey().equals(e.getValue()))
-                        {
                             expandPath(new TreePath(e.getKey().getPath()));
-                        }
-                    }
-                }
-            }
             updateSelection();
         }
         /*synchronized (nodeIndexes)
@@ -337,9 +312,10 @@ public class ElementTree extends JXTree
             DefaultMutableTreeNode tempNode = new DefaultMutableTreeNode(element.getName(),
                     (spatial instanceof Node && !(spatial instanceof TerrainQuad))
                     && (spatial.getUserData("modelName") == null));
+            //System.out.println("Parent Node: " + parentNode.getUserObject().toString());
             parentNode.add(tempNode);
             nodeIndexes.put(tempNode, element.getUUID());
-            if (spatial instanceof Node && !(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof TerrainQuad)
+            if (spatial instanceof Node && !(spatial instanceof TerrainQuad)
                     && (spatial.getUserData("modelName") == null))
             {
                 Node node = (Node) spatial;
@@ -361,20 +337,14 @@ public class ElementTree extends JXTree
             if (!codeSelect)
             {
                 if (CurrentData.getEditorWindow().getB3DApp().getSelectedUUID() != Wizard.NULL_SELECTION)
-                {
                     for (Map.Entry<DefaultMutableTreeNode, UUID> entry : nodeIndexes.entrySet())
-                    {
                         if (entry.getValue().equals(CurrentData.getEditorWindow().getB3DApp().getSelectedUUID()))
                         {
                             TreePath tPath = new TreePath(treeModel.getPathToRoot(entry.getKey()));
                             setSelectionPath(tPath);
                         }
-                    }
-                }
             } else
-            {
                 codeSelect = false;
-            }
             repaint();
         }
     }
@@ -383,13 +353,12 @@ public class ElementTree extends JXTree
     {
 
         private JMenuItem renameItem = new JMenuItem("Rename", new ImageIcon("dat//img//menu//edit.png"));
-        private JMenuItem twinItem = new JMenuItem("Duplicate", new ImageIcon("dat//img//menu//duplicate.png"));
+        private JMenuItem duplicateItem = new JMenuItem("Duplicate", new ImageIcon("dat//img//menu//duplicate.png"));
         private JMenuItem deleteItem = new JMenuItem("Delete", new ImageIcon("dat//img//menu//delete.png"));
         private JMenuItem jumpToItem = new JMenuItem("Jump to", new ImageIcon("dat//img//menu//jumpTo.png"));
         private JMenuItem lookAtItem = new JMenuItem("Look at", new ImageIcon("dat//img//menu//lookAt.png"));
         private JCheckBoxMenuItem enableItem = new JCheckBoxMenuItem("Enabled", new ImageIcon("dat//img//menu//eye.png"));
         private JMenuItem dissolveItem = new JMenuItem("Dissolve", new ImageIcon("dat//img//menu//dissolve.png"));
-        private JMenuItem connectItem = new JMenuItem("Dissolve", new ImageIcon("dat//img//menu//connect.png"));
         private JMenuItem batchNodeItem = new JMenuItem("Export as optimized Model", new ImageIcon("dat//img//menu//batch.png"));
         private JMenuItem filterUpItem = new JMenuItem("Up", new ImageIcon("dat//img//menu//arrowUp.png"));
         private JMenuItem filterDownItem = new JMenuItem("Down", new ImageIcon("dat//img//menu//arrowDown.png"));
@@ -476,7 +445,9 @@ public class ElementTree extends JXTree
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    ((Filter) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).setEnabled(enableItem.isSelected());
+                    Filter f = ((Filter) CurrentData.getEditorWindow().getB3DApp().getSelectedObject());
+                    f.setEnabled(enableItem.isSelected());
+                    UAManager.add(f, (enableItem.isSelected() ? "Enable " : "Disable ") + f.getName());
                 }
             });
             numberElementsItem.addActionListener(new ActionListener()
@@ -512,12 +483,12 @@ public class ElementTree extends JXTree
                     CurrentData.execLookAt();
                 }
             });
-            twinItem.addActionListener(new ActionListener()
+            duplicateItem.addActionListener(new ActionListener()
             {
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    CurrentData.execCreateTwin();
+                    CurrentData.execDuplicate();
                 }
             });
             animateItem.addActionListener(new ActionListener()
@@ -599,7 +570,6 @@ public class ElementTree extends JXTree
                 public void actionPerformed(ActionEvent e)
                 {
                     B3D_Element selectedElement = Wizard.getObjects().getB3D_Element(CurrentData.getEditorWindow().getB3DApp().getSelectedUUID());
-                    int oldIndex = ((B3D_Filter) selectedElement).getFilterIndex();
                     int newIndex = ((B3D_Filter) selectedElement).getFilterIndex() + 1;
                     int filterID = CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().getFilterList().get(newIndex).hashCode();
                     UUID b3d_filterUUID = Wizard.getObjectReferences().getUUID(
@@ -615,6 +585,8 @@ public class ElementTree extends JXTree
                         public Void call() throws Exception
                         {
                             CurrentData.getEditorWindow().getB3DApp().sortFilters();
+                            Filter f = (Filter) CurrentData.getEditorWindow().getB3DApp().getSelectedObject();
+                            UAManager.add(f, "Change Filter Index of " + f.getName());
                             return null;
                         }
                     });
@@ -643,6 +615,8 @@ public class ElementTree extends JXTree
                         public Void call() throws Exception
                         {
                             CurrentData.getEditorWindow().getB3DApp().sortFilters();
+                            Filter f = (Filter) CurrentData.getEditorWindow().getB3DApp().getSelectedObject();
+                            UAManager.add(f, "Change Filter Index of " + f.getName());
                             return null;
                         }
                     });
@@ -718,7 +692,7 @@ public class ElementTree extends JXTree
                         add(batchNodeItem);
                         add(new JSeparator());
                     }
-                    add(twinItem);
+                    add(duplicateItem);
                     add(lookAtItem);
                     add(jumpToItem);
                     add(renameItem);
@@ -727,7 +701,7 @@ public class ElementTree extends JXTree
                     add(copyIDItem);
                 } else if (selectedNode.getParent().equals(lightsNode))
                 {
-                    add(twinItem);
+                    add(duplicateItem);
                     if (!(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof AmbientLight)
                             && !(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof DirectionalLight))
                     {
@@ -772,7 +746,7 @@ public class ElementTree extends JXTree
                         add(stopItem);
                     }
                     add(new JSeparator(JSeparator.HORIZONTAL));
-                    add(twinItem);
+                    add(duplicateItem);
                     add(lookAtItem);
                     add(jumpToItem);
                     add(renameItem);

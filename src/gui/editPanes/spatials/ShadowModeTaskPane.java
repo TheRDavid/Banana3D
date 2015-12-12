@@ -6,12 +6,14 @@ import general.CurrentData;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Vector;
+import java.util.concurrent.Callable;
 import javax.swing.JComboBox;
 import other.Wizard;
 
@@ -27,8 +29,8 @@ public class ShadowModeTaskPane extends EditTaskPane
     public ShadowModeTaskPane()
     {
         spatial = (Spatial) CurrentData.getEditorWindow().getB3DApp().getSelectedObject();
-        System.out.println("spatial " + spatial);
-        if(spatial==null) return;
+        if (spatial == null)
+            return;
         if (spatial.getShadowMode().equals(RenderQueue.ShadowMode.Cast))
         {
             modeComboBox.setSelectedIndex(0);
@@ -48,7 +50,7 @@ public class ShadowModeTaskPane extends EditTaskPane
         modeComboBox.addItemListener(new ItemListener()
         {
             @Override
-            public void itemStateChanged(ItemEvent e)
+            public void itemStateChanged(final ItemEvent e)
             {
                 switch (modeComboBox.getSelectedIndex())
                 {
@@ -68,6 +70,16 @@ public class ShadowModeTaskPane extends EditTaskPane
                         spatial.setShadowMode(RenderQueue.ShadowMode.Off);
                         break;
                 }
+                CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                {
+                    @Override
+                    public Void call() throws Exception
+                    {
+                        if (e.getStateChange() == ItemEvent.SELECTED)
+                            UAManager.add(spatial, "Set Shadow Mode of " + spatial.getName() + " to " + modeComboBox.getModel().getSelectedItem());
+                        return null;
+                    }
+                });
             }
         });
         applyButton.addActionListener(new ActionListener()

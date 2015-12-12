@@ -15,9 +15,12 @@ import components.BTextField;
 import components.Checker;
 import components.Float3Panel;
 import components.RoundBorder;
+import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -85,6 +88,22 @@ public class PhysicsTaskPane extends EditTaskPane
                 }
             }
         });
+        positionPanel.addFieldFocusListener(new FocusAdapter()
+        {
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                {
+                    @Override
+                    public Void call() throws Exception
+                    {
+                        UAManager.add(spatial, "Change Physics Position of " + spatial.getName());
+                        return null;
+                    }
+                });
+            }
+        });
         enablePhysicsChecker.setChecked(spatial.getControl(RigidBodyControl.class) != null);
         collisionShapeComboBox.addItemListener(new ItemListener()
         {
@@ -123,6 +142,15 @@ public class PhysicsTaskPane extends EditTaskPane
                         break;
                 }
                 arrangeCShapePanel();
+                CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                {
+                    @Override
+                    public Void call() throws Exception
+                    {
+                        UAManager.add(spatial, "Change Collision Shape of " + spatial.getName());
+                        return null;
+                    }
+                });
             }
         });
         enablePhysicsChecker.addMouseListener(new MouseAdapter()
@@ -146,6 +174,15 @@ public class PhysicsTaskPane extends EditTaskPane
                             CurrentData.getEditorWindow().getB3DApp().getBulletAppState().getPhysicsSpace().remove(spatial.getControl(RigidBodyControl.class));
                             spatial.removeControl(RigidBodyControl.class);
                         }
+                        CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                        {
+                            @Override
+                            public Void call() throws Exception
+                            {
+                                UAManager.add(spatial, (enablePhysicsChecker.isChecked() ? "Enable" : "Disable") + " Physics of " + spatial.getName());
+                                return null;
+                            }
+                        });
                         arrange();
                         return null;
                     }
@@ -252,6 +289,15 @@ public class PhysicsTaskPane extends EditTaskPane
         spatial.getControl(RigidBodyControl.class).setRestitution(Float.parseFloat(restitutionField.getText()));
         spatial.getControl(RigidBodyControl.class).setCollisionShape(collisionShape);
         CurrentData.getEditorWindow().getB3DApp().getBulletAppState().getPhysicsSpace().add(spatial);
+        CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+        {
+            @Override
+            public Void call() throws Exception
+            {
+                UAManager.add(spatial, "Edit Physics of " + spatial.getName());
+                return null;
+            }
+        });
     }
 
     private void arrangeCShapePanel()

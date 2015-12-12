@@ -273,7 +273,7 @@ public class OtherTaskPane extends EditTaskPane
                         @Override
                         public Void call() throws Exception
                         {
-                            UAManager.add(spatial, enabledChecker.isChecked() ? "enable" : "disable" + " Light Scattering Control of " + spatial.getName());
+                            UAManager.add(spatial, (enabledChecker.isChecked() ? "Enable" : "Disable") + " Light Scattering Control of " + spatial.getName());
                             return null;
                         }
                     });
@@ -367,7 +367,7 @@ public class OtherTaskPane extends EditTaskPane
                         @Override
                         public Void call() throws Exception
                         {
-                            UAManager.add(spatial, enabledChecker.isChecked() ? "enable" : "disable" + " Light Control of " + spatial.getName());
+                            UAManager.add(spatial, enabledChecker.isChecked() ? "Enable" : "Disable" + " Light Control of " + spatial.getName());
                             return null;
                         }
                     });

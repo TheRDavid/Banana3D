@@ -75,7 +75,7 @@ public class LightScatteringTaskPane extends EditTaskPane
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                UAManager.add(lightScatteringFilter, "Change Samples to " + samplesSlider.getValue());
+                UAManager.add(lightScatteringFilter, "Set Samples to " + samplesSlider.getValue());
             }
         });
         blurStartField.setText("" + scatteringFilter.getBlurStart());

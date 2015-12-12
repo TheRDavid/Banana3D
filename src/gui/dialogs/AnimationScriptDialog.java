@@ -205,7 +205,6 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
                     if (e.getKeyCode() == KeyEvent.VK_ENTER)
                     {
                         setRows(getRows() + 1);
-                        System.out.println("Setting rows to " + getRows());
                         if (brace)
                         {
                             brace = false;

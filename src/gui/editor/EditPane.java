@@ -166,7 +166,6 @@ public class EditPane extends JScrollPane
                 {
                     //It's a spatial.
                     Spatial tempSpatial = (Spatial) CurrentData.getEditorWindow().getB3DApp().getSelectedObject();
-                    System.out.println("tempSpatial : " + tempSpatial);
                     if (tempSpatial.getParent() != null
                             && !tempSpatial.getParent().equals(CurrentData.getEditorWindow().getB3DApp().getEditorNode()))
                     {
@@ -393,7 +392,6 @@ public class EditPane extends JScrollPane
 
     public void refresh()
     {
-        System.out.println("refreshing");
         for (EditTaskPane etp : taskPanes)
             etp.updateData(true);
     }

@@ -93,7 +93,7 @@ public class ShadowTaskPane extends EditTaskPane
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                UAManager.add(shadowFilter, "Change Intensity to " + intensitySlider._getValue());
+                UAManager.add(shadowFilter, "Set Intensity to " + intensitySlider._getValue());
             }
         });
         taskPane.setLayout(new RiverLayout());
