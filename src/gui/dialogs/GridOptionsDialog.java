@@ -6,6 +6,7 @@ import components.BTextField;
 import components.CancelButton;
 import components.OKButton;
 import dialogs.BasicDialog;
+import general.Preference;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.concurrent.Callable;
@@ -15,9 +16,9 @@ import se.datadosen.component.RiverLayout;
 public class GridOptionsDialog extends BasicDialog
 {
 
-    private BTextField xLinesField = new BTextField("Integer",""+ CurrentData.getConfiguration().gridx);
-    private BTextField yLinesField = new BTextField("Integer", ""+ CurrentData.getConfiguration().gridy);
-    private BTextField gridGapField = new BTextField("Float", ""+ CurrentData.getConfiguration().gridgap);
+    private BTextField xLinesField = new BTextField("Integer", "" + CurrentData.getPrefs().get(Preference.GRID_X));
+    private BTextField yLinesField = new BTextField("Integer", "" + CurrentData.getPrefs().get(Preference.GRID_Y));
+    private BTextField gridGapField = new BTextField("Float", "" + CurrentData.getPrefs().get(Preference.GRID_GAP));
     private OKButton okButton = new OKButton("Ok");
     private CancelButton cancelButton;
 
@@ -38,9 +39,9 @@ public class GridOptionsDialog extends BasicDialog
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                CurrentData.getConfiguration().setGridx(Integer.parseInt(xLinesField.getText()));
-                CurrentData.getConfiguration().setGridy(Integer.parseInt(yLinesField.getText()));
-                CurrentData.getConfiguration().setGridgap(Float.parseFloat(gridGapField.getText()));
+                CurrentData.getPrefs().set(Preference.GRID_X, Integer.parseInt(xLinesField.getText()));
+                CurrentData.getPrefs().set(Preference.GRID_Y, Integer.parseInt(yLinesField.getText()));
+                CurrentData.getPrefs().set(Preference.GRID_GAP, Float.parseFloat(gridGapField.getText()));
                 CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
                 {
                     @Override

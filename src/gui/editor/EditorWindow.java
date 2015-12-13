@@ -10,13 +10,14 @@ import monkeyStuff.B3DApp;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 import components.BButton;
+import components.CanvasPanel;
 import components.StatusBar;
 import dialogs.ObserverDialog;
+import general.Preference;
 import general.UAManager;
 import other.B3D_Scene;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Ellipse2D;
 import javax.swing.*;
 import org.jdesktop.swingx.VerticalLayout;
 import other.Wizard;
@@ -29,7 +30,7 @@ public class EditorWindow extends JFrame
     private JPanel treePanel = new JPanel(new VerticalLayout(0));
     private JScrollPane treeScrollPane = new JScrollPane();
     private ElementTree tree;
-    private PlayPanel playPanel = new PlayPanel();
+    private CanvasPanel canvasPanel = new CanvasPanel();
     private JPanel middlePanel = new JPanel(new VerticalLayout());
     private ControlToolBar toolbar = new ControlToolBar();
     private B3DApp b3DSimpleApplication;
@@ -54,16 +55,12 @@ public class EditorWindow extends JFrame
         tree.init();
         fieldOfViewButton.setEnabled(false);
         addCamButton.setEnabled(false);
-        if (CurrentData.getConfiguration().treesort.equals("z-a(no_cs)"))
-        {
+        if (CurrentData.getPrefs().get(Preference.TREESORT).equals("z-a(no_cs)"))
             sortModeComboBox.setSelectedIndex(1);
-        } else if (CurrentData.getConfiguration().treesort.equals("a-z(cs)"))
-        {
+        else if (CurrentData.getPrefs().get(Preference.TREESORT).equals("a-z(cs)"))
             sortModeComboBox.setSelectedIndex(2);
-        } else if (CurrentData.getConfiguration().treesort.equals("z-a(cs)"))
-        {
+        else if (CurrentData.getPrefs().get(Preference.TREESORT).equals("z-a(cs)"))
             sortModeComboBox.setSelectedIndex(2);
-        }
         sortModeComboBox.addItemListener(new ItemListener()
         {
             @Override
@@ -72,16 +69,16 @@ public class EditorWindow extends JFrame
                 switch (sortModeComboBox.getSelectedIndex())
                 {
                     case 0:
-                        CurrentData.getConfiguration().setTreesort("a-z(no_cs)");
+                        CurrentData.getPrefs().set(Preference.TREESORT, "a-z(no_cs)");
                         break;
                     case 1:
-                        CurrentData.getConfiguration().setTreesort("z-a(no_cs)");
+                        CurrentData.getPrefs().set(Preference.TREESORT, "z-a(no_cs)");
                         break;
                     case 2:
-                        CurrentData.getConfiguration().setTreesort("a-z(cs)");
+                        CurrentData.getPrefs().set(Preference.TREESORT, "a-z(cs)");
                         break;
                     case 3:
-                        CurrentData.getConfiguration().setTreesort("z-a(cs)");
+                        CurrentData.getPrefs().set(Preference.TREESORT, "z-a(cs)");
                         break;
                 }
                 tree.sync();
@@ -113,17 +110,17 @@ public class EditorWindow extends JFrame
             }
         });
         setJMenuBar(editorMenu);
-        if (CurrentData.getConfiguration().fullscreen)
+        if ((Boolean) CurrentData.getPrefs().get(Preference.FULLSCREEN))
         {
             setUndecorated(true);
             setSize(Toolkit.getDefaultToolkit().getScreenSize());
             setLocation(0, 0);
         } else
         {
-            setSize(CurrentData.getConfiguration().editorWidth, CurrentData.getConfiguration().editorHeight);
+            setSize((Dimension) CurrentData.getPrefs().get(Preference.EDITOR_WINDOW_SIZE));
             setLocationRelativeTo(null);
         }
-        addComponentListener(new ComponentListener()
+        addComponentListener(new ComponentAdapter()
         {
             @Override
             public void componentResized(ComponentEvent e)
@@ -136,16 +133,6 @@ public class EditorWindow extends JFrame
             {
                 arrangeComponentSizes();
             }
-
-            @Override
-            public void componentShown(ComponentEvent e)
-            {
-            }
-
-            @Override
-            public void componentHidden(ComponentEvent e)
-            {
-            }
         });
         addWindowStateListener(new WindowStateListener()
         {
@@ -155,7 +142,7 @@ public class EditorWindow extends JFrame
                 arrangeComponentSizes();
             }
         });
-        addWindowListener(new WindowListener()
+        addWindowListener(new WindowAdapter()
         {
             @Override
             public void windowOpened(WindowEvent e)
@@ -168,31 +155,6 @@ public class EditorWindow extends JFrame
             {
                 CurrentData.execQuit();
             }
-
-            @Override
-            public void windowClosed(WindowEvent e)
-            {
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e)
-            {
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e)
-            {
-            }
-
-            @Override
-            public void windowActivated(WindowEvent e)
-            {
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e)
-            {
-            }
         });
         setIconImage(new ImageIcon("dat//img//other//logo.png").getImage());
         setTitle("Banana3D");
@@ -202,7 +164,7 @@ public class EditorWindow extends JFrame
         upperPanel.setLayout(new BorderLayout());
         upperPanel.add(addCamButton, BorderLayout.WEST);
         upperPanel.add(fieldOfViewButton, BorderLayout.CENTER);
-        middlePanel.add(playPanel);
+        middlePanel.add(canvasPanel);
         middlePanel.add(toolbar);
         add(middlePanel, BorderLayout.CENTER);
         treePanel.add(sortModeComboBox);
@@ -225,8 +187,8 @@ public class EditorWindow extends JFrame
         CurrentData.getSplashDialog().dispose();
         //Needs to be called after every resize
         arrangeComponentSizes();
-        playPanel.setPlayIcon(Wizard.resizeImage(new ImageIcon("dat//img//other//playPic2.png").getImage(), getWidth(), getHeight(), true));
-        playPanel.setPlayIcon2(Wizard.resizeImage(new ImageIcon("dat//img//other//playPic1.png").getImage(), getWidth(), getHeight(), true));
+        canvasPanel.setPlayIcon(Wizard.resizeImage(new ImageIcon("dat//img//other//playPic2.png").getImage(), getWidth(), getHeight(), true));
+        canvasPanel.setPlayIcon2(Wizard.resizeImage(new ImageIcon("dat//img//other//playPic1.png").getImage(), getWidth(), getHeight(), true));
         setVisible(true);
     }
 
@@ -245,102 +207,17 @@ public class EditorWindow extends JFrame
         else
             middlePanel.setPreferredSize(new Dimension(getContentPane().getWidth() - tree.getWidth() - editPane.getWidth(), getHeight() - 110));
         toolbar.setPreferredSize(new Dimension(middlePanel.getWidth(), 110));
-        playPanel.setPreferredSize(new Dimension(
+        canvasPanel.setPreferredSize(new Dimension(
                 middlePanel.getPreferredSize().width,
                 middlePanel.getPreferredSize().height - upperPanel.getPreferredSize().height - toolbar.getPreferredSize().height));
         if (canvasContext != null)
         {
             b3DSimpleApplication.restart();
-            canvasContext.getCanvas().setPreferredSize(playPanel.getPreferredSize());
+            canvasContext.getCanvas().setPreferredSize(canvasPanel.getPreferredSize());
         }
         repaint();
         revalidate();
         validate();
-    }
-
-    /**
-     * This Panel either contains the 3D-Canvas or the welcome image /
-     * animation.
-     */
-    public class PlayPanel extends JPanel
-    {
-
-        private ImageIcon playIcon;
-        private ImageIcon playIcon2;
-        private Point mousePosition = new Point();
-        private boolean seriousNow = false;
-        private Ellipse2D.Double ellipse = new Ellipse2D.Double();
-
-        public PlayPanel()
-        {
-            new Thread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    while (!seriousNow)
-                    {
-                        try
-                        {
-                            Thread.sleep(10);
-                        } catch (InterruptedException ex)
-                        {
-                            ObserverDialog.getObserverDialog().printError("Thread.sleep in EditorWindow interrupted", ex);
-                        }
-                        PlayPanel.this.repaint();
-                    }
-                    playIcon = null;
-                    playIcon2 = null;
-                    mousePosition = null;
-                }
-            }).start();
-            addMouseMotionListener(new MouseMotionAdapter()
-            {
-                @Override
-                public void mouseMoved(MouseEvent e)
-                {
-                    ellipse.setFrame(e.getX() - pSize / 2, e.getY() - pSize / 2, pSize, pSize);
-                }
-            });
-        }
-        private Graphics2D g2d;
-        private AlphaComposite ac;
-        private int pSize = Toolkit.getDefaultToolkit().getScreenSize().width / 10;
-
-        @Override
-        public void paint(Graphics g)
-        {
-            super.paint(g);
-            g2d = (Graphics2D) g;
-            if (!seriousNow)
-            {
-                g.drawImage(playIcon.getImage(), getWidth() / 2 - playIcon.getIconWidth() / 2, getHeight() / 2 - playIcon.getIconHeight() / 2, playIcon.getIconWidth(), playIcon.getIconHeight(), null);
-                ac = AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 1);
-                g2d.setComposite(ac);
-                g.setClip(ellipse);
-                g.drawImage(playIcon2.getImage(), getWidth() / 2 - playIcon.getIconWidth() / 2, getHeight() / 2 - playIcon.getIconHeight() / 2, playIcon.getIconWidth(), playIcon.getIconHeight(), null);
-            }
-        }
-
-        public ImageIcon getPlayIcon()
-        {
-            return playIcon;
-        }
-
-        public void setPlayIcon(ImageIcon playIcon)
-        {
-            this.playIcon = playIcon;
-        }
-
-        public ImageIcon getPlayIcon2()
-        {
-            return playIcon2;
-        }
-
-        public void setPlayIcon2(ImageIcon playIcon2)
-        {
-            this.playIcon2 = playIcon2;
-        }
     }
 
     /**
@@ -350,23 +227,23 @@ public class EditorWindow extends JFrame
      */
     public void initNewScene(B3D_Scene world)
     {
-        playPanel.seriousNow = true;
+        canvasPanel.setSeriousNow(true);
         AppSettings settings = new AppSettings(true);
-        settings.setFrameRate(CurrentData.getConfiguration().framerate);
+        settings.setFrameRate((Integer) CurrentData.getPrefs().get(Preference.FRAMERATE));
         settings.setRenderer(AppSettings.LWJGL_OPENGL3);
-        settings.setVSync(CurrentData.getConfiguration().vSync);
-        settings.setBitsPerPixel(CurrentData.getConfiguration().colorDepth);
-        settings.setResolution(playPanel.getWidth(), playPanel.getHeight());
-        settings.setSamples(CurrentData.getConfiguration().mutlisampling);
-        settings.setDepthBits(CurrentData.getConfiguration().depthBits);
+        settings.setVSync((Boolean) CurrentData.getPrefs().get(Preference.VSYNC));
+        settings.setBitsPerPixel((Integer) CurrentData.getPrefs().get(Preference.COLOR_DEPTH));
+        settings.setResolution(canvasPanel.getWidth(), canvasPanel.getHeight());
+        settings.setSamples((Integer) CurrentData.getPrefs().get(Preference.MULTISAMPLING));
+        settings.setDepthBits((Integer) CurrentData.getPrefs().get(Preference.DEPTH_BITS));
         b3DSimpleApplication = new B3DApp(1000, world);
         b3DSimpleApplication.setSettings(settings);
         b3DSimpleApplication.createCanvas();
         b3DSimpleApplication.startCanvas();
         canvasContext = (JmeCanvasContext) b3DSimpleApplication.getContext();
-        canvasContext.getCanvas().setPreferredSize(playPanel.getSize());
+        canvasContext.getCanvas().setPreferredSize(canvasPanel.getSize());
         canvasContext.setSystemListener(b3DSimpleApplication);
-        playPanel.add(canvasContext.getCanvas());
+        canvasPanel.add(canvasContext.getCanvas());
         editorMenu.setDisabled(false);
         tree.setEnabled(true);
         toolbar.setEnabled(true);
@@ -413,9 +290,7 @@ public class EditorWindow extends JFrame
                     } else if ((e.getKeyCode() == KeyEvent.VK_F7))
                     {
                         if (b3DSimpleApplication != null)
-                        {
                             CurrentData.execFullscreen();
-                        }
                         ret = true;
                     } else if ((e.getKeyCode() == KeyEvent.VK_O) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
                     {
@@ -497,9 +372,9 @@ public class EditorWindow extends JFrame
         return editPane;
     }
 
-    public PlayPanel getPlayPanel()
+    public CanvasPanel getCanvasPanel()
     {
-        return playPanel;
+        return canvasPanel;
     }
 
     public BButton getFieldOfViewButton()

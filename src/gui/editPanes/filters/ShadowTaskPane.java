@@ -1,6 +1,5 @@
 package gui.editPanes.filters;
 
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import com.jme3.shadow.AbstractShadowFilter;
 import static com.jme3.shadow.EdgeFilteringMode.Bilinear;
@@ -13,6 +12,7 @@ import components.BComboBox;
 import components.BSlider;
 import components.BTextField;
 import components.Checker;
+import components.EditTaskPane;
 import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

@@ -6,6 +6,7 @@ import com.jme3.light.Light;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainQuad;
+import general.Preference;
 import other.Wizard;
 
 public class SceneNode extends Node
@@ -67,12 +68,9 @@ public class SceneNode extends Node
     @Override
     public int attachChild(Spatial spatial)
     {
-        Wizard.setWireframe(spatial, CurrentData.getConfiguration().showwire);
-        System.out.println("Setting wf : " + CurrentData.getConfiguration().showwire);
+        Wizard.setWireframe(spatial, (Boolean) CurrentData.getPrefs().get(Preference.SHOW_WIREFRAME));
         if (spatial instanceof Node && !(spatial instanceof TerrainQuad))
-        {
             CurrentData.getEditorWindow().getB3DApp().getNodeModels().add(new NodeModel((Node) spatial));
-        }
         if (CurrentData.getEditorWindow().getB3DApp().getSelectedNode() == this || CurrentData.getEditorWindow().getB3DApp().getSelectedNode() == spatial)
         {
             System.out.println("Adding " + spatial + " to sceneNode -> " + spatial.getVertexCount());

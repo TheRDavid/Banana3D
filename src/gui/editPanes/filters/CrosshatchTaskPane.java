@@ -1,9 +1,9 @@
 package gui.editPanes.filters;
 
 import gui.components.BColorButton;
-import gui.editPanes.EditTaskPane;
 import com.jme3.post.filters.CrossHatchFilter;
 import components.BTextField;
+import components.EditTaskPane;
 import general.UAManager;
 import other.Wizard;
 import java.awt.BorderLayout;

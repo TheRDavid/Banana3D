@@ -7,6 +7,8 @@ import components.OKButton;
 import dialogs.BasicDialog;
 import files.Configuration;
 import general.CurrentData;
+import general.Preference;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JComboBox;
@@ -38,41 +40,40 @@ public class SettingsDialog extends BasicDialog
         {
             public void actionPerformed(ActionEvent e)
             {
-                CurrentData.getConfiguration().setColorDepth(Integer.parseInt(viewPanel.colorDepthField.getText()));
-                CurrentData.getConfiguration().setDefaultEditorSize(Integer.parseInt(viewPanel.editorWidthField.getText()), Integer.parseInt(viewPanel.editorHeightField.getText()));
-                CurrentData.getConfiguration().setDepthBits(Integer.parseInt(viewPanel.depthBitsField.getText()));
-                CurrentData.getConfiguration().setExitwithoutprompt(behaviourPanel.exitWithoutPromptChecker.isChecked());
-                CurrentData.getConfiguration().setFramerate(Integer.parseInt(viewPanel.fpsField.getText()));
+                int w = Integer.parseInt(viewPanel.editorWidthField.getText());
+                int h = Integer.parseInt(viewPanel.editorHeightField.getText());
+                CurrentData.getPrefs().set(Preference.COLOR_DEPTH, Integer.parseInt(viewPanel.colorDepthField.getText()));
+                CurrentData.getPrefs().set(Preference.EDITOR_WINDOW_SIZE, new Dimension(w, h));
+                CurrentData.getPrefs().set(Preference.DEPTH_BITS, Integer.parseInt(viewPanel.depthBitsField.getText()));
+                CurrentData.getPrefs().set(Preference.EXIT_WITHOUT_PROMPT, behaviourPanel.exitWithoutPromptChecker.isChecked());
+                CurrentData.getPrefs().set(Preference.FRAMERATE, Integer.parseInt(viewPanel.fpsField.getText()));
                 switch (behaviourPanel.speedComboBox.getSelectedIndex())
                 {
                     case 0:
-                        CurrentData.getConfiguration().setGuiSPeed(Configuration.SLOW_GUI);
+                        CurrentData.getPrefs().set(Preference.GUI_SPEED, CurrentData.GUI_SLOW);
                         break;
                     case 1:
-                        CurrentData.getConfiguration().setGuiSPeed(Configuration.DEFAULT_GUI);
+                        CurrentData.getPrefs().set(Preference.GUI_SPEED, CurrentData.GUI_DEFAULT);
                         break;
                     case 2:
-                        CurrentData.getConfiguration().setGuiSPeed(Configuration.FAST_GUI);
+                        CurrentData.getPrefs().set(Preference.GUI_SPEED, CurrentData.GUI_FAST);
                         break;
                 }
-                CurrentData.getConfiguration().setMutlisampling(Integer.parseInt(viewPanel.multisamplingField.getText()));
-                CurrentData.getConfiguration().setvSync(viewPanel.vsyncChecker.isChecked());
+                CurrentData.getPrefs().set(Preference.MULTISAMPLING, Integer.parseInt(viewPanel.multisamplingField.getText()));
+                CurrentData.getPrefs().set(Preference.VSYNC, viewPanel.vsyncChecker.isChecked());
                 if (CurrentData.getEditorWindow().getB3DApp() != null)
                 {
                     AppSettings settings = new AppSettings(true);
-                    settings.setFrameRate(CurrentData.getConfiguration().framerate);
+                    settings.setFrameRate((Integer) CurrentData.getPrefs().get(Preference.FRAMERATE));
                     settings.setRenderer(AppSettings.LWJGL_OPENGL3);
-                    settings.setVSync(CurrentData.getConfiguration().vSync);
-                    settings.setBitsPerPixel(CurrentData.getConfiguration().colorDepth);
-                    settings.setResolution(CurrentData.getEditorWindow().getPlayPanel().getWidth(), CurrentData.getEditorWindow().getPlayPanel().getHeight());
-                    settings.setSamples(CurrentData.getConfiguration().mutlisampling);
-                    settings.setDepthBits(CurrentData.getConfiguration().depthBits);
+                    settings.setVSync((Boolean) CurrentData.getPrefs().get(Preference.VSYNC));
+                    settings.setBitsPerPixel((Integer) CurrentData.getPrefs().get(Preference.COLOR_DEPTH));
+                    settings.setResolution(CurrentData.getEditorWindow().getCanvasPanel().getWidth(), CurrentData.getEditorWindow().getCanvasPanel().getHeight());
+                    settings.setSamples((Integer) CurrentData.getPrefs().get(Preference.MULTISAMPLING));
+                    settings.setDepthBits((Integer) CurrentData.getPrefs().get(Preference.DEPTH_BITS));
                     CurrentData.getEditorWindow().getB3DApp().setSettings(settings);
                     CurrentData.getEditorWindow().getB3DApp().restart();
                 }
-                int w = Integer.parseInt(viewPanel.editorWidthField.getText());
-                int h = Integer.parseInt(viewPanel.editorHeightField.getText());
-                CurrentData.getConfiguration().setEditorSize(w, h);
                 CurrentData.getEditorWindow().setSize(w, h);
                 CurrentData.getEditorWindow().arrangeComponentSizes();
                 dispose();
@@ -88,16 +89,19 @@ public class SettingsDialog extends BasicDialog
     private class ViewPanel extends JPanel
     {
 
-        BTextField editorWidthField = new BTextField("Integer", "" + CurrentData.getConfiguration().editorWidth), editorHeightField = new BTextField("Integer", "" + CurrentData.getConfiguration().editorHeight);
-        BTextField fpsField = new BTextField("Integer", CurrentData.getConfiguration().framerate + "");
+        BTextField editorWidthField = new BTextField(
+                "Integer", "" + ((Dimension) CurrentData.getPrefs().get(Preference.EDITOR_WINDOW_SIZE)).width),
+                editorHeightField = new BTextField(
+                "Integer", "" + ((Dimension) CurrentData.getPrefs().get(Preference.EDITOR_WINDOW_SIZE)).height);
+        BTextField fpsField = new BTextField("Integer", CurrentData.getPrefs().get(Preference.FRAMERATE) + "");
         Checker vsyncChecker = new Checker();
-        BTextField colorDepthField = new BTextField("Integer", CurrentData.getConfiguration().colorDepth + "");
-        BTextField multisamplingField = new BTextField("Integer", CurrentData.getConfiguration().mutlisampling + "");
-        BTextField depthBitsField = new BTextField("Integer", CurrentData.getConfiguration().depthBits + "");
+        BTextField colorDepthField = new BTextField("Integer", CurrentData.getPrefs().get(Preference.COLOR_DEPTH) + "");
+        BTextField multisamplingField = new BTextField("Integer", CurrentData.getPrefs().get(Preference.MULTISAMPLING) + "");
+        BTextField depthBitsField = new BTextField("Integer", CurrentData.getPrefs().get(Preference.DEPTH_BITS) + "");
 
         public ViewPanel()
         {
-            vsyncChecker.setChecked(CurrentData.getConfiguration().vSync);
+            vsyncChecker.setChecked((Boolean) CurrentData.getPrefs().get(Preference.VSYNC));
             setLayout(new RiverLayout());
             add(new JLabel("Default Editor Size:"));
             add("tab", editorWidthField);
@@ -127,15 +131,15 @@ public class SettingsDialog extends BasicDialog
 
         public BehaviourPanel()
         {
-            xmlChecker.setChecked(CurrentData.getConfiguration().saveXML);
-            exitWithoutPromptChecker.setChecked(CurrentData.getConfiguration().exitwithoutprompt);
-            switch (CurrentData.getConfiguration().guiSPeed)
+            xmlChecker.setChecked((Boolean) CurrentData.getPrefs().get(Preference.SAVE_XML));
+            exitWithoutPromptChecker.setChecked((Boolean) CurrentData.getPrefs().get(Preference.EXIT_WITHOUT_PROMPT));
+            switch ((Integer) CurrentData.getPrefs().get(Preference.GUI_SPEED))
             {
-                case Configuration.DEFAULT_GUI:
+                case CurrentData.GUI_DEFAULT:
                     speedComboBox.setSelectedIndex(1);
                     break;
-                case Configuration.FAST_GUI:
-                    speedComboBox.setSelectedIndex(1);
+                case CurrentData.GUI_FAST:
+                    speedComboBox.setSelectedIndex(2);
                     break;
             }
             setLayout(new RiverLayout());

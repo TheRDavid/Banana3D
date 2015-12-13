@@ -1,9 +1,9 @@
 package gui.editPanes.filters;
 
 import gui.components.BColorButton;
-import gui.editPanes.EditTaskPane;
 import com.shaderblow.filter.oldfilm.OldFilmFilter;
 import components.BTextField;
+import components.EditTaskPane;
 import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

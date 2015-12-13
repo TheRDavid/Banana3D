@@ -1,11 +1,11 @@
 package gui.editPanes.filters;
 
 import b3dElements.filters.B3D_BasicSSAO;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import com.shaderblow.filter.basicssao.BasicSSAO;
 import components.BTextField;
 import components.Checker;
+import components.EditTaskPane;
 import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.MouseEvent;

@@ -2,7 +2,6 @@ package gui.editPanes.others;
 
 import b3dElements.other.B3D_MotionEvent;
 import gui.components.BColorButton;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import monkeyStuff.MotionPathModel;
 import com.jme3.animation.LoopMode;
@@ -18,6 +17,7 @@ import com.jme3.scene.Spatial;
 import components.BButton;
 import components.BTextField;
 import components.Checker;
+import components.EditTaskPane;
 import components.Float3Panel;
 import components.Float4Panel;
 import dialogs.ObserverDialog;

@@ -5,6 +5,7 @@ import monkeyStuff.B3DApp;
 import components.BButton;
 import components.CancelButton;
 import dialogs.BasicDialog;
+import general.Preference;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -38,14 +39,14 @@ public class AssetBrowserDialog extends BasicDialog
     public AssetBrowserDialog()
     {
         setModal(false);
-        setAlwaysOnTop(CurrentData.getConfiguration().assetbrowserontop);
+        setAlwaysOnTop((Boolean) CurrentData.getPrefs().get(Preference.ASSETBROWSER_ON_TOP));
         alwaysOnTopCheckBox.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
                 AssetBrowserDialog.this.setAlwaysOnTop(alwaysOnTopCheckBox.isSelected());
-                CurrentData.getConfiguration().setAssetbrowserontop(alwaysOnTopCheckBox.isSelected());
+                CurrentData.getPrefs().set(Preference.ASSETBROWSER_ON_TOP, alwaysOnTopCheckBox.isSelected());
             }
         });
         refreshBButton.addActionListener(new ActionListener()
@@ -97,11 +98,11 @@ public class AssetBrowserDialog extends BasicDialog
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                CurrentData.getConfiguration().setAssetbrowsershown(false);
+                CurrentData.getPrefs().set(Preference.ASSETBROWSER_SHOWN, false);
                 CurrentData.getEditorWindow().getMainMenu().getViewMenu().getShowAssetBrowserItem().setSelected(false);
             }
         });
-        alwaysOnTopCheckBox.setSelected(CurrentData.getConfiguration().assetbrowserontop);
+        alwaysOnTopCheckBox.setSelected((Boolean) CurrentData.getPrefs().get(Preference.ASSETBROWSER_ON_TOP));
         controlsPanel.add(alwaysOnTopCheckBox);
         controlsPanel.add(refreshBButton);
         controlsPanel.add(cancelButton);
@@ -109,7 +110,7 @@ public class AssetBrowserDialog extends BasicDialog
         setSize(600, 430);
         setLocation(0, 50);
         setTitle("Assets");
-        setVisible(CurrentData.getConfiguration().assetbrowsershown);
+        setVisible((Boolean) CurrentData.getPrefs().get(Preference.ASSETBROWSER_SHOWN));
         refresh(false);
     }
 

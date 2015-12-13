@@ -1,9 +1,11 @@
 package files;
 
 import general.CurrentData;
+import general.Preference;
 import other.B3D_Scene;
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import other.Wizard;
 
@@ -85,7 +87,7 @@ public class Project implements Serializable
         {
             currentScene = (B3D_Scene) Wizard.loadFile(sceneFile.getAbsolutePath());
         }
-        currentScene.setName(sceneFile.getName().replaceAll(".b3ds", "")); 
+        currentScene.setName(sceneFile.getName().replaceAll(".b3ds", ""));
         autosaveOptions = ((Project) Wizard.loadFile(projectFile.getAbsolutePath())).getAutosaveOptions();
         if (autosaveOptions == null)
         {
@@ -168,7 +170,14 @@ public class Project implements Serializable
      */
     private void updateRecentProjects()
     {
-        CurrentData.getConfiguration().addRecentlyOpenedEntry(mainFolder.getAbsolutePath() + "\\" + mainFolder.getName() + ".b3dp");
+        ArrayList<String> projectPaths = (ArrayList<String>) CurrentData.getPrefs().get(Preference.RECENT_PROJECT_PATHS);
+        String path = mainFolder.getAbsolutePath() + "\\" + mainFolder.getName() + ".b3dp";
+        if (!projectPaths.contains(path))
+            projectPaths.add(path);
+        CurrentData.getPrefs().set(
+                Preference.RECENT_PROJECT_PATHS,
+                projectPaths);
+        //CurrentData.getPrefs().addRecentlyOpenedEntry(mainFolder.getAbsolutePath() + "\\" + mainFolder.getName() + ".b3dp");
     }
 
     public void setCurrentScene(B3D_Scene currentScene)

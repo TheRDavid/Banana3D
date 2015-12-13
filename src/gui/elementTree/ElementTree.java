@@ -23,6 +23,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import dialogs.ObserverDialog;
+import general.Preference;
 import general.UAManager;
 import java.awt.Insets;
 import java.awt.Point;
@@ -230,11 +231,11 @@ public class ElementTree extends JXTree
                 {
                     if (o1 != null && o2 != null && o1.getName() != null && o2.getName() != null)
                     {
-                        if (CurrentData.getConfiguration().treesort.equals("a-z(cs)"))
+                        if (CurrentData.getPrefs().get(Preference.TREESORT).equals("a-z(cs)"))
                             return o1.getName().compareTo(o2.getName());
-                        else if (CurrentData.getConfiguration().treesort.equals("a-z(no_cs)"))
+                        else if (CurrentData.getPrefs().get(Preference.TREESORT).equals("a-z(no_cs)"))
                             return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-                        else if (CurrentData.getConfiguration().treesort.equals("z-a(cs)"))
+                        else if (CurrentData.getPrefs().get(Preference.TREESORT).equals("z-a(cs)"))
                             return -o1.getName().compareTo(o2.getName());
                         else
                             return -o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
@@ -365,7 +366,7 @@ public class ElementTree extends JXTree
         private JMenuItem stopItem = new JMenuItem("Stop", new ImageIcon("dat//img//menu//stop.png"));
         private JMenuItem numberElementsItem = new JMenuItem("Number elements", new ImageIcon("dat//img//menu//number.png"));
         private JCheckBoxMenuItem showAllMotionPathsItem = new JCheckBoxMenuItem("Show all MotionPaths", new ImageIcon("dat//img//menu//motionPath.png"),
-                CurrentData.getConfiguration().showallmotionpaths);
+                (Boolean) CurrentData.getPrefs().get(Preference.SHOW_ALL_MOTIONPATHS));
         private JMenuItem animateItem = new JMenuItem("Animate", new ImageIcon("dat//img//menu//random.png"));
         private JMenuItem copyIDItem = new JMenuItem("Copy ID to clipboard", new ImageIcon("dat//img//menu//duplicate.png"));
 
@@ -470,7 +471,7 @@ public class ElementTree extends JXTree
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    CurrentData.getConfiguration().setShowallmotionpaths(showAllMotionPathsItem.isSelected());
+                    CurrentData.getPrefs().set(Preference.SHOW_ALL_MOTIONPATHS, showAllMotionPathsItem.isSelected());
                     CurrentData.getEditorWindow().getB3DApp().updateSelectedMotionPath();
                 }
             });

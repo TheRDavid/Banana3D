@@ -3,13 +3,12 @@ package gui.editor;
 import general.CurrentData;
 import com.jme3.math.Vector3f;
 import components.BButton;
-import components.BToggleButton;
 import components.Checker;
 import dialogs.ObserverDialog;
+import general.Preference;
 import other.Wizard;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -19,11 +18,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -126,7 +122,7 @@ public class ControlToolBar extends JToolBar
         {
             selectedObjectLabel.setText("");
         }
-        dimensionLabel.setText("Dimension:  " + CurrentData.getEditorWindow().getPlayPanel().getSize().width + " x " + CurrentData.getEditorWindow().getPlayPanel().getSize().height);
+        dimensionLabel.setText("Dimension:  " + CurrentData.getEditorWindow().getCanvasPanel().getSize().width + " x " + CurrentData.getEditorWindow().getCanvasPanel().getSize().height);
     }
 
     @Override
@@ -157,31 +153,27 @@ public class ControlToolBar extends JToolBar
 
     private void initConfigValues()
     {
-        gridChecker.setChecked(CurrentData.getConfiguration().showgrid);
-        filterChecker.setChecked(CurrentData.getConfiguration().showfilters);
-        if (CurrentData.getConfiguration().camspeed == 10)
-        {
+        gridChecker.setChecked((Boolean) CurrentData.getPrefs().get(Preference.SHOW_GRID));
+        filterChecker.setChecked((Boolean) CurrentData.getPrefs().get(Preference.SHOW_FILTERS));
+        float speed = (Float) CurrentData.getPrefs().get(Preference.CAM_SPEED);
+        if (speed == 10)
             camSpeedComboBox.setSelectedIndex(0);
-        } else if (CurrentData.getConfiguration().camspeed == 50)
-        {
+        else if (speed == 50)
             camSpeedComboBox.setSelectedIndex(1);
-        } else if (CurrentData.getConfiguration().camspeed == 100)
-        {
+        else if (speed == 100)
             camSpeedComboBox.setSelectedIndex(2);
-        } else if (CurrentData.getConfiguration().camspeed == 200)
-        {
+        else if (speed == 200)
             camSpeedComboBox.setSelectedIndex(3);
-        } else if (CurrentData.getConfiguration().camspeed == 400)
-        {
+        else if (speed == 400)
             camSpeedComboBox.setSelectedIndex(4);
-        } else
+        else
         {
             camSpeedComboBox.removeItemAt(camSpeedComboBox.getItemCount() - 1);
-            camSpeedComboBox.addItem("Custom (" + CurrentData.getConfiguration().camspeed + ")");
+            camSpeedComboBox.addItem("Custom (" + CurrentData.getPrefs().get(Preference.CAM_SPEED) + ")");
             camSpeedComboBox.setSelectedIndex(camSpeedComboBox.getItemCount() - 1);
         }
-        wireChecker.setChecked(CurrentData.getConfiguration().showwire);
-        sceneryViewChecker.setChecked(CurrentData.getConfiguration().showscenery);
+        wireChecker.setChecked((Boolean) CurrentData.getPrefs().get(Preference.SHOW_WIREFRAME));
+        sceneryViewChecker.setChecked((Boolean) CurrentData.getPrefs().get(Preference.SHOW_SCENERY));
     }
     private JPopupMenu idPopup = new JPopupMenu();
     private JMenuItem copyItem = new JMenuItem("Copy ID", new ImageIcon("dat//img//menu//duplicate.png"));
@@ -234,7 +226,7 @@ public class ControlToolBar extends JToolBar
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                CurrentData.getConfiguration().setShowgrid(gridChecker.isChecked());
+                CurrentData.getPrefs().set(Preference.SHOW_GRID, gridChecker.isChecked());
                 CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
                 {
                     @Override
@@ -259,7 +251,7 @@ public class ControlToolBar extends JToolBar
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                CurrentData.getConfiguration().setShowfilters(filterChecker.isChecked());
+                CurrentData.getPrefs().set(Preference.SHOW_FILTERS, filterChecker.isChecked());
                 CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
                 {
                     @Override
@@ -284,7 +276,7 @@ public class ControlToolBar extends JToolBar
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                CurrentData.getConfiguration().setShowwire(wireChecker.isChecked());
+                CurrentData.getPrefs().set(Preference.SHOW_WIREFRAME, wireChecker.isChecked());
                 CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
                 {
                     @Override
@@ -318,7 +310,7 @@ public class ControlToolBar extends JToolBar
                         return null;
                     }
                 });
-                CurrentData.getConfiguration().setShowscenery(sceneryViewChecker.isChecked());
+                CurrentData.getPrefs().set(Preference.SHOW_SCENERY, sceneryViewChecker.isChecked());
             }
         });
         camSpeedComboBox.addActionListener(new ActionListener()
@@ -349,7 +341,7 @@ public class ControlToolBar extends JToolBar
                     camSpeedComboBox.addItem("Custom (" + newSpeed + ")");
                     camSpeedComboBox.setSelectedIndex(camSpeedComboBox.getItemCount() - 1);
                 }
-                CurrentData.getConfiguration().setCamspeed(CurrentData.getEditorWindow().getB3DApp().getFlyByCamera().getMoveSpeed());
+                CurrentData.getPrefs().set(Preference.CAM_SPEED, CurrentData.getEditorWindow().getB3DApp().getFlyByCamera().getMoveSpeed());
             }
         });
     }

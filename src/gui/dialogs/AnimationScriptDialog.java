@@ -6,11 +6,13 @@ import components.BButton;
 import dialogs.BasicDialog;
 import dialogs.ObserverDialog;
 import general.CurrentData;
+import general.Preference;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -81,7 +83,9 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
             @Override
             public void componentMoved(ComponentEvent e)
             {
-                CurrentData.getConfiguration().setAnimationScriptDialogPosition(AnimationScriptDialog.this.getLocation());
+                CurrentData.getPrefs().set(
+                        Preference.ANIMATION_SCRIPT_DIALOG_POSITION,
+                        AnimationScriptDialog.this.getLocation());
             }
         });
         setTitle("Animation Scripts");
@@ -271,8 +275,8 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
         if (b != isVisible())
             super.setVisible(b); //To change body of generated methods, choose Tools | Templates.
         setAlwaysOnTop(true);
-        setLocation(CurrentData.getConfiguration().animationScriptDialogPosition);
-        CurrentData.getConfiguration().setAnimationDialogVisible(b);
+        setLocation((Point) CurrentData.getPrefs().get(Preference.ANIMATION_SCRIPT_DIALOG_POSITION));
+        CurrentData.getPrefs().set(Preference.ANIMATIONSCRIPT_DIALOG_VISIBLE, b);
         if (CurrentData.getEditorWindow().getB3DApp().getSelectedUUID() != Wizard.NULL_SELECTION && CurrentData.getEditorWindow().getB3DApp().getSelectedUUID() != null)
         {
             openTab(Wizard.getObjects().getB3D_Element(CurrentData.getEditorWindow().getB3DApp().getSelectedUUID()));
@@ -287,7 +291,7 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
             ScriptArea sa = (ScriptArea) ((JScrollPane) scriptPane.getSelectedComponent()).getViewport().getView();
             sa.setForeground(Color.LIGHT_GRAY);
             for (B3D_Animation b3d_anim : sa.getB3D_Element().getAnimations())
-                b3d_anim.stop(); 
+                b3d_anim.stop();
             sa.getB3D_Element().getAnimations().clear();
             sa.getB3D_Element().getAnimations().addAll(AnimationTranslator.parseToLocalAnimations(sa.getText(), sa.getB3D_Element().getUUID()));
             CurrentData.getEditorWindow().getEditPane().refresh();

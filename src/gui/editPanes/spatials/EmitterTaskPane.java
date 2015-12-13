@@ -1,7 +1,6 @@
 package gui.editPanes.spatials;
 
 import gui.components.BColorButton;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.effect.shapes.EmitterBoxShape;
@@ -12,6 +11,7 @@ import com.jme3.math.Vector3f;
 import components.BSlider;
 import components.BTextField;
 import components.Checker;
+import components.EditTaskPane;
 import components.Float3Panel;
 import general.UAManager;
 import other.Wizard;

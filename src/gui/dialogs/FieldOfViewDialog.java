@@ -1,4 +1,4 @@
-package gui.dialogs;
+ package gui.dialogs;
 
 import general.CurrentData;
 import components.BButton;
@@ -6,6 +6,7 @@ import components.BTextField;
 import components.CancelButton;
 import components.OKButton;
 import dialogs.BasicDialog;
+import general.Preference;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JLabel;
@@ -50,8 +51,8 @@ public class FieldOfViewDialog extends BasicDialog
                 };
                 CurrentData.getEditorWindow().getB3DApp().getCamera().setFrustum(
                         fov[0], fov[1], fov[2], fov[3], fov[4], fov[5]);
-                CurrentData.getConfiguration().fov = fov;
-                CurrentData.getConfiguration().save();
+                CurrentData.getPrefs().set(Preference.FIELD_OF_VIEW, fov);
+                CurrentData.getPrefs().save();
                 dispose();
             }
         });

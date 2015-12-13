@@ -2,9 +2,9 @@ package gui.editPanes.others;
 
 import b3dElements.animations.B3D_Animation;
 import b3dElements.B3D_Element;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import components.BButton;
+import components.EditTaskPane;
 import components.SmallProgressbar;
 import java.awt.BorderLayout;
 import java.awt.Color;

@@ -2,7 +2,6 @@ package gui.editPanes.spatials;
 
 import b3dElements.controls.B3D_LightControl;
 import b3dElements.controls.B3D_LightScatteringMotionControl;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import com.jme3.light.Light;
 import com.jme3.light.PointLight;
@@ -14,6 +13,7 @@ import com.jme3.scene.control.LightControl;
 import components.BButton;
 import components.BComboBox;
 import components.Checker;
+import components.EditTaskPane;
 import dialogs.SelectDialog;
 import general.UAManager;
 import java.awt.BorderLayout;

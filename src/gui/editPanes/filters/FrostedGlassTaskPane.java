@@ -1,10 +1,10 @@
 package gui.editPanes.filters;
 
 import b3dElements.filters.B3D_FrostedGlass;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import com.shaderblow.filter.frostedglass.FrostedGlassFilter;
 import components.BTextField;
+import components.EditTaskPane;
 import general.UAManager;
 import other.ObjectToElementConverter;
 import java.awt.BorderLayout;

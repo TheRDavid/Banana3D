@@ -2,6 +2,7 @@ package gui.menu;
 
 import gui.dialogs.GridOptionsDialog;
 import general.CurrentData;
+import general.Preference;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -10,17 +11,17 @@ import javax.swing.*;
 public class ViewMenu extends JMenu
 {
 
-    private JCheckBoxMenuItem showAssetBrowserItem = new JCheckBoxMenuItem("Asset Browser",new ImageIcon("dat//img//menu//assets.png"));
-    private JCheckBoxMenuItem fullscreenItem = new JCheckBoxMenuItem("Fullscreen",new ImageIcon("dat//img//menu//fullscreen.png"));
-    private JMenuItem gridOptionsItem = new JMenuItem("Grid Options",new ImageIcon("dat//img//menu//grid.png"));
-    private JMenuItem addCameraItem = new JMenuItem("Add Camera",new ImageIcon("dat//img//menu//camera.png"));
-    private JMenuItem changeFPSItem = new JMenuItem("Set FPS",new ImageIcon("dat//img//menu//fps.png"));
+    private JCheckBoxMenuItem showAssetBrowserItem = new JCheckBoxMenuItem("Asset Browser", new ImageIcon("dat//img//menu//assets.png"));
+    private JCheckBoxMenuItem fullscreenItem = new JCheckBoxMenuItem("Fullscreen", new ImageIcon("dat//img//menu//fullscreen.png"));
+    private JMenuItem gridOptionsItem = new JMenuItem("Grid Options", new ImageIcon("dat//img//menu//grid.png"));
+    private JMenuItem addCameraItem = new JMenuItem("Add Camera", new ImageIcon("dat//img//menu//camera.png"));
+    private JMenuItem changeFPSItem = new JMenuItem("Set FPS", new ImageIcon("dat//img//menu//fps.png"));
 
     public ViewMenu()
     {
         initShortcuts();
-        fullscreenItem.setSelected(CurrentData.getConfiguration().fullscreen);
-        showAssetBrowserItem.setSelected(CurrentData.getConfiguration().assetbrowsershown);
+        fullscreenItem.setSelected((Boolean) CurrentData.getPrefs().get(Preference.FULLSCREEN));
+        showAssetBrowserItem.setSelected((Boolean) CurrentData.getPrefs().get(Preference.ASSETBROWSER_SHOWN));
         setText("View");
         add(showAssetBrowserItem);
         add(fullscreenItem);
@@ -36,7 +37,7 @@ public class ViewMenu extends JMenu
         {
             @Override
             public void actionPerformed(ActionEvent e)
-            { 
+            {
                 int fps = Integer.parseInt(JOptionPane.showInputDialog(null, "Set Maximum FPS", CurrentData.getEditorWindow().getB3DApp().getSettings().getFrameRate()));
                 CurrentData.getEditorWindow().getB3DApp().getSettings().setFrameRate(fps);
                 CurrentData.getEditorWindow().getB3DApp().restart();
@@ -72,7 +73,7 @@ public class ViewMenu extends JMenu
             public void actionPerformed(ActionEvent e)
             {
                 CurrentData.getAssetBrowserDialog().setVisible(showAssetBrowserItem.isSelected());
-                CurrentData.getConfiguration().setAssetbrowsershown(showAssetBrowserItem.isSelected());
+                CurrentData.getPrefs().set(Preference.ASSETBROWSER_SHOWN, showAssetBrowserItem.isSelected());
             }
         });
     }

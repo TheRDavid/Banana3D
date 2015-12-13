@@ -1,11 +1,11 @@
 package gui.editPanes.filters;
 
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import monkeyStuff.LightScatteringModel;
 import com.jme3.post.filters.LightScatteringFilter;
 import components.BSlider;
 import components.BTextField;
+import components.EditTaskPane;
 import components.Float3Panel;
 import general.UAManager;
 import java.awt.BorderLayout;

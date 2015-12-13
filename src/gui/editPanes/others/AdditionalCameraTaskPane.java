@@ -1,13 +1,13 @@
 package gui.editPanes.others;
 
 import gui.dialogs.AdditionalCameraDialog;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import components.BSlider;
+import components.EditTaskPane;
 import components.Float3Panel;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

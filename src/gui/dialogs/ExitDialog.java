@@ -4,6 +4,7 @@ import general.CurrentData;
 import components.BButton;
 import components.CancelButton;
 import dialogs.BasicDialog;
+import general.Preference;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,7 +20,7 @@ public class ExitDialog extends BasicDialog
 
     private JCheckBox dontBotherCheckBox = new JCheckBox("Don't bother me again");
     private JPanel buttonPanel = new JPanel();
-    private BButton okButton = new BButton("Exit" ,new ImageIcon("dat//img//menu//quit.png"));
+    private BButton okButton = new BButton("Exit", new ImageIcon("dat//img//menu//quit.png"));
     private CancelButton cancelButton;
 
     public ExitDialog()
@@ -29,10 +30,8 @@ public class ExitDialog extends BasicDialog
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                if (dontBotherCheckBox.isSelected())
-                {
-                    CurrentData.getConfiguration().setExitwithoutprompt(true);
-                }
+                CurrentData.getPrefs().set(Preference.EXIT_WITHOUT_PROMPT, dontBotherCheckBox.isSelected());
+                CurrentData.getPrefs().save();
                 System.exit(0);
             }
         });

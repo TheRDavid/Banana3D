@@ -4,9 +4,11 @@ import files.Project;
 import gui.dialogs.OpenProjectDialog;
 import general.CurrentData;
 import static general.CurrentData.execReset;
+import general.Preference;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -53,13 +55,12 @@ public class FileMenu extends JMenu
             public void menuSelected(MenuEvent e)
             {
                 openRecentMenu.removeAll();
-                for (String s : CurrentData.getConfiguration().recentProjectPaths)
-                {
+                ArrayList<String> paths = (ArrayList<String>) CurrentData.getPrefs().get(Preference.RECENT_PROJECT_PATHS);
+                for (String s : paths)
                     openRecentMenu.add(new PathMenuItem(s));
-                }
                 openRecentMenu.add(new JSeparator());
                 openRecentMenu.add(clearRecentItemsItem);
-                clearRecentItemsItem.setEnabled(CurrentData.getConfiguration().recentProjectPaths.size() > 0);
+                clearRecentItemsItem.setEnabled(paths.size() > 0);
             }
 
             @Override
@@ -98,7 +99,7 @@ public class FileMenu extends JMenu
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                CurrentData.getConfiguration().recentProjectPaths.clear();
+                ((ArrayList<String>) CurrentData.getPrefs().get(Preference.RECENT_PROJECT_PATHS)).clear();
             }
         });
         newProjectItem.addActionListener(new ActionListener()
@@ -211,7 +212,7 @@ public class FileMenu extends JMenu
                     else
                     {
                         if (JOptionPane.showConfirmDialog(openRecentMenu, "File could not be found\nDelete entry?", "Whops", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.YES_OPTION)
-                            CurrentData.getConfiguration().recentProjectPaths.remove(file.getAbsolutePath());
+                            ((ArrayList<String>) CurrentData.getPrefs().get(Preference.RECENT_PROJECT_PATHS)).remove(file.getAbsolutePath());
                     }
                 }
             });

@@ -1,11 +1,11 @@
 package gui.editPanes.spatials;
 
 import b3dElements.spatials.B3D_Node;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import components.EditTaskPane;
 import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

@@ -1,8 +1,8 @@
 package gui.editPanes.filters;
 
-import gui.editPanes.EditTaskPane;
 import com.jme3.post.filters.BloomFilter;
 import components.BTextField;
+import components.EditTaskPane;
 import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

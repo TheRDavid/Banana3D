@@ -46,7 +46,7 @@ public class ScreenshotDialog extends BasicDialog
     private CancelButton cancelButton;
     private BButton goButton = new BButton("Go", new ImageIcon("dat//img//menu//screenshot.png"));
     private Robot robot;
-    private JPanel canvas = CurrentData.getEditorWindow().getPlayPanel();
+    private JPanel canvas = CurrentData.getEditorWindow().getCanvasPanel();
     private JFrame window = CurrentData.getEditorWindow();
     private BufferedImage screenshot;
 

@@ -19,7 +19,6 @@ import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.cinematic.events.MotionEvent;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
-import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -59,6 +58,7 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.texture.Texture2D;
 import com.jme3.ui.Picture;
 import dialogs.ObserverDialog;
+import general.Preference;
 import general.UAManager;
 import other.Wizard;
 import java.io.File;
@@ -102,9 +102,9 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     private Vector<MotionPathModel> motionPathModels = new Vector<MotionPathModel>();
     private Gizmo gizmo;
     private Geometry gridGeometry = new Geometry("nonI_Grid", new Grid(
-            CurrentData.getConfiguration().gridx,
-            CurrentData.getConfiguration().gridy,
-            CurrentData.getConfiguration().gridgap));
+            (Integer) CurrentData.getPrefs().get(Preference.GRID_X),
+            (Integer) CurrentData.getPrefs().get(Preference.GRID_Y),
+            (Integer) CurrentData.getPrefs().get(Preference.GRID_GAP)));
     //Element & Object that are focused
     private UUID selectedUUID = Wizard.NULL_SELECTION;
     private Object selectedObject;
@@ -192,12 +192,10 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
      */
     public void correctGridLocation()
     {
-        gridGeometry.setLocalTranslation(
-                CurrentData.getConfiguration().gridx
-                * CurrentData.getConfiguration().gridgap / -2,
-                0,
-                CurrentData.getConfiguration().gridy
-                * CurrentData.getConfiguration().gridgap / -2);
+        int gap = (Integer) CurrentData.getPrefs().get(Preference.GRID_GAP);
+        int gx = (Integer) CurrentData.getPrefs().get(Preference.GRID_X);
+        int gy = (Integer) CurrentData.getPrefs().get(Preference.GRID_Y);
+        gridGeometry.setLocalTranslation(gx * gap / -2, 0, gy * gap / -2);
     }
 
     public void playPhysics()
@@ -291,8 +289,9 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                 CurrentData.getProject().getAutosaveOptions().isEnabled());
         CurrentData.getEditorWindow().getFieldOfViewButton().setEnabled(true);
         CurrentData.getEditorWindow().getAddCamButton().setEnabled(true);
-        CurrentData.getAnimationScriptDialog().setVisible(CurrentData.getConfiguration().animationDialogVisible);
-        cam.setFrustum(CurrentData.getConfiguration().fov[0], CurrentData.getConfiguration().fov[1], CurrentData.getConfiguration().fov[2], CurrentData.getConfiguration().fov[3], CurrentData.getConfiguration().fov[4], CurrentData.getConfiguration().fov[5]);
+        CurrentData.getAnimationScriptDialog().setVisible((Boolean) CurrentData.getPrefs().get(Preference.ANIMATIONSCRIPT_DIALOG_VISIBLE));
+        float fov[] = (float[]) CurrentData.getPrefs().get(Preference.FIELD_OF_VIEW);
+        cam.setFrustum(fov[0], fov[1], fov[2], fov[3], fov[4], fov[5]);
         CurrentData.setDefaultFieldOfView(new Float[]
         {
             cam.getFrustumBottom(),
@@ -305,7 +304,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         initComponents();
         initBasicSettings();
         filterPostProcessor = new FilterPostProcessor(assetManager);
-        if (CurrentData.getConfiguration().showfilters)
+        if ((Boolean) CurrentData.getPrefs().get(Preference.SHOW_FILTERS))
             viewPort.addProcessor(filterPostProcessor);
         initInput();
         initMonkeyGUI();
@@ -327,7 +326,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     public void simpleUpdate(float tpf)
     {
         if (returnToNormalSpeed)
-            flyingEditor.setMoveSpeed(CurrentData.getConfiguration().camspeed);
+            flyingEditor.setMoveSpeed((Float) CurrentData.getPrefs().get(Preference.CAM_SPEED));
         if (!waterTexturesSynced)
         {
             syncWaterTextures();
@@ -486,7 +485,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         setPauseOnLostFocus(false);
         cam.setLocation(new Vector3f(0, 0, 0));
         flyingEditor.setDragToRotate(true);
-        flyingEditor.setMoveSpeed(CurrentData.getConfiguration().camspeed);
+        flyingEditor.setMoveSpeed((Float) CurrentData.getPrefs().get(Preference.CAM_SPEED));
     }
 
     private void initComponents()
@@ -494,7 +493,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         camNode = new CameraNode("CamNode", cam);
         camNode.setControlDir(ControlDirection.SpatialToCamera);
         rootNode.attachChild(sceneNode);
-        if (!CurrentData.getConfiguration().showscenery)
+        if (!(Boolean) CurrentData.getPrefs().get(Preference.SHOW_SCENERY))
             rootNode.attachChild(editorNode);
         editorNode.attachChild(motionEventNode);
         editorNode.addLight(new AmbientLight());
@@ -505,7 +504,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         gridGeometry.setLocalTranslation(-10000, 0, -10000);
         mousePicture.setLocalScale(40, 40, 10);
         editorNode.attachChild(gizmo);
-        if (CurrentData.getConfiguration().showgrid)
+        if ((Boolean) CurrentData.getPrefs().get(Preference.SHOW_GRID))
             editorNode.attachChild(gridGeometry);
         correctGridLocation();
     }
@@ -1140,7 +1139,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     {
         if (name.equals("doubleSpeed"))
         {
-            flyingEditor.setMoveSpeed(CurrentData.getConfiguration().camspeed * 2);
+            flyingEditor.setMoveSpeed((Float) CurrentData.getPrefs().get(Preference.CAM_SPEED) * 2);
             returnToNormalSpeed = false;
         }
     }
@@ -1421,7 +1420,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             gizmo.attachChild(gizmo.getxArrow());
             gizmo.attachChild(gizmo.getzArrow());
         }
-        if (CurrentData.getConfiguration().showallmotionpaths && !allPathsShown)
+        if ((Boolean) CurrentData.getPrefs().get(Preference.SHOW_ALL_MOTIONPATHS) && !allPathsShown)
             updateAllMotionPathGeometrys();
         if (updateMotionPath && Wizard.getObjects().getB3D_Element(selectedUUID) instanceof B3D_MotionEvent)
             updateMotionPathGeometrys();
@@ -1468,10 +1467,9 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
 
     private void updateMotionPathGeometrys()
     {
-        if (CurrentData.getConfiguration().showallmotionpaths)
-        {
+        if ((Boolean) CurrentData.getPrefs().get(Preference.SHOW_ALL_MOTIONPATHS))
             updateAllMotionPathGeometrys();
-        } else
+        else
         {
             if (Wizard.getObjects().getB3D_Element(selectedUUID) instanceof B3D_MotionEvent)
                 for (MotionPathModel mpm : motionPathModels)
@@ -1776,8 +1774,8 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     public void createCam()
     {
         AdditionalCameraDialog acd = new AdditionalCameraDialog(cam.getLocation(), cam.getRotation(),
-                CurrentData.getEditorWindow().getPlayPanel().getSize().width / 2,
-                CurrentData.getEditorWindow().getPlayPanel().getSize().height / 2,
+                CurrentData.getEditorWindow().getCanvasPanel().getSize().width / 2,
+                CurrentData.getEditorWindow().getCanvasPanel().getSize().height / 2,
                 renderer,
                 renderManager,
                 rootNode,

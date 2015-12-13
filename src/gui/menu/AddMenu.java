@@ -61,6 +61,7 @@ import com.shaderblow.filter.oldfilm.OldFilmFilter;
 import com.simsilica.lemur.geom.MBox;
 import dialogs.ObserverDialog;
 import dialogs.SelectDialog;
+import general.Preference;
 import general.UAManager;
 import other.Wizard;
 import java.awt.event.ActionEvent;
@@ -156,7 +157,7 @@ public class AddMenu extends JMenu
                                 motionEvent.getLoopMode()));
                         allSpatials.get(selectDialog.getSelectedIndex() - 1).setUserData("motionEventName", element.getName());
                         allSpatials.get(selectDialog.getSelectedIndex() - 1).setUserData("motionEventLookAtName", element.getName());
-                        if (CurrentData.getConfiguration().remindOfNodeChildrenAsMotionEventSpatial
+                        if ((Boolean) CurrentData.getPrefs().get(Preference.REMOND_OF_NODE_CHILDREN_AS_MOTION_EVENT_SPATIAL)
                                 && !allSpatials.get(selectDialog.getSelectedIndex() - 1).getParent().equals(
                                 CurrentData.getEditorWindow().getB3DApp().getSceneNode()))
                             new ChildMotionEventDialog();

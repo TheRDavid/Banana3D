@@ -1,7 +1,6 @@
 package gui.editPanes.lights;
 
 import gui.components.BColorButton;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import monkeyStuff.LightModel;
 import com.jme3.light.DirectionalLight;
@@ -9,6 +8,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.shape.Line;
 import components.BSlider;
+import components.EditTaskPane;
 import components.Float3Panel;
 import general.UAManager;
 import other.Wizard;

@@ -6,7 +6,6 @@ import b3dElements.filters.B3D_Filter;
 import b3dElements.lights.B3D_Light;
 import b3dElements.spatials.B3D_Spatial;
 import b3dElements.other.B3D_MotionEvent;
-import files.Configuration;
 import files.Project;
 import gui.components.B3DSFileView;
 import gui.dialogs.AssetBrowserDialog;
@@ -39,9 +38,13 @@ import com.thoughtworks.xstream.XStream;
 import dialogs.ObserverDialog;
 import dialogs.SplashDialog;
 import gui.dialogs.AnimationScriptDialog;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -53,6 +56,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.ImageIcon;
@@ -64,13 +69,14 @@ import javax.swing.filechooser.FileFilter;
 import other.ElementToObjectConverter;
 import other.ObjectToElementConverter;
 import other.B3D_Scene;
+import other.Preferences;
 import other.Wizard;
 
 public class CurrentData
 {
 
     private static Project project;
-    private static Configuration configuration;
+    private static Preferences prefs = new Preferences();
     private static EditorWindow editorWindow;
     private static AssetBrowserDialog assetBrowserDialog;
     private static File materialDirectory = new File("dat//mats");
@@ -82,6 +88,7 @@ public class CurrentData
             CAM_DEFAULT = 20,
             CAM_FAST = 40,
             CAM_VERY_FAST = 100;
+    public static final int GUI_SLOW = 250, GUI_DEFAULT = 100, GUI_FAST = 4;
     private static boolean appRunning = false;
     private static String[] forbiddenNames =
     {
@@ -91,6 +98,44 @@ public class CurrentData
     private static Thread autosaveThread;
     private static AutosaveRunnable autosaveRunnable = new AutosaveRunnable();
     private static AnimationScriptDialog asd = new AnimationScriptDialog();
+
+    static void loadPreferences()
+    {
+        ObjectInputStream ois = null;
+        File f = new File("preferences");
+        if (f.exists())
+            try
+            {
+                ois = new ObjectInputStream(new FileInputStream(f));
+                prefs = (Preferences) ois.readObject();
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            } catch (ClassNotFoundException ex)
+            {
+                ex.printStackTrace();
+            } finally
+            {
+                try
+                {
+                    if (ois != null)
+                        ois.close();
+                } catch (IOException ex)
+                {
+                    Logger.getLogger(CurrentData.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        else
+        {
+            prefs = new Preferences();
+            loadDefaultProperties();
+        }
+    }
+
+    public static Preferences getPrefs()
+    {
+        return prefs;
+    }
 
     public static AnimationScriptDialog getAnimationScriptDialog()
     {
@@ -153,18 +198,13 @@ public class CurrentData
         CurrentData.project = proj;
     }
 
-    public static Configuration getConfiguration()
-    {
-        return configuration;
-    }
-
     /**
      *
      * @param configuration
      */
-    public static void setConfiguration(Configuration configuration)
+    public static void setConfiguration(Preferences c)
     {
-        CurrentData.configuration = configuration;
+        prefs = c;
     }
 
     public static AssetBrowserDialog getAssetBrowserDialog()
@@ -393,7 +433,7 @@ public class CurrentData
                             ((Filter) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).setName(newName);
                         selectedElement.setName(newName);
                         editorWindow.getB3DApp().setTreeSyncNeeded(true);
-                        UAManager.add(CurrentData.getEditorWindow().getB3DApp().getSelectedObject(), "Rename to \"" + newName+"\"");
+                        UAManager.add(CurrentData.getEditorWindow().getB3DApp().getSelectedObject(), "Rename to \"" + newName + "\"");
                     }
                 }
             }
@@ -619,10 +659,9 @@ public class CurrentData
             @Override
             public void run()
             {
-                configuration.editorWidth = editorWindow.getWidth();
-                configuration.editorHeight = editorWindow.getHeight();
-                configuration.save();
-                if (CurrentData.getConfiguration().exitwithoutprompt)
+                prefs.set(Preference.EDITOR_WINDOW_SIZE, editorWindow.getSize());
+                prefs.save();
+                if ((Boolean) prefs.get(Preference.EXIT_WITHOUT_PROMPT))
                     Runtime.getRuntime().exit(0);
                 else
                     new ExitDialog();
@@ -979,7 +1018,7 @@ public class CurrentData
             @Override
             public void run()
             {
-                if (!CurrentData.getConfiguration().fullscreen)
+                if (!prefs.get("fullscreen").equals("true"))
                 {
                     CurrentData.getEditorWindow().dispose();
                     CurrentData.getEditorWindow().setUndecorated(true);
@@ -996,8 +1035,9 @@ public class CurrentData
                     CurrentData.getEditorWindow().setVisible(true);
                     ObserverDialog.getObserverDialog().printMessage("Fullscreen: Off");
                 }
-                CurrentData.getConfiguration().setFullscreen(!CurrentData.getConfiguration().fullscreen);
-                editorWindow.getMainMenu().getViewMenu().getFullscreenItem().setSelected(CurrentData.getConfiguration().fullscreen);
+                prefs.set(Preference.FULLSCREEN,
+                        !(Boolean) prefs.get(Preference.FULLSCREEN));
+                editorWindow.getMainMenu().getViewMenu().getFullscreenItem().setSelected(prefs.get("fullscreen").equals("true"));
                 CurrentData.getEditorWindow().arrangeComponentSizes();
             }
         });
@@ -1199,5 +1239,41 @@ public class CurrentData
         for (File f : assetsFolder.listFiles())
             if (f.isDirectory())
                 updateAssetRegister(f);
+    }
+
+    static void loadDefaultProperties()
+    {
+        prefs.set(Preference.RECENT_PROJECT_PATHS, new ArrayList<String>());
+        prefs.set(Preference.EXIT_WITHOUT_PROMPT, false);
+        prefs.set(Preference.FULLSCREEN, false);
+        prefs.set(Preference.ASSETBROWSER_SHOWN, false);
+        prefs.set(Preference.SHOW_GRID, true);
+        prefs.set(Preference.SHOW_SCENERY, false);
+        prefs.set(Preference.SHOW_FILTERS, true);
+        prefs.set(Preference.SHOW_WIREFRAME, false);
+        prefs.set(Preference.SHOW_ALL_MOTIONPATHS, false);
+        prefs.set(Preference.REMOND_OF_NODE_CHILDREN_AS_MOTION_EVENT_SPATIAL, true);
+        prefs.set(Preference.ASSETBROWSER_ON_TOP, true);
+        prefs.set(Preference.ANIMATIONSCRIPT_DIALOG_VISIBLE, false);
+        prefs.set(Preference.SAVE_XML, true);
+        prefs.set(Preference.VSYNC, false);
+        prefs.set(Preference.CAM_SPEED, CAM_DEFAULT);
+        prefs.set(Preference.GRID_GAP, 20);
+        prefs.set(Preference.GRID_X, 50);
+        prefs.set(Preference.GRID_Y, 50);
+        prefs.set(Preference.TREESORT, "a-z(no_cs)");
+        prefs.set(Preference.EDITOR_WINDOW_SIZE, new Dimension(1650, 960));
+        prefs.set(Preference.ANIMATION_SCRIPT_DIALOG_POSITION, new Point());
+        prefs.set(Preference.FRAMERATE, 60);
+        prefs.set(Preference.GUI_SPEED, GUI_DEFAULT);
+        prefs.set(Preference.COLOR_DEPTH, 8);
+        prefs.set(Preference.MULTISAMPLING, 0);
+        prefs.set(Preference.DEPTH_BITS, 24);
+        prefs.set(Preference.FIELD_OF_VIEW,
+                new float[]
+        {
+            1, 2000, -0.45738515f, 0.45738515f, 0.41421357f, -0.41421357f
+        });
+        prefs.save();
     }
 }

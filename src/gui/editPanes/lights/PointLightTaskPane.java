@@ -1,13 +1,13 @@
 package gui.editPanes.lights;
 
 import gui.components.BColorButton;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import monkeyStuff.LightModel;
 import com.jme3.light.PointLight;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.shape.Sphere;
 import components.BTextField;
+import components.EditTaskPane;
 import components.Float3Panel;
 import general.UAManager;
 import other.Wizard;

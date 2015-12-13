@@ -1,10 +1,8 @@
 package general;
 
-import files.Configuration;
 import gui.editor.EditorWindow;
 import dialogs.ObserverDialog;
 import dialogs.SplashDialog;
-import other.Wizard;
 import java.awt.Color;
 import java.io.File;
 import java.util.logging.Level;
@@ -14,14 +12,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-
 public class Start
 {
 
-    private static File configurationFile = new File("dat//config.cfg");
-
     /**
-     * Creating an Observer-Dialog to Display Messages to the user. Also
+     * Creates an Observer-Dialog to Display Messages to the user. Also
      * checking for a configuration-file, loading all Material files found,
      * displaying the Splash-Dialog and setting the LookAndFeel. Atl last,
      * opening the Editor Window.
@@ -53,14 +48,9 @@ public class Start
             Logger.getLogger(Start.class.getName()).log(Level.SEVERE, null, ex);
         }
         CurrentData.setSplashDialog(new SplashDialog(new ImageIcon("dat//img//other//splash.png")));
-        if (configurationFile.exists())
-        {
-            CurrentData.setConfiguration((Configuration) Wizard.loadFile(configurationFile.getAbsolutePath()));
-        } else
-        {
-            CurrentData.setConfiguration(new Configuration());
-            Wizard.saveFile(configurationFile.getAbsolutePath(), CurrentData.getConfiguration());
-        }
+
+        CurrentData.loadPreferences();
+
         CurrentData.findMaterials();
         SwingUtilities.invokeLater(new Runnable()
         {

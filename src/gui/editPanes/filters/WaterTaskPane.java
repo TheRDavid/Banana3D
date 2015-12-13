@@ -2,7 +2,6 @@ package gui.editPanes.filters;
 
 import gui.components.AssetButton;
 import gui.components.BColorButton;
-import gui.editPanes.EditTaskPane;
 import general.CurrentData;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -11,6 +10,7 @@ import components.BButton;
 import components.BSlider;
 import components.BTextField;
 import components.Checker;
+import components.EditTaskPane;
 import components.Float3Panel;
 import components.OKButton;
 import general.UAManager;

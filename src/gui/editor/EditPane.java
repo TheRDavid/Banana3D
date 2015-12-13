@@ -3,13 +3,11 @@ package gui.editor;
 import b3dElements.filters.B3D_Filter;
 import b3dElements.lights.B3D_Light;
 import b3dElements.spatials.geometries.B3D_Geometry;
-import b3dElements.spatials.B3D_Node;
 import b3dElements.spatials.B3D_Spatial;
 import b3dElements.other.B3D_MotionEvent;
 import b3dElements.spatials.B3D_Heightmap;
 import b3dElements.spatials.B3D_Terrain;
 import gui.dialogs.AdditionalCameraDialog;
-import gui.editPanes.EditTaskPane;
 import gui.editPanes.filters.BasicSSAOTaskPane;
 import gui.editPanes.filters.BloomTaskPane;
 import gui.editPanes.filters.CartoonEdgeTaskPane;
@@ -63,7 +61,9 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.shaderblow.filter.basicssao.BasicSSAO;
 import com.shaderblow.filter.frostedglass.FrostedGlassFilter;
 import com.shaderblow.filter.oldfilm.OldFilmFilter;
+import components.EditTaskPane;
 import dialogs.ObserverDialog;
+import general.Preference;
 import gui.editPanes.spatials.TQMaterialTaskPane;
 import java.io.File;
 import java.util.Vector;
@@ -102,7 +102,7 @@ public class EditPane extends JScrollPane
                 {
                     try
                     {
-                        Thread.sleep(CurrentData.getConfiguration().guiSPeed);
+                        Thread.sleep((Integer) CurrentData.getPrefs().get(Preference.GUI_SPEED));
                     } catch (InterruptedException ex)
                     {
                         Logger.getLogger(EditPane.class.getName()).log(Level.SEVERE, null, ex);
@@ -129,12 +129,12 @@ public class EditPane extends JScrollPane
     {
         if (taskPane instanceof MaterialTaskPane)
         {
-            if(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Geometry)
-            ((MaterialTaskPane) taskPane).arrange(
-                    new File("matD//" + ((Geometry) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getMaterial().getMaterialDef().getAssetName()));
-            else if(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof TerrainQuad)
-            ((TQMaterialTaskPane) taskPane).arrange(
-                    new File("matD//" + ((TerrainQuad) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getMaterial().getMaterialDef().getAssetName()));
+            if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Geometry)
+                ((MaterialTaskPane) taskPane).arrange(
+                        new File("matD//" + ((Geometry) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getMaterial().getMaterialDef().getAssetName()));
+            else if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof TerrainQuad)
+                ((TQMaterialTaskPane) taskPane).arrange(
+                        new File("matD//" + ((TerrainQuad) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getMaterial().getMaterialDef().getAssetName()));
         }
         panel.add(taskPane);
         currentEditPane = taskPane;

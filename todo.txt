@@ -1,10 +1,10 @@
 1.0
-Protokoll
 Installer
-Neuer Startbildschirm
-
+Neuer Startbildschirm (Coole Scene -> Coole Models benötigt)
+Configuration via ResourceBoundle
 
 1.x
+CanvasPanel in B3D_GUI -> Wiederverwendung in Apps
 Globale Einstellungen (Physics Speed, ViewportColor, Framerate (max), etc) in extra Element verpacken (und somit bei un - / redo mit einbeziehen)
 Screenshot preview of scenes when loading
 All Textfields use input when no longer focused and SHOW THAT
@@ -38,14 +38,15 @@ MeshEditor
 Import from XML
 Animationen á la Keyframes
 Zeitanimations better parser
+Protokoll
 AnimationScript Anzeige durchlaufnummer
 Besseres Bewegen von Objekten
 Objekte „Locken“ (wie in PS)
+Filter enable - / disable button in treenode
 Let user control setQueueBucket
 MotionPath jump to waypoint x
 Auf JME 3.1 umsteigen
 MotionEvent Pause / Stop -> Difference?
-Aktion Rückgängig
 Texture Scale
 Model Animations
 Bug	java.lang.UnsupportedOperationException: FrameBuffer already initialized.

@@ -3,6 +3,7 @@ package gui.dialogs;
 import general.CurrentData;
 import components.CancelButton;
 import dialogs.BasicDialog;
+import general.Preference;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,7 +31,7 @@ public class ChildMotionEventDialog extends BasicDialog
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                CurrentData.getConfiguration().setRemindOfNodeChildrenAsMotionEventSpatial(!dontBotherMeAgainCheckBox.isSelected());
+                CurrentData.getPrefs().set(Preference.REMOND_OF_NODE_CHILDREN_AS_MOTION_EVENT_SPATIAL, !dontBotherMeAgainCheckBox.isSelected());
             }
         });
         pack();

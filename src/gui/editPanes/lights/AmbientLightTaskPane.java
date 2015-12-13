@@ -1,8 +1,8 @@
 package gui.editPanes.lights;
 
 import gui.components.BColorButton;
-import gui.editPanes.EditTaskPane;
 import com.jme3.light.AmbientLight;
+import components.EditTaskPane;
 import general.UAManager;
 import other.Wizard;
 import java.awt.BorderLayout;
