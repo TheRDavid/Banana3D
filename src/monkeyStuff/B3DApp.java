@@ -851,65 +851,44 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     {
         // Record pressed mappings
         if (isPressed)
-        {
             pressedMappings.add(name);
-        } else
-        {
+        else
             pressedMappings.remove(name);
-        }
         List<ComboMove> invokedMoves = new ArrayList<ComboMove>();
         if (newComboExec.updateState(pressedMappings, time))
-        {
             invokedMoves.add(newProjectCombo);
-        } else if (undoComboExec.updateState(pressedMappings, time))
-        {
+        else if (undoComboExec.updateState(pressedMappings, time))
             invokedMoves.add(undoCombo);
-        } else if (redoComboExec.updateState(pressedMappings, time))
-        {
+        else if (redoComboExec.updateState(pressedMappings, time))
             invokedMoves.add(redoCombo);
-        } else if (openComboExec.updateState(pressedMappings, time))
-        {
+        else if (openComboExec.updateState(pressedMappings, time))
             invokedMoves.add(openProjectCombo);
-        } else if (saveComboExec.updateState(pressedMappings, time))
-        {
+        else if (saveComboExec.updateState(pressedMappings, time))
             invokedMoves.add(saveSceneCombo);
-        } else if (quitComboExec.updateState(pressedMappings, time))
-        {
+        else if (quitComboExec.updateState(pressedMappings, time))
             invokedMoves.add(quitCombo);
-        } else if (renameComboExec.updateState(pressedMappings, time))
-        {
+        else if (renameComboExec.updateState(pressedMappings, time))
             invokedMoves.add(renameCombo);
-        } else if (twinComboExec.updateState(pressedMappings, time))
-        {
+        else if (twinComboExec.updateState(pressedMappings, time))
             invokedMoves.add(twinCombo);
-        } else if (findComboExec.updateState(pressedMappings, time))
-        {
+        else if (findComboExec.updateState(pressedMappings, time))
             invokedMoves.add(findCombo);
-        } else if (lookAtComboExec.updateState(pressedMappings, time))
-        {
+        else if (lookAtComboExec.updateState(pressedMappings, time))
             invokedMoves.add(lookAtCombo);
-        } else if (playMotionComboExec.updateState(pressedMappings, time))
-        {
+        else if (playMotionComboExec.updateState(pressedMappings, time))
             invokedMoves.add(playMotionCombo);
-        } else if (deleteExec.updateState(pressedMappings, time))
-        {
+        else if (deleteExec.updateState(pressedMappings, time))
             invokedMoves.add(deleteMove);
-        } else if (startStopPhysicsExec.updateState(pressedMappings, time))
-        {
+        else if (startStopPhysicsExec.updateState(pressedMappings, time))
             invokedMoves.add(startStopPhysicsMove);
-        } else if (screenshotExec.updateState(pressedMappings, time))
-        {
+        else if (screenshotExec.updateState(pressedMappings, time))
             invokedMoves.add(screenshotMove);
-        } else if (recordExec.updateState(pressedMappings, time))
-        {
+        else if (recordExec.updateState(pressedMappings, time))
             invokedMoves.add(recordMove);
-        } else if (neingagMoveExec.updateState(pressedMappings, time))
-        {
+        else if (neingagMoveExec.updateState(pressedMappings, time))
             invokedMoves.add(neingagMove);
-        } else if (fullscreenMoveExec.updateState(pressedMappings, time))
-        {
+        else if (fullscreenMoveExec.updateState(pressedMappings, time))
             invokedMoves.add(fullscreenMove);
-        }
         if (invokedMoves.size() > 0)
         {
             // identify the move with highest priority
@@ -929,12 +908,9 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         if (name.equals("space"))
         {
             if (isPressed)
-            {
                 interactionType = InteractionType.DontDoANYTHING;
-            } else
-            {
+            else
                 interactionType = InteractionType.Default;
-            }
         }
         if (name.equals("mouseLeft"))
         {
@@ -955,21 +931,16 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                 {
                     if (pickedGeometry.getName() == null || pickedGeometry.getName().equals("LightSymbol") || pickedGeometry.getName().contains("nonI_")
                             || pickedGeometry.getUserData("north") != null)
-                    {
                         try
                         {
                             if (results.getCollision(cNumber++).getGeometry() != null)
-                            {
                                 pickedGeometry = results.getCollision(cNumber).getGeometry();
-                            }
                         } catch (java.lang.IndexOutOfBoundsException ioobe)
                         {
                             checking = false;
                         }
-                    } else
-                    {
+                    else
                         checking = false;
-                    }
                 }
                 System.out.println("Angeklickt: " + pickedGeometry.getName());
                 if (interactionType.equals(InteractionType.Default) && isPressed)
@@ -1206,7 +1177,6 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                     }
                     if (results.getCollision(resultNr) != null && selectedObject != null)
                     {
-                        final Vector3f arrowBefore = gizmo.getLocalTranslation().clone();
                         float xDiff = 0, yDiff = 0, zDiff = 0;
                         if (gizmo.getSelectedArrow() != null)
                         {
@@ -1245,7 +1215,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                                 Vector3f move = new Vector3f(xDiff, yDiff, zDiff);
                                 Quaternion rot = tempSpatial.getParent().getWorldRotation().inverse();
                                 tempSpatial.move(rot.mult(move));
-                                //sync childrens physics if there are any
+                                //sync childrens' physics if there are any
                                 if (tempSpatial instanceof Node)
                                 {
                                     Vector<Spatial> children = new Vector<Spatial>();

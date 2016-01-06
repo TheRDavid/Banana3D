@@ -1018,7 +1018,7 @@ public class CurrentData
             @Override
             public void run()
             {
-                if (!prefs.get("fullscreen").equals("true"))
+                if (!prefs.get(Preference.FULLSCREEN).equals("true"))
                 {
                     CurrentData.getEditorWindow().dispose();
                     CurrentData.getEditorWindow().setUndecorated(true);
@@ -1037,7 +1037,7 @@ public class CurrentData
                 }
                 prefs.set(Preference.FULLSCREEN,
                         !(Boolean) prefs.get(Preference.FULLSCREEN));
-                editorWindow.getMainMenu().getViewMenu().getFullscreenItem().setSelected(prefs.get("fullscreen").equals("true"));
+                editorWindow.getMainMenu().getViewMenu().getFullscreenItem().setSelected(prefs.get(Preference.FULLSCREEN).equals("true"));
                 CurrentData.getEditorWindow().arrangeComponentSizes();
             }
         });

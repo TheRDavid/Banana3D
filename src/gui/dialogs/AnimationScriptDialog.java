@@ -43,6 +43,7 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
 
     private ControlPane controlsPanel;
     private JTabbedPane scriptPane = new JTabbedPane();
+    private boolean shift = false;
     private String[][] commands =
     {
         new String[]
@@ -202,6 +203,8 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
 
                 public void keyPressed(KeyEvent e)
                 {
+                    if (e.getKeyCode() == 44)
+                        shift = true;
                 }
 
                 public void keyReleased(KeyEvent e)
@@ -224,6 +227,10 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
                             typesMenu.show(ScriptArea.this, 0, 0);
                             ObserverDialog.getObserverDialog().printMessage("Locating typesMenu of AnimationsTaskPane at 0,0");
                         }
+                    else if (shift && e.getKeyCode() == 44)
+                        insert("\n", getCaretPosition());
+                    else if (e.getKeyCode() == 44)
+                        shift = false;
                     else
                     {
                         setForeground(Color.white);

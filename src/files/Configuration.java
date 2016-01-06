@@ -1,13 +1,9 @@
 package files;
 
-import general.CurrentData;
-import java.awt.Point;
-import other.Wizard;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
- * Stores all configurations of the editor
+ * Stores all configurations of the editor - no longer used, replaced by Preferences
  *
  * @author David
  */
