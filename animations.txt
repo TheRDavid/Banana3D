@@ -56,7 +56,6 @@ global:
 
 B3D_Anim_Move
 
-	move : float : ms : ms;
 	move : float, float, float : ms : ms;
 	
 B3D_Anim_Rotate

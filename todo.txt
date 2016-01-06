@@ -1,10 +1,10 @@
 1.0
 Installer
 Neuer Startbildschirm (Coole Scene -> Coole Models benötigt)
-Configuration via ResourceBoundle
 
 1.x
 CanvasPanel in B3D_GUI -> Wiederverwendung in Apps
+EditTaskpane header knöpfe?
 Globale Einstellungen (Physics Speed, ViewportColor, Framerate (max), etc) in extra Element verpacken (und somit bei un - / redo mit einbeziehen)
 Screenshot preview of scenes when loading
 All Textfields use input when no longer focused and SHOW THAT
@@ -53,3 +53,4 @@ Bug	java.lang.UnsupportedOperationException: FrameBuffer already initialized.
 New meshes
 Menu -> Search liefert bei mehreren Ergebnissen List zurück
 Search: Tell if nothing was found
+JavaFX instead of Swing
