@@ -1,7 +1,7 @@
 package gui.dialogs;
 
 import b3dElements.B3D_Element;
-import b3dElements.animations.B3D_Animation;
+import b3dElements.animations.timedAnimations.B3D_TimedAnimation;
 import components.BButton;
 import dialogs.BasicDialog;
 import dialogs.ObserverDialog;
@@ -182,7 +182,7 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
             setFont(new Font("Arial", Font.PLAIN, 16));
             b3D_Element = element;
             setTabSize(3);
-            for (B3D_Animation animation : element.getAnimations())
+            for (B3D_TimedAnimation animation : element.getAnimations())
             {
                 append(AnimationTranslator.translate(animation) + "\n");
                 /* append(animation.getName() + "\n{");
@@ -297,7 +297,7 @@ public class AnimationScriptDialog extends BasicDialog implements ActionListener
         {
             ScriptArea sa = (ScriptArea) ((JScrollPane) scriptPane.getSelectedComponent()).getViewport().getView();
             sa.setForeground(Color.LIGHT_GRAY);
-            for (B3D_Animation b3d_anim : sa.getB3D_Element().getAnimations())
+            for (B3D_TimedAnimation b3d_anim : sa.getB3D_Element().getAnimations())
                 b3d_anim.stop();
             sa.getB3D_Element().getAnimations().clear();
             sa.getB3D_Element().getAnimations().addAll(AnimationTranslator.parseToLocalAnimations(sa.getText(), sa.getB3D_Element().getUUID()));

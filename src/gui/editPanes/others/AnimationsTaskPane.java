@@ -1,6 +1,6 @@
 package gui.editPanes.others;
 
-import b3dElements.animations.B3D_Animation;
+import b3dElements.animations.timedAnimations.B3D_TimedAnimation;
 import b3dElements.B3D_Element;
 import general.CurrentData;
 import components.BButton;
@@ -61,7 +61,7 @@ public class AnimationsTaskPane extends EditTaskPane
         public void update()
         {
             removeAll();
-            for (B3D_Animation animation : element.getAnimations())
+            for (B3D_TimedAnimation animation : element.getAnimations())
             {
                 add("br", new AnimationPanel(animation));
             }
@@ -71,11 +71,11 @@ public class AnimationsTaskPane extends EditTaskPane
         {
 
             private SmallProgressbar progressbar;
-            private BButton playButton = new BButton(playIcon);
-            private B3D_Animation animation;
+            private BButton playButton = new BButton(playIcon,true);
+            private B3D_TimedAnimation animation;
             private JLabel nameLabel;
 
-            public AnimationPanel(B3D_Animation anim)
+            public AnimationPanel(B3D_TimedAnimation anim)
             {
                 this.animation = anim;
                 progressbar = new SmallProgressbar();
@@ -126,7 +126,7 @@ public class AnimationsTaskPane extends EditTaskPane
                 return playButton;
             }
 
-            public B3D_Animation getAnimation()
+            public B3D_TimedAnimation getAnimation()
             {
                 return animation;
             }
@@ -136,7 +136,7 @@ public class AnimationsTaskPane extends EditTaskPane
     @Override
     public void updateData(boolean urgent)
     {
-        for (B3D_Animation animation : element.getAnimations())
+        for (B3D_TimedAnimation animation : element.getAnimations())
         {
             if (animation.isPlaying())
             {

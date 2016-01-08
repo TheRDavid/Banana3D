@@ -74,6 +74,7 @@ import java.util.Vector;
 import java.util.concurrent.Callable;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import monkeyStuff.keyframeAnimation.KeyframeAnimation;
 import org.lwjgl.input.Mouse;
 import other.B3D_Scene;
 import other.ObjectToElementConverter;
@@ -175,6 +176,8 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     private boolean waterTexturesSynced = false, returnToNormalSpeed = false;
     private Vector<Spatial> spatials = new Vector<Spatial>();
     private NodeModel currentNodeModel;
+    //Keyframe animations
+    private Vector<KeyframeAnimation> keyframeAnimations = new Vector<KeyframeAnimation>();
 
     /**
      * Just settin variables
@@ -1804,5 +1807,10 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     public Vector<LightControl> getLightControls()
     {
         return lightControls;
+    }
+
+    public Vector<KeyframeAnimation> getKeyframeAnimations()
+    {
+        return keyframeAnimations;
     }
 }

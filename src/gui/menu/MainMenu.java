@@ -35,6 +35,7 @@ public class MainMenu extends JMenuBar
         viewMenu.setEnabled(!disable);
         physicsMenu.setEnabled(!disable);
         extrasMenu.getScreenshotItem().setEnabled(!disable);
+        //extrasMenu.getKeyframeAnimationItem().setEnabled(!disable);
         extrasMenu.getRecordItem().setEnabled(!disable);
         extrasMenu.getAutosaveMenu().setEnabled(!disable);
         extrasMenu.getOpenFolderItem().setEnabled(!disable);

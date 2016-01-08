@@ -19,7 +19,7 @@ import other.Wizard;
 
 public class ExtrasMenu extends JMenu implements ActionListener
 {
-
+    
     private JMenuItem openFolderItem = new JMenuItem("Open Assets-Folder", new ImageIcon("dat//img//menu//open.png"));
     private JMenu autosaveMenu = new JMenu("Autosave");
     private JCheckBoxMenuItem autosaveEnabledItem = new JCheckBoxMenuItem("Enabled", new ImageIcon("dat//img//menu//autosaveEnabled.png"));
@@ -27,8 +27,9 @@ public class ExtrasMenu extends JMenu implements ActionListener
     private JMenuItem screenshotItem = new JMenuItem("Screenshot", new ImageIcon("dat//img//menu//screenshot.png"));
     private JMenuItem recordItem = new JMenuItem("Record", new ImageIcon("dat//img//menu//record.png"));
     private JMenuItem configItem = new JMenuItem("Settings", new ImageIcon("dat//img//menu//settings.png"));
+    private JMenuItem keyframeAnimationItem = new JMenuItem("Keyframe Editor", new ImageIcon("dat//img//menu//keyframe.png"));
     private ArrayList<AppItem> appItems = new ArrayList<AppItem>();
-
+    
     public ExtrasMenu()
     {
         autosaveMenu.setIcon(new ImageIcon("dat//img//menu//autosave.png"));
@@ -42,6 +43,7 @@ public class ExtrasMenu extends JMenu implements ActionListener
         add(recordItem);
         add(configItem);
         add(new JSeparator());
+        add(keyframeAnimationItem);
         File apps = new File("dat//apps");
         if (!apps.exists())
             apps.mkdir();
@@ -59,9 +61,16 @@ public class ExtrasMenu extends JMenu implements ActionListener
         }
         initActions();
     }
-
+    
     private void initActions()
     {
+        keyframeAnimationItem.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                CurrentData.getEditorWindow().getKeyframeAnimationEditor().setVisible(true);
+            }
+        });
         configItem.addActionListener(new ActionListener()
         {
             @Override
@@ -118,13 +127,13 @@ public class ExtrasMenu extends JMenu implements ActionListener
             }
         });
     }
-
+    
     private void initShortcuts()
     {
         screenshotItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
         recordItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
     }
-
+    
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().startsWith("app"))
@@ -142,10 +151,10 @@ public class ExtrasMenu extends JMenu implements ActionListener
             }
         }
     }
-
+    
     class AppItem extends JMenuItem
     {
-
+        
         public AppItem(String appName)
         {
             setActionCommand("app" + appName + "//" + appName + ".jar");
@@ -154,32 +163,37 @@ public class ExtrasMenu extends JMenu implements ActionListener
             addActionListener(ExtrasMenu.this);
         }
     }
-
+    
     public JMenuItem getScreenshotItem()
     {
         return screenshotItem;
     }
-
+    
     public JMenuItem getRecordItem()
     {
         return recordItem;
     }
-
+    
     public JMenu getAutosaveMenu()
     {
         return autosaveMenu;
     }
-
+    
     public JCheckBoxMenuItem getAutosaveEnabledItem()
     {
         return autosaveEnabledItem;
     }
-
+    
     public JMenuItem getOpenFolderItem()
     {
         return openFolderItem;
     }
-
+    
+    public JMenuItem getKeyframeAnimationItem()
+    {
+        return keyframeAnimationItem;
+    }
+    
     public ArrayList<AppItem> getAppItems()
     {
         return appItems;

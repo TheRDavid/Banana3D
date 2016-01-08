@@ -504,9 +504,9 @@ public class MotionPathTaskPane extends EditTaskPane
     private class PlayTaskPane extends JXTaskPane
     {
 
-        private BButton playButton = new BButton(new ImageIcon("dat//img//menu//c_play.png"));
-        private BButton pauseButton = new BButton(new ImageIcon("dat//img//menu//c_pause.png"));
-        private BButton stopButton = new BButton(new ImageIcon("dat//img//menu//c_stop.png"));
+        private BButton playButton = new BButton(new ImageIcon("dat//img//menu//c_play.png"),true);
+        private BButton pauseButton = new BButton(new ImageIcon("dat//img//menu//c_pause.png"),true);
+        private BButton stopButton = new BButton(new ImageIcon("dat//img//menu//c_stop.png"),true);
         private JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         public PlayTaskPane()

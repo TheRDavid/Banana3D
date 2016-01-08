@@ -15,6 +15,7 @@ import components.StatusBar;
 import dialogs.ObserverDialog;
 import general.Preference;
 import general.UAManager;
+import gui.dialogs.KeyframeAnimationDialog;
 import other.B3D_Scene;
 import java.awt.*;
 import java.awt.event.*;
@@ -36,6 +37,7 @@ public class EditorWindow extends JFrame
     private B3DApp b3DSimpleApplication;
     private JmeCanvasContext canvasContext;
     private JPanel upperPanel = new JPanel();
+    private KeyframeAnimationDialog kfad = new KeyframeAnimationDialog();
     private BButton fieldOfViewButton = new BButton("FOV", new ImageIcon("dat//img//menu//fieldOfView.png")), addCamButton = new BButton("Add Camera", new ImageIcon("dat//img//menu//camera.png"));
     private JComboBox sortModeComboBox = new JComboBox(new String[]
     {
@@ -390,5 +392,10 @@ public class EditorWindow extends JFrame
     public BButton getAddCamButton()
     {
         return addCamButton;
+    }
+
+    public KeyframeAnimationDialog getKeyframeAnimationEditor()
+    {
+        return kfad;
     }
 }

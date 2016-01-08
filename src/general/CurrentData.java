@@ -1,6 +1,6 @@
 package general;
 
-import b3dElements.animations.B3D_Animation;
+import b3dElements.animations.timedAnimations.B3D_TimedAnimation;
 import b3dElements.B3D_Element;
 import b3dElements.filters.B3D_Filter;
 import b3dElements.lights.B3D_Light;
@@ -467,7 +467,7 @@ public class CurrentData
                     b3D_Light.setUuid(oldB3D_Light.getUUID());
                     System.out.println("Saving b3dLight with UUID: " + b3D_Light.getUUID());
                     scene.getElements().add(b3D_Light);
-                    b3D_Light.setAnimations((ArrayList<B3D_Animation>) oldB3D_Light.getAnimations().clone());
+                    b3D_Light.setAnimations((ArrayList<B3D_TimedAnimation>) oldB3D_Light.getAnimations().clone());
                 }
             }
             //Now spatials, but only those without a parent, they will also load their children
@@ -494,7 +494,7 @@ public class CurrentData
                     newB3D_Element.setUuid(oldB3D_Element.getUUID());
                     if (oldB3D_Element instanceof B3D_Filter)
                         ((B3D_Filter) newB3D_Element).changeFilterIndex(((B3D_Filter) oldB3D_Element).getFilterIndex());
-                    newB3D_Element.setAnimations((ArrayList<B3D_Animation>) oldB3D_Element.getAnimations().clone());
+                    newB3D_Element.setAnimations((ArrayList<B3D_TimedAnimation>) oldB3D_Element.getAnimations().clone());
                     scene.getElements().add(newB3D_Element);
                 }
             }
@@ -682,11 +682,11 @@ public class CurrentData
                     final B3D_Element oldElement = Wizard.getObjects().getB3D_Element(
                             Wizard.getObjectReferences().getUUID(CurrentData.getEditorWindow().getB3DApp().getSelectedObject().hashCode()));
                     final B3D_Element newElement = ObjectToElementConverter.convertToElement(CurrentData.getEditorWindow().getB3DApp().getSelectedObject());
-                    for (B3D_Animation animation : oldElement.getAnimations())
+                    for (B3D_TimedAnimation animation : oldElement.getAnimations())
                     {
-                        B3D_Animation copy = animation.copy();
+                        B3D_TimedAnimation copy = animation.copy();
                         copy.setObject(newElement.getUUID());
-                        newElement.getAnimations().add((B3D_Animation) copy);
+                        newElement.getAnimations().add((B3D_TimedAnimation) copy);
                     }
                     final Object newObject = ElementToObjectConverter.convertToObject(newElement);
                     System.out.println("New Element: " + newElement + " -> " + newObject);
@@ -1018,7 +1018,7 @@ public class CurrentData
             @Override
             public void run()
             {
-                if (!prefs.get(Preference.FULLSCREEN).equals("true"))
+                if (!prefs.get(Preference.FULLSCREEN).equals(true))
                 {
                     CurrentData.getEditorWindow().dispose();
                     CurrentData.getEditorWindow().setUndecorated(true);

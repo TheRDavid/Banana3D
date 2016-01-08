@@ -25,7 +25,7 @@ public class AssetChooserDialog extends BasicDialog
 
     private JFileChooser assetChooser = new JFileChooser();
     private AssetButton.AssetType type;
-    private BButton upButton = new BButton(new ImageIcon("dat//img//other//upButtonIcon.png"));
+    private BButton upButton = new BButton(new ImageIcon("dat//img//other//upButtonIcon.png"),true);
     private OKButton finishButton = new OKButton("Ok");
     private String selectedAssetName;
     private File selectedFile;
