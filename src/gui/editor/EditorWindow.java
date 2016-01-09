@@ -15,7 +15,7 @@ import components.StatusBar;
 import dialogs.ObserverDialog;
 import general.Preference;
 import general.UAManager;
-import gui.dialogs.KeyframeAnimationDialog;
+import gui.dialogs.keyframeAnimationEditor.KeyframeAnimationDialog;
 import other.B3D_Scene;
 import java.awt.*;
 import java.awt.event.*;
@@ -31,13 +31,13 @@ public class EditorWindow extends JFrame
     private JPanel treePanel = new JPanel(new VerticalLayout(0));
     private JScrollPane treeScrollPane = new JScrollPane();
     private ElementTree tree;
-    private CanvasPanel canvasPanel = new CanvasPanel();
+    private JPanel canvasPanel = new JPanel();
     private JPanel middlePanel = new JPanel(new VerticalLayout());
     private ControlToolBar toolbar = new ControlToolBar();
     private B3DApp b3DSimpleApplication;
     private JmeCanvasContext canvasContext;
     private JPanel upperPanel = new JPanel();
-    private KeyframeAnimationDialog kfad = new KeyframeAnimationDialog();
+    private KeyframeAnimationDialog kfad;
     private BButton fieldOfViewButton = new BButton("FOV", new ImageIcon("dat//img//menu//fieldOfView.png")), addCamButton = new BButton("Add Camera", new ImageIcon("dat//img//menu//camera.png"));
     private JComboBox sortModeComboBox = new JComboBox(new String[]
     {
@@ -50,6 +50,7 @@ public class EditorWindow extends JFrame
      */
     public EditorWindow()
     {
+        kfad = new KeyframeAnimationDialog();
         initShortcuts();
         sortModeComboBox.setFont(new Font("Tahoma", Font.PLAIN, 13));
         CurrentData.setEditorWindow(this);
@@ -120,7 +121,10 @@ public class EditorWindow extends JFrame
         } else
         {
             setSize((Dimension) CurrentData.getPrefs().get(Preference.EDITOR_WINDOW_SIZE));
-            setLocationRelativeTo(null);
+            if (CurrentData.getPrefs().get(Preference.EDITOR_WINDOW_LOCATION) == null)
+                setLocationRelativeTo(null);
+            else
+                setLocation((Point) CurrentData.getPrefs().get(Preference.EDITOR_WINDOW_LOCATION));
         }
         addComponentListener(new ComponentAdapter()
         {
@@ -128,12 +132,16 @@ public class EditorWindow extends JFrame
             public void componentResized(ComponentEvent e)
             {
                 arrangeComponentSizes();
+                CurrentData.getPrefs().set(Preference.EDITOR_WINDOW_SIZE, getSize());
+                CurrentData.getPrefs().save();
             }
 
             @Override
             public void componentMoved(ComponentEvent e)
             {
                 arrangeComponentSizes();
+                CurrentData.getPrefs().set(Preference.EDITOR_WINDOW_LOCATION, getLocation());
+                CurrentData.getPrefs().save();
             }
         });
         addWindowStateListener(new WindowStateListener()
@@ -189,8 +197,6 @@ public class EditorWindow extends JFrame
         CurrentData.getSplashDialog().dispose();
         //Needs to be called after every resize
         arrangeComponentSizes();
-        canvasPanel.setPlayIcon(Wizard.resizeImage(new ImageIcon("dat//img//other//playPic2.png").getImage(), getWidth(), getHeight(), true));
-        canvasPanel.setPlayIcon2(Wizard.resizeImage(new ImageIcon("dat//img//other//playPic1.png").getImage(), getWidth(), getHeight(), true));
         setVisible(true);
     }
 
@@ -229,7 +235,6 @@ public class EditorWindow extends JFrame
      */
     public void initNewScene(B3D_Scene world)
     {
-        canvasPanel.setSeriousNow(true);
         AppSettings settings = new AppSettings(true);
         settings.setFrameRate((Integer) CurrentData.getPrefs().get(Preference.FRAMERATE));
         settings.setRenderer(AppSettings.LWJGL_OPENGL3);
@@ -251,6 +256,7 @@ public class EditorWindow extends JFrame
         toolbar.setEnabled(true);
         repaint();
         validate();
+        kfad.setVisible((Boolean) CurrentData.getPrefs().get(Preference.KEY_ANIMATION_EDITOR_SHOWN));
     }
 
     /**
@@ -374,7 +380,7 @@ public class EditorWindow extends JFrame
         return editPane;
     }
 
-    public CanvasPanel getCanvasPanel()
+    public JPanel getCanvasPanel()
     {
         return canvasPanel;
     }

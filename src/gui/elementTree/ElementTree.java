@@ -33,8 +33,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -143,18 +143,8 @@ public class ElementTree extends JXTree
                 }
             }
         });
-        addMouseListener(new MouseListener()
+        addMouseListener(new MouseAdapter()
         {
-            @Override
-            public void mouseClicked(MouseEvent e)
-            {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e)
-            {
-            }
-
             @Override
             public void mouseReleased(MouseEvent e)
             {
@@ -185,16 +175,6 @@ public class ElementTree extends JXTree
                     addMenu.add(addMenu.getObject3DMenu(), 0);
                     addPopupMenu.show(ElementTree.this, e.getX(), e.getY());
                 }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e)
-            {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e)
-            {
             }
         });
         rootNode.removeAllChildren();

@@ -66,6 +66,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import monkeyStuff.keyframeAnimation.Updaters.AnimationType;
+import monkeyStuff.keyframeAnimation.Updaters.SpatialUpdater;
 import other.ElementToObjectConverter;
 import other.ObjectToElementConverter;
 import other.B3D_Scene;
@@ -1269,11 +1271,23 @@ public class CurrentData
         prefs.set(Preference.COLOR_DEPTH, 8);
         prefs.set(Preference.MULTISAMPLING, 0);
         prefs.set(Preference.DEPTH_BITS, 24);
+        prefs.set(Preference.KEY_ANIMATION_EDITOR_SHOWN, false);
+        prefs.set(Preference.KEY_ANIMATION_EDITOR_ON_TOP, true);
         prefs.set(Preference.FIELD_OF_VIEW,
                 new float[]
         {
             1, 2000, -0.45738515f, 0.45738515f, 0.41421357f, -0.41421357f
         });
         prefs.save();
+    }
+
+    public static Vector<AnimationType> getAttributes(B3D_Element element)
+    {
+        Vector<AnimationType> attribs = new Vector<AnimationType>();
+        if (element instanceof B3D_Spatial)
+        {
+            attribs.add(AnimationType.Translation);
+        }
+        return attribs;
     }
 }
