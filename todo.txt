@@ -1,5 +1,7 @@
 1.0
 Installer
+Neues Error Handling für den User
+AnimationPanel
 Neuer Startbildschirm (Coole Scene -> Coole Models benötigt)
 
 1.x
