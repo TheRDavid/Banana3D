@@ -15,7 +15,7 @@ import components.StatusBar;
 import dialogs.ObserverDialog;
 import general.Preference;
 import general.UAManager;
-import gui.dialogs.keyframeAnimationEditor.KeyframeAnimationDialog;
+import gui.dialogs.keyframeAnimationEditor.KeyframeAnimationFrame;
 import other.B3D_Scene;
 import java.awt.*;
 import java.awt.event.*;
@@ -37,7 +37,7 @@ public class EditorWindow extends JFrame
     private B3DApp b3DSimpleApplication;
     private JmeCanvasContext canvasContext;
     private JPanel upperPanel = new JPanel();
-    private KeyframeAnimationDialog kfad;
+    private KeyframeAnimationFrame kfad;
     private BButton fieldOfViewButton = new BButton("FOV", new ImageIcon("dat//img//menu//fieldOfView.png")), addCamButton = new BButton("Add Camera", new ImageIcon("dat//img//menu//camera.png"));
     private JComboBox sortModeComboBox = new JComboBox(new String[]
     {
@@ -50,7 +50,7 @@ public class EditorWindow extends JFrame
      */
     public EditorWindow()
     {
-        kfad = new KeyframeAnimationDialog();
+        kfad = new KeyframeAnimationFrame();
         initShortcuts();
         sortModeComboBox.setFont(new Font("Tahoma", Font.PLAIN, 13));
         CurrentData.setEditorWindow(this);
@@ -400,7 +400,7 @@ public class EditorWindow extends JFrame
         return addCamButton;
     }
 
-    public KeyframeAnimationDialog getKeyframeAnimationEditor()
+    public KeyframeAnimationFrame getKeyframeAnimationEditor()
     {
         return kfad;
     }

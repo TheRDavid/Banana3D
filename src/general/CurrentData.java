@@ -38,6 +38,7 @@ import com.thoughtworks.xstream.XStream;
 import dialogs.ObserverDialog;
 import dialogs.SplashDialog;
 import gui.dialogs.AnimationScriptDialog;
+import gui.dialogs.keyframeAnimationEditor.AnimationElementTree;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -66,8 +67,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
 import monkeyStuff.keyframeAnimation.Updaters.AnimationType;
-import monkeyStuff.keyframeAnimation.Updaters.SpatialUpdater;
 import other.ElementToObjectConverter;
 import other.ObjectToElementConverter;
 import other.B3D_Scene;
@@ -1281,13 +1282,31 @@ public class CurrentData
         prefs.save();
     }
 
-    public static Vector<AnimationType> getAttributes(B3D_Element element)
+    public static Vector<AnimationType> getAttributes(B3D_Element element, ArrayList<AnimationElementTree.AttributeNode> nodes)
     {
         Vector<AnimationType> attribs = new Vector<AnimationType>();
         if (element instanceof B3D_Spatial)
         {
-            attribs.add(AnimationType.Translation);
+            add(attribs, AnimationType.Translation, nodes);
+            add(attribs, AnimationType.Rotation, nodes);
+            add(attribs, AnimationType.Scale, nodes);
         }
         return attribs;
+    }
+
+    private static void add(Vector<AnimationType> vec, AnimationType at, ArrayList<AnimationElementTree.AttributeNode> nodes)
+    {
+        boolean legit = true;
+        for (DefaultMutableTreeNode dmtn : nodes)
+        {
+            if (dmtn.getUserObject().toString().equals(at.toString()))
+            {
+                legit = false;
+                break;
+
+            }
+        }
+        if (legit)
+            vec.add(at);
     }
 }

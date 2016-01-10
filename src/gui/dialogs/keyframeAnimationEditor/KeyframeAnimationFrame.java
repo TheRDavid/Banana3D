@@ -9,15 +9,20 @@ import general.Preference;
 import gui.dialogs.SelectElementDialog;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -31,6 +36,9 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import monkeyStuff.keyframeAnimation.KeyframeAnimation;
+import monkeyStuff.keyframeAnimation.KeyframeProperty;
+import monkeyStuff.keyframeAnimation.KeyframeUpdater;
+import org.jdesktop.swingx.VerticalLayout;
 import other.Wizard;
 import se.datadosen.component.RiverLayout;
 
@@ -38,11 +46,12 @@ import se.datadosen.component.RiverLayout;
  *
  * @author David
  */
-public class KeyframeAnimationDialog extends JFrame
+public class KeyframeAnimationFrame extends JFrame
 {
 
     private Selector selector = new Selector();
     private ToolsPanel toolsPanel = new ToolsPanel();
+    private ValuePanel valuePanel = new ValuePanel();
     private AttributesPanel attributesPanel = new AttributesPanel();
     private EditPanel editPanel = new EditPanel();
     private KeyframePanel keyframePanel = new KeyframePanel();
@@ -53,9 +62,8 @@ public class KeyframeAnimationDialog extends JFrame
     private boolean firstPaint = true;
     private KeyframeAnimation currentAnimation = null;
 
-    public KeyframeAnimationDialog()
+    public KeyframeAnimationFrame()
     {
-        setType(Type.UTILITY);
         setIconImage(new ImageIcon("dat//img//other//logo.png").getImage());
         if (CurrentData.getPrefs().get(Preference.KEY_ANIMATION_DIALOG_SIZE) == null)
             setSize(Toolkit.getDefaultToolkit().getScreenSize().width / 3 * 2, 499);
@@ -66,10 +74,11 @@ public class KeyframeAnimationDialog extends JFrame
         else
             setLocation((Point) CurrentData.getPrefs().get(Preference.KEY_ANIMATION_DIALOG_LOCATION));
         setTitle("Keyframe Animations");
-        setAlwaysOnTop((Boolean) CurrentData.getPrefs().get(Preference.KEY_ANIMATION_EDITOR_SHOWN));
+        setAlwaysOnTop((Boolean) CurrentData.getPrefs().get(Preference.KEY_ANIMATION_EDITOR_ON_TOP));
         setLayout(new BorderLayout(0, 0));
         add(toolsPanel, BorderLayout.NORTH);
         add(editorPanel, BorderLayout.CENTER);
+        add(valuePanel, BorderLayout.EAST);
         addWindowListener(new WindowAdapter()
         {
             @Override
@@ -127,11 +136,12 @@ public class KeyframeAnimationDialog extends JFrame
 
     private void arrangeSizes()
     {
-        toolsPanel.setPreferredSize(new Dimension(KeyframeAnimationDialog.this.getWidth(), 26));
-        editorPanel.setPreferredSize(new Dimension(KeyframeAnimationDialog.this.getWidth(), getHeight() - toolsPanel.getHeight()));
+        valuePanel.setPreferredSize(new Dimension(320, editPanel.getHeight()));
+        toolsPanel.setPreferredSize(new Dimension(KeyframeAnimationFrame.this.getWidth(), 26));
+        editorPanel.setPreferredSize(new Dimension(KeyframeAnimationFrame.this.getWidth(), getHeight() - toolsPanel.getHeight()));
         keyframePanel.setPreferredSize(new Dimension(editorPanel.getWidth(), editorPanel.getHeight() - TIMELINE_HEIGHT));
-        timelinePanel.setPreferredSize(new Dimension(editorPanel.getWidth() - 500, TIMELINE_HEIGHT));
-        attributesPanel.setPreferredSize(new Dimension(500, 200));
+        timelinePanel.setPreferredSize(new Dimension(editorPanel.getWidth() - 200, TIMELINE_HEIGHT));
+        attributesPanel.setPreferredSize(new Dimension(200, 200));
         editPanel.setPreferredSize(new Dimension(keyframePanel.getWidth() - 500, keyframePanel.getHeight()));
         toolsPanel.updateSlider();
         toolsPanel.repaint();
@@ -196,7 +206,9 @@ public class KeyframeAnimationDialog extends JFrame
                     if (firstPaint) // elegant af
                     {
                         firstPaint = false;
-                        KeyframeAnimationDialog.this.setSize(KeyframeAnimationDialog.this.getWidth() + 1, KeyframeAnimationDialog.this.getHeight() + 1);
+                        KeyframeAnimationFrame.this.setSize(
+                                KeyframeAnimationFrame.this.getWidth() + 1,
+                                KeyframeAnimationFrame.this.getHeight() + 1);
                     }
                     if (dont) // elegant af
                     {
@@ -215,23 +227,23 @@ public class KeyframeAnimationDialog extends JFrame
             newAnimationButton.setActionCommand("new");
             setLayout(new RiverLayout(0, 0));
             add("left", onTopButton);
-            add(new JLabel("                  ")); //elegant af
+            add(new JLabel("    ")); //elegant af
             add("tab", new JLabel("Select:   "));
             add(animationSelector);
             add(newAnimationButton);
             add(deleteAnimationButton);
-            add(new JLabel("                  ")); //elegant af
+            add(new JLabel("                ")); //elegant af
             add(previousFrameButton);
             add(playButton);
             add(nextFrameButton);
             add(stopButton);
-            add(new JLabel("             ")); //elegant af
+            add(new JLabel("           ")); //elegant af
             add(zoomInButton);
             add(zoomSlider);
             add(zoomOutButton);
-            add(new JLabel("                ")); //elegant af
+            add(new JLabel("              ")); //elegant af
             add(currentFrameLabel);
-            add(new JLabel("          ")); //elegant af
+            add(new JLabel("        ")); //elegant af
             add(maxFramesLabel);
         }
 
@@ -276,6 +288,9 @@ public class KeyframeAnimationDialog extends JFrame
                     JOptionPane.showMessageDialog(playButton, "Select an Animation first!", "Error", JOptionPane.ERROR_MESSAGE);
                 else
                 {
+                    currentAnimation.removeAllUpdaters();
+                    for (AnimationElementTree aet : keyframePanel.animationElementTrees)
+                        currentAnimation.addUpdater(aet.getKeyframeUpdater().createNew());
                     currentAnimation.play();
                 }
             } else if (e.getActionCommand().equals("stop"))
@@ -289,6 +304,7 @@ public class KeyframeAnimationDialog extends JFrame
             } else if (e.getActionCommand().equals("aot"))
             {
                 setAlwaysOnTop(onTopButton.isSelected());
+                CurrentData.getPrefs().set(Preference.KEY_ANIMATION_EDITOR_ON_TOP, onTopButton.isSelected());
             }
         }
 
@@ -311,7 +327,6 @@ public class KeyframeAnimationDialog extends JFrame
 
         public ValuePanel()
         {
-            setBackground(Color.RED);
         }
     }
 
@@ -343,7 +358,6 @@ public class KeyframeAnimationDialog extends JFrame
                 setLayout(new RiverLayout(0, 0));
                 add(new JLabel("            ")); //elegant af
                 add("br", sortTypes);
-                add(new JLabel("            ")); //elegant af
                 add(addElementButton);
                 add(deleteElementButton);
                 addElementButton.setActionCommand("add");
@@ -360,7 +374,10 @@ public class KeyframeAnimationDialog extends JFrame
                         return;
                     }
                     setAlwaysOnTop(false);
-                    SelectElementDialog sed = new SelectElementDialog(KeyframeAnimationDialog.this.getLocation());
+                    ArrayList<B3D_Element> exclude = new ArrayList<B3D_Element>();
+                    for (AnimationElementTree aet : keyframePanel.animationElementTrees)
+                        exclude.add(aet.getElement());
+                    SelectElementDialog sed = new SelectElementDialog(KeyframeAnimationFrame.this.getLocation(), exclude);
                     if (sed.getSelectedElement() != null)
                         keyframePanel.addElement(sed.getSelectedElement());
                     setAlwaysOnTop((Boolean) CurrentData.getPrefs().get(Preference.KEY_ANIMATION_EDITOR_ON_TOP));
@@ -371,6 +388,8 @@ public class KeyframeAnimationDialog extends JFrame
 
     class TimelinePanel extends JPanel
     {
+
+        private double gapSize, currentStart = 0;
 
         public TimelinePanel()
         {
@@ -386,7 +405,7 @@ public class KeyframeAnimationDialog extends JFrame
             g.fillRect(0, 0, getWidth(), getHeight());
             g.setColor(Color.LIGHT_GRAY);
             double x;
-            double gapSize = (double) getWidth() / zoom;
+            gapSize = (double) getWidth() / zoom;
             //System.out.println("Width: " + getWidth());
             //System.out.println("Zoom: " + zoom);
             //   System.out.println("Gap Size: " + gapSize);
@@ -430,18 +449,9 @@ public class KeyframeAnimationDialog extends JFrame
         public void addElement(B3D_Element e)
         {
             elements.add(e);
-            KeyframePanel.this.arrange();
-        }
-
-        private void arrange()
-        {
-            for (B3D_Element e : elements)
-            {
-                AnimationElementTree aet = new AnimationElementTree(e);
-                animationElementTrees.add(aet);
-                attributesPanel.add(aet);
-                currentAnimation.addUpdater(aet.getKeyframeUpdater());
-            }
+            AnimationElementTree aet = new AnimationElementTree(e);
+            animationElementTrees.add(aet);
+            attributesPanel.add(aet);
             repaint();
             attributesPanel.repaint();
             revalidate();
@@ -453,8 +463,13 @@ public class KeyframeAnimationDialog extends JFrame
 
         public AttributesPanel()
         {
-            setLayout(new BorderLayout(0, 0));
+            setLayout(new VerticalLayout(0));
             setBackground(Color.GRAY);
+        }
+
+        public void updateAttributes()
+        {
+            editPanel.getKeyframeEditor().repaint();
         }
     }
 
@@ -462,11 +477,110 @@ public class KeyframeAnimationDialog extends JFrame
     {
 
         private JScrollBar hscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0, 30, 0, 40);
+        private KeyframeEditor keyframeEditor = new KeyframeEditor();
 
         public EditPanel()
         {
             setLayout(new BorderLayout(0, 0));
+            add(keyframeEditor, BorderLayout.CENTER);
             add(hscrollbar, BorderLayout.SOUTH);
+        }
+
+        class KeyframeEditor extends JPanel
+        {
+
+            public KeyframeEditor()
+            {
+                setDoubleBuffered(true);
+                addMouseListener(new MouseAdapter()
+                {
+                    @Override
+                    public void mouseReleased(MouseEvent e)
+                    {
+                        if (e.getClickCount() == 2)
+                        {
+                            int frame = (int) (e.getX() / timelinePanel.gapSize);
+                            Component comp = attributesPanel.getComponentAt(66, e.getY());
+                            toolsPanel.currentFrameLabel.setText("Clicked " + comp.toString());
+                            AnimationElementTree.AttributeNode aNode = null;
+                            AnimationElementTree aet = null;
+                            if (comp instanceof AnimationElementTree)
+                            {
+                                toolsPanel.currentFrameLabel.setText("Tree");
+                                aet = (AnimationElementTree) comp;
+                                if (aet.getClosestPathForLocation(10, e.getY()).getLastPathComponent() instanceof AnimationElementTree.AttributeNode)
+                                {
+                                    aNode = (AnimationElementTree.AttributeNode) aet.getClosestPathForLocation(10, e.getY()).getLastPathComponent();
+                                    toolsPanel.currentFrameLabel.setText("Frame: "
+                                            + frame
+                                            + " "
+                                            + aet.getElement().getName()
+                                            + ":"
+                                            + aNode.getUserObject().toString() + " (" + aNode.getProperty().type + ")");
+                                }
+                            }
+                            if (aNode != null && aet != null)
+                            {
+                                KeyframeProperty property = aNode.getProperty();
+                                KeyframeUpdater updater = aet.getKeyframeUpdater();
+                                try
+                                {
+                                    property.setValue(frame, updater.getLiveValue(property.type));
+                                } catch (Exception ex)
+                                {
+                                    JOptionPane.showMessageDialog(KeyframeEditor.this, "Out of Bounds? " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                }
+                                repaint();
+                            }
+                        }
+                    }
+                });
+            }
+
+            @Override
+            protected void paintComponent(Graphics g0)
+            {
+                super.paintComponent(g0);
+                Graphics2D g = (Graphics2D) g0;
+                //Antialiasing ON
+                g.setRenderingHint(
+                        RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+                int y = 25;
+                int num = 1;
+                AnimationElementTree aet;
+                for (int i = 0; i < keyframePanel.animationElementTrees.size(); i++)
+                {
+                    aet = keyframePanel.animationElementTrees.get(i);
+                    y += 25;
+                    if (aet.isExpanded())
+                        for (AnimationElementTree.AttributeNode an : aet.getAttributeNodes())
+                        {
+                            if (num++ % 2 > 0)
+                                g.setColor(Color.darkGray);
+                            else
+                                g.setColor(Color.darkGray.darker());
+                            g.fillRect(0, y - 25, getWidth(), 25);
+                            g.setColor(Color.orange);
+                            for (int k = 0; k < an.getProperty().getValues().length; k++)
+                            {
+                                if (an.getProperty().getValues()[k] != null)
+                                {
+                                    int radius = (int) (timelinePanel.gapSize > 25 ? 25 : timelinePanel.gapSize) / 4 * 3;
+                                    g.fillOval((int) (k * timelinePanel.gapSize + timelinePanel.gapSize / 2 - radius / 2),
+                                            y - 12 /* (25/2) */ - radius / 2,
+                                            radius, radius);
+                                }
+                            }
+                            y += 25;
+                        }
+                }
+            }
+        }
+
+        public KeyframeEditor getKeyframeEditor()
+        {
+            return keyframeEditor;
         }
     }
 
