@@ -10,7 +10,6 @@ import monkeyStuff.B3DApp;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 import components.BButton;
-import components.CanvasPanel;
 import components.StatusBar;
 import dialogs.ObserverDialog;
 import general.Preference;
@@ -21,7 +20,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import org.jdesktop.swingx.VerticalLayout;
-import other.Wizard;
 
 public class EditorWindow extends JFrame
 {

@@ -35,7 +35,7 @@ public class AdditionalCameraTaskPane extends EditTaskPane
     public AdditionalCameraTaskPane(AdditionalCameraDialog acd)
     {
         additionalCameraDialog = acd;
-        positionPanel = new Float3Panel(acd.getRepresentative().getLocalTranslation(), Wizard.getCamera())
+        positionPanel = new Float3Panel(acd.getRepresentative().getLocalTranslation(), Wizard.getCamera(), Float3Panel.HORIZONTAL)
         {
             @Override
             public void setVector(Vector3f vec)
@@ -115,7 +115,7 @@ public class AdditionalCameraTaskPane extends EditTaskPane
         public RotationPanel(final Spatial spatial)
         {
             tempSpatial = spatial;
-            rotationFloatPanel = new Float3Panel((Vector3f) tempSpatial.getUserData("angles"), Wizard.getCamera());
+            rotationFloatPanel = new Float3Panel((Vector3f) tempSpatial.getUserData("angles"), Wizard.getCamera(), Float3Panel.HORIZONTAL);
             rotationFloatPanel.addFieldFocusListener(new FocusListener()
             {
                 @Override

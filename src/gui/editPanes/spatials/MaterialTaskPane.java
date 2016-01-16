@@ -410,7 +410,7 @@ public class MaterialTaskPane extends EditTaskPane
                                         value1 = tokenizer.nextToken(",");
                                         value2 = tokenizer.nextToken(",");
                                         value3 = tokenizer.nextToken(",");
-                                        newComponent = new Float3Panel(new Vector3f(Float.parseFloat(value1), Float.parseFloat(value2), Float.parseFloat(value3)), Wizard.getCamera());
+                                        newComponent = new Float3Panel(new Vector3f(Float.parseFloat(value1), Float.parseFloat(value2), Float.parseFloat(value3)), Wizard.getCamera(), Float3Panel.HORIZONTAL);
                                     } catch (NumberFormatException nfe)
                                     {
                                         JOptionPane.showMessageDialog(null, "Exception:\n" + nfe + "\nValue1: " + value1 + "\nValue2: " + value2 + "\nValue3: " + value3);
@@ -418,7 +418,7 @@ public class MaterialTaskPane extends EditTaskPane
                                     }
                                 } else
                                 {
-                                    newComponent = new Float3Panel(null, Wizard.getCamera());
+                                    newComponent = new Float3Panel(null, Wizard.getCamera(), Float3Panel.HORIZONTAL);
                                 }
                             } else if (properties.get(key).equals("Vector4"))
                             {

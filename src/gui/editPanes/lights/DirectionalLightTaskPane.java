@@ -73,7 +73,7 @@ public class DirectionalLightTaskPane extends EditTaskPane
 
         public DirectionalLightDirectionPanel()
         {
-            float3Panel = new Float3Panel(((DirectionalLight) lightModel.getLight()).getDirection(), Wizard.getCamera())
+            float3Panel = new Float3Panel(((DirectionalLight) lightModel.getLight()).getDirection(), Wizard.getCamera(), Float3Panel.HORIZONTAL)
             {
                 @Override
                 public void setVector(Vector3f vec)

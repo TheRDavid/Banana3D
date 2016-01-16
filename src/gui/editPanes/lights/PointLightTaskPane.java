@@ -38,7 +38,7 @@ public class PointLightTaskPane extends EditTaskPane
     {
         lightModel = model;
         colorButton = new BColorButton(Wizard.makeColor(lightModel.getLight().getColor()));
-        positionPanel = new Float3Panel(((PointLight) lightModel.getLight()).getPosition(), Wizard.getCamera())
+        positionPanel = new Float3Panel(((PointLight) lightModel.getLight()).getPosition(), Wizard.getCamera(), Float3Panel.HORIZONTAL)
         {
             @Override
             public void setVector(final Vector3f vec)

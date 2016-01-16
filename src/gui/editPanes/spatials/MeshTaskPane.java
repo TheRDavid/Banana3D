@@ -76,7 +76,7 @@ public class MeshTaskPane extends EditTaskPane
             setLayout(new RiverLayout(5, 5));
             slicesPanel = new Float3Panel(new Vector3f((Integer) ((Geometry) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getUserData("xSlices"),
                     (Integer) ((Geometry) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getUserData("ySlices"),
-                    (Integer) ((Geometry) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getUserData("zSlices")), Wizard.getCamera());
+                    (Integer) ((Geometry) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getUserData("zSlices")), Wizard.getCamera(), Float3Panel.HORIZONTAL);
             add("br left", new JLabel("Slices (integers!):"));
             add("tab hfill", slicesPanel);
             applyButton.addActionListener(new ActionListener()

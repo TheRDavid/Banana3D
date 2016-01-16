@@ -38,7 +38,7 @@ public class LightScatteringTaskPane extends EditTaskPane
     public LightScatteringTaskPane(LightScatteringFilter scatteringFilter)
     {
         lightScatteringFilter = scatteringFilter;
-        positionPanel = new Float3Panel(scatteringFilter.getLightPosition(), Wizard.getCamera());
+        positionPanel = new Float3Panel(scatteringFilter.getLightPosition(), Wizard.getCamera(), Float3Panel.HORIZONTAL);
         positionPanel.addFieldKeyListener(new KeyListener()
         {
             @Override

@@ -49,7 +49,7 @@ public class WaterTaskPane extends EditTaskPane
     private BSlider windZSlider = new BSlider(Float.class, -1, 1, 0);
     private BTextField sunScaleField = new BTextField("Float");
     private BColorButton sunColorButton = new BColorButton(Color.white);
-    private Float3Panel sunDirectionField = new Float3Panel(Vector3f.NAN, Wizard.getCamera());
+    private Float3Panel sunDirectionField = new Float3Panel(Vector3f.NAN, Wizard.getCamera(), Float3Panel.HORIZONTAL);
     private BTextField reflectionDisplaceField = new BTextField("Float");
     private BTextField refractionStrengthField = new BTextField("Float");
     private BTextField foamHardnessField = new BTextField("Float");
@@ -58,8 +58,8 @@ public class WaterTaskPane extends EditTaskPane
     private BTextField underWaterFogDistanceField = new BTextField("Float");
     private BTextField shoreHardnessField = new BTextField("Float");
     private BTextField shininessField = new BTextField("Float");
-    private Float3Panel foamExistencePanel = new Float3Panel(Vector3f.NAN, Wizard.getCamera());
-    private Float3Panel colorExtinctionPanel = new Float3Panel(Vector3f.NAN, Wizard.getCamera());
+    private Float3Panel foamExistencePanel = new Float3Panel(Vector3f.NAN, Wizard.getCamera(), Float3Panel.HORIZONTAL);
+    private Float3Panel colorExtinctionPanel = new Float3Panel(Vector3f.NAN, Wizard.getCamera(), Float3Panel.HORIZONTAL);
     private Checker useCausistsChecker, useFoamChecker, useHQShoreLineChecker, useRefractionChecker, useRipplesChecker, useSpecularChecker;
     private TexturesTaskPane texturesTaskPane;
     private boolean heightAltered = false;

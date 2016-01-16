@@ -112,7 +112,7 @@ public class MotionPathTaskPane extends EditTaskPane
             case Loop:
                 loopModeComboBox.setSelectedIndex(2);
         }
-        positionPanel = new Float3Panel(motionPathModel.getSymbol().getLocalTranslation(), Wizard.getCamera())
+        positionPanel = new Float3Panel(motionPathModel.getSymbol().getLocalTranslation(), Wizard.getCamera(), Float3Panel.HORIZONTAL)
         {
             @Override
             public void setVector(final Vector3f vec)
@@ -620,7 +620,7 @@ public class MotionPathTaskPane extends EditTaskPane
                 numberLabel.setPreferredSize(new Dimension(45, 10));
                 setLayout(new FlowLayout(FlowLayout.CENTER));
                 index = indx;
-                locationPanel = new Float3Panel(vec3f, Wizard.getCamera());
+                locationPanel = new Float3Panel(vec3f, Wizard.getCamera(), Float3Panel.HORIZONTAL);
                 locationPanel.addFieldKeyListener(new KeyListener()
                 {
                     @Override

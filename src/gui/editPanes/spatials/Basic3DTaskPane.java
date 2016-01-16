@@ -48,7 +48,7 @@ public class Basic3DTaskPane extends EditTaskPane
         worldTransformPane = new WorldTransformPane();
         rotationPanel = new RotationPanel(basicSpatial);
         scalePanel = new ScalePanel(basicSpatial);
-        positionPanel = new Float3Panel(basicSpatial.getLocalTranslation(), Wizard.getCamera())
+        positionPanel = new Float3Panel(basicSpatial.getLocalTranslation(), Wizard.getCamera(), Float3Panel.HORIZONTAL)
         {
             @Override
             public void setVector(final Vector3f vec)
@@ -162,7 +162,7 @@ public class Basic3DTaskPane extends EditTaskPane
         public RotationPanel(Spatial tempSpatial)
         {
             spatial = tempSpatial;
-            rotationFloatPanel = new Float3Panel((Vector3f) spatial.getUserData("angles"), Wizard.getCamera());
+            rotationFloatPanel = new Float3Panel((Vector3f) spatial.getUserData("angles"), Wizard.getCamera(), Float3Panel.HORIZONTAL);
             rotationFloatPanel.addFieldFocusListener(new FocusListener()
             {
                 @Override

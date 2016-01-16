@@ -46,8 +46,8 @@ public class EmitterTaskPane extends EditTaskPane
     private BTextField highLifeField = new BTextField("float");
     private BTextField lowLifeField = new BTextField("float");
     private BSlider velocityVariationSlider = new BSlider(Float.class, 0, 1, .25f);
-    private Float3Panel gravityPanel = new Float3Panel(Vector3f.ZERO, Wizard.getCamera());
-    private Float3Panel directionVelocityPanel = new Float3Panel(Vector3f.ZERO, Wizard.getCamera());
+    private Float3Panel gravityPanel = new Float3Panel(Vector3f.ZERO, Wizard.getCamera(), Float3Panel.HORIZONTAL);
+    private Float3Panel directionVelocityPanel = new Float3Panel(Vector3f.ZERO, Wizard.getCamera(), Float3Panel.HORIZONTAL);
     private BColorButton startColorButton = new BColorButton(Color.white);
     private BColorButton endColorButton = new BColorButton(Color.white);
     private BTextField rotateSpeedField = new BTextField("float");
@@ -56,7 +56,7 @@ public class EmitterTaskPane extends EditTaskPane
     private Checker firingChecker = new Checker();
     private Checker depthWriteChecker = new Checker();
     private Checker faceVelocityChecker = new Checker();
-    private Float3Panel faceNormalPanel = new Float3Panel(null, Wizard.getCamera());
+    private Float3Panel faceNormalPanel = new Float3Panel(null, Wizard.getCamera(), Float3Panel.HORIZONTAL);
     private StartShapeTaskPane startShapeTaskPane;
 
     /**
@@ -311,7 +311,7 @@ public class EmitterTaskPane extends EditTaskPane
 
             public PointShapePanel(Vector3f point)
             {
-                pointPanel = new Float3Panel(point, Wizard.getCamera());
+                pointPanel = new Float3Panel(point, Wizard.getCamera(), Float3Panel.HORIZONTAL);
                 setLayout(new RiverLayout());
                 add("left", new JLabel("Location:"));
                 add("tab hfill", pointPanel);
@@ -330,8 +330,8 @@ public class EmitterTaskPane extends EditTaskPane
 
             public BoxShapePanel(Vector3f min, Vector3f max)
             {
-                minPanel = new Float3Panel(min, Wizard.getCamera());
-                maxPanel = new Float3Panel(max, Wizard.getCamera());
+                minPanel = new Float3Panel(min, Wizard.getCamera(), Float3Panel.HORIZONTAL);
+                maxPanel = new Float3Panel(max, Wizard.getCamera(), Float3Panel.HORIZONTAL);
                 setLayout(new RiverLayout());
                 add("left", new JLabel("Minimum:"));
                 add("tab hfill", minPanel);
@@ -358,7 +358,7 @@ public class EmitterTaskPane extends EditTaskPane
 
             public SphereShapePanel(Vector3f center, float radius)
             {
-                centerPanel = new Float3Panel(center, Wizard.getCamera());
+                centerPanel = new Float3Panel(center, Wizard.getCamera(), Float3Panel.HORIZONTAL);
                 radiusField = new BTextField("Int", radius + "");
                 setLayout(new RiverLayout());
                 add("left", new JLabel("Center:"));

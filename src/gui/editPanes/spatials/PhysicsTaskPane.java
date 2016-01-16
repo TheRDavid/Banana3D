@@ -53,7 +53,7 @@ public class PhysicsTaskPane extends EditTaskPane
     private CShape_CapsulePanel cShape_CapsulePanel;
     private CShape_ConePanel cShape_ConePanel;
     private CShape_CylinderPanel cShape_CylinderPanel;
-    private Float3Panel positionPanel = new Float3Panel(Vector3f.ZERO, Wizard.getCamera());
+    private Float3Panel positionPanel = new Float3Panel(Vector3f.ZERO, Wizard.getCamera(), Float3Panel.HORIZONTAL);
 
     public PhysicsTaskPane()
     {
@@ -339,7 +339,7 @@ public class PhysicsTaskPane extends EditTaskPane
         public CShape_BoxPanel(BoxCollisionShape bcs)
         {
             setBorder(new RoundBorder());
-            halfExtendsPanel = new Float3Panel(bcs.getHalfExtents(), Wizard.getCamera());
+            halfExtendsPanel = new Float3Panel(bcs.getHalfExtents(), Wizard.getCamera(), Float3Panel.HORIZONTAL);
             setLayout(new RiverLayout(10, 5));
             add("left", new JLabel("Half Extends:"));
             add("tab hfill", halfExtendsPanel);
@@ -418,7 +418,7 @@ public class PhysicsTaskPane extends EditTaskPane
         public CShape_CylinderPanel(CylinderCollisionShape ccs)
         {
             setBorder(new RoundBorder());
-            halfExtendsPanel = new Float3Panel(ccs.getHalfExtents(), Wizard.getCamera());
+            halfExtendsPanel = new Float3Panel(ccs.getHalfExtents(), Wizard.getCamera(), Float3Panel.HORIZONTAL);
             halfExtendsPanel.getyField().setEnabled(false);
             setLayout(new RiverLayout(10, 5));
             add("left", new JLabel("Half Extends:"));

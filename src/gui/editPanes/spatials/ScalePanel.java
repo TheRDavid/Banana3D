@@ -28,7 +28,7 @@ public class ScalePanel extends JPanel
      */
     public ScalePanel(final Spatial tempSpatial)
     {
-        scalePanel = new Float3Panel((Vector3f) tempSpatial.getUserData("scale"), Wizard.getCamera());
+        scalePanel = new Float3Panel((Vector3f) tempSpatial.getUserData("scale"), Wizard.getCamera(), Float3Panel.HORIZONTAL);
         scalePanel.addFieldFocusListener(new FocusListener()
         {
             @Override

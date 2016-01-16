@@ -49,7 +49,7 @@ public class SpotLightTaskPane extends EditTaskPane
     public SpotLightTaskPane(LightModel model)
     {
         lightModel = model;
-        positionPanel = new Float3Panel(((SpotLight) model.getLight()).getPosition(), Wizard.getCamera())
+        positionPanel = new Float3Panel(((SpotLight) model.getLight()).getPosition(), Wizard.getCamera(), Float3Panel.HORIZONTAL)
         {
             @Override
             public void setVector(final Vector3f vec)
@@ -139,7 +139,7 @@ public class SpotLightTaskPane extends EditTaskPane
 
         public SpotLightDirectionPanel()
         {
-            float3Panel = new Float3Panel(((SpotLight) lightModel.getLight()).getDirection(), Wizard.getCamera())
+            float3Panel = new Float3Panel(((SpotLight) lightModel.getLight()).getDirection(), Wizard.getCamera(), Float3Panel.HORIZONTAL)
             {
                 @Override
                 public void setVector(Vector3f vec)

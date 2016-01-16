@@ -1,9 +1,12 @@
 package gui.dialogs.keyframeAnimationEditor;
 
 import b3dElements.B3D_Element;
+import com.jme3.math.Vector3f;
+import com.jme3.scene.Spatial;
 import components.BButton;
 import components.BComboBox;
 import components.BToggleButton;
+import components.Float3Panel;
 import general.CurrentData;
 import general.Preference;
 import gui.dialogs.SelectElementDialog;
@@ -27,17 +30,22 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
+import javax.swing.JSeparator;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import monkeyStuff.keyframeAnimation.KeyframeAnimation;
 import monkeyStuff.keyframeAnimation.KeyframeProperty;
 import monkeyStuff.keyframeAnimation.KeyframeUpdater;
+import monkeyStuff.keyframeAnimation.Updaters.AnimationType;
 import org.jdesktop.swingx.VerticalLayout;
 import other.Wizard;
 import se.datadosen.component.RiverLayout;
@@ -61,6 +69,11 @@ public class KeyframeAnimationFrame extends JFrame
     private int minFrame = 0, zoom = 20;
     private boolean firstPaint = true;
     private KeyframeAnimation currentAnimation = null;
+
+    public ValuePanel getValuePanel()
+    {
+        return valuePanel;
+    }
 
     public KeyframeAnimationFrame()
     {
@@ -155,6 +168,7 @@ public class KeyframeAnimationFrame extends JFrame
     private void updateFrames()
     {
         timelinePanel.repaint();
+        editPanel.keyframeEditor.repaint();
     }
 
     class ToolsPanel extends JPanel implements ActionListener
@@ -168,7 +182,6 @@ public class KeyframeAnimationFrame extends JFrame
         private JSlider zoomSlider = new JSlider(JSlider.HORIZONTAL, 3, 100, 30);
         private BButton zoomOutButton = new BButton(new ImageIcon("dat//img//menu//keyframe//minus.png"), false);
         private JLabel currentFrameLabel = new JLabel("Frame: " + selector.currentFrame);
-        private JLabel maxFramesLabel = new JLabel("Number of Frames: " + 200);
         private BComboBox<String> animationSelector = new BComboBox<String>();
         private BButton newAnimationButton = new BButton(new ImageIcon("dat//img//menu//keyframe//plus.png"), false);
         private BButton deleteAnimationButton = new BButton(new ImageIcon("dat//img//menu//keyframe//delete.png"), false);
@@ -215,7 +228,7 @@ public class KeyframeAnimationFrame extends JFrame
                         dont = false;
                         return;
                     }
-                    zoom = zoomSlider.getValue() * timelinePanel.getWidth() / 1000;
+                    zoom = zoomSlider.getValue() * timelinePanel.getWidth() / 500;
                     updateFrames();
                 }
             });
@@ -243,8 +256,6 @@ public class KeyframeAnimationFrame extends JFrame
             add(zoomOutButton);
             add(new JLabel("              ")); //elegant af
             add(currentFrameLabel);
-            add(new JLabel("        ")); //elegant af
-            add(maxFramesLabel);
         }
 
         public JLabel getCurrentFrameLabel()
@@ -322,11 +333,54 @@ public class KeyframeAnimationFrame extends JFrame
         }
     }
 
-    class ValuePanel extends JPanel
+    class ValuePanel extends JPanel implements ActionListener
     {
+
+        private KeyframeProperty property;
+        private int frame;
+        private BButton refreshButton = new BButton("Refresh", new ImageIcon("dat//img//menu//keyframe//refresh.png"));
+        private JComponent valueComponent;
 
         public ValuePanel()
         {
+            setBorder(new EmptyBorder(10, 20, 10, 20));
+            setLayout(new RiverLayout(10, 10));
+        }
+
+        public void updateValues(KeyframeProperty currentProperty, int currentFrame)
+        {
+            property = currentProperty;
+            frame = currentFrame;
+            removeAll();
+            add("hfill", new JLabel(property.type.toString(), SwingConstants.CENTER));
+            add("br hfill", new JSeparator(JSeparator.HORIZONTAL));
+            if (property.type == AnimationType.Translation || property.type == AnimationType.Scale)
+            {
+                //Index 2
+                valueComponent = new Float3Panel((Vector3f) property.getValues()[frame],
+                        CurrentData.getEditorWindow().getB3DApp().getCamera(),
+                        Float3Panel.VERTICAL);
+                add("br hfill", valueComponent);
+            }
+            add("br", refreshButton);
+            refreshButton.addActionListener(this);
+            repaint();
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            if (e.getSource() == refreshButton)
+                refreshValues();
+        }
+
+        private void refreshValues()
+        {
+            if (property.getUpdater().getObject() instanceof Spatial && property.type == AnimationType.Translation)
+            {
+                Vector3f newVec = ((Spatial) property.getUpdater().getObject()).getLocalTranslation();
+                ((Float3Panel) valueComponent).setVector(newVec);
+                property.setValue(frame, newVec);
+            }
         }
     }
 
@@ -478,6 +532,8 @@ public class KeyframeAnimationFrame extends JFrame
 
         private JScrollBar hscrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 0, 30, 0, 40);
         private KeyframeEditor keyframeEditor = new KeyframeEditor();
+        private int currentFrame;
+        private KeyframeProperty currentProperty;
 
         public EditPanel()
         {
@@ -497,32 +553,31 @@ public class KeyframeAnimationFrame extends JFrame
                     @Override
                     public void mouseReleased(MouseEvent e)
                     {
-                        if (e.getClickCount() == 2)
+                        int frame = (int) (e.getX() / timelinePanel.gapSize);
+                        Component comp = attributesPanel.getComponentAt(66, e.getY());
+                        AnimationElementTree.AttributeNode aNode = null;
+                        AnimationElementTree aet = null;
+                        if (comp instanceof AnimationElementTree)
                         {
-                            int frame = (int) (e.getX() / timelinePanel.gapSize);
-                            Component comp = attributesPanel.getComponentAt(66, e.getY());
-                            toolsPanel.currentFrameLabel.setText("Clicked " + comp.toString());
-                            AnimationElementTree.AttributeNode aNode = null;
-                            AnimationElementTree aet = null;
-                            if (comp instanceof AnimationElementTree)
+                            // toolsPanel.currentFrameLabel.setText("Tree");
+                            aet = (AnimationElementTree) comp;
+                            if (aet.getClosestPathForLocation(10, e.getY()).getLastPathComponent() instanceof AnimationElementTree.AttributeNode)
                             {
-                                toolsPanel.currentFrameLabel.setText("Tree");
-                                aet = (AnimationElementTree) comp;
-                                if (aet.getClosestPathForLocation(10, e.getY()).getLastPathComponent() instanceof AnimationElementTree.AttributeNode)
-                                {
-                                    aNode = (AnimationElementTree.AttributeNode) aet.getClosestPathForLocation(10, e.getY()).getLastPathComponent();
-                                    toolsPanel.currentFrameLabel.setText("Frame: "
-                                            + frame
-                                            + " "
-                                            + aet.getElement().getName()
-                                            + ":"
-                                            + aNode.getUserObject().toString() + " (" + aNode.getProperty().type + ")");
-                                }
+                                aNode = (AnimationElementTree.AttributeNode) aet.getClosestPathForLocation(10, e.getY()).getLastPathComponent();
+                                /*    toolsPanel.currentFrameLabel.setText("Frame: "
+                                 + frame
+                                 + " "
+                                 + aet.getElement().getName()
+                                 + ":"
+                                 + aNode.getUserObject().toString() + " (" + aNode.getProperty().type + ")");*/
                             }
-                            if (aNode != null && aet != null)
+                        }
+                        if (aNode != null && aet != null)
+                        {
+                            KeyframeProperty property = aNode.getProperty();
+                            KeyframeUpdater updater = aet.getKeyframeUpdater();
+                            if (e.getClickCount() == 2)
                             {
-                                KeyframeProperty property = aNode.getProperty();
-                                KeyframeUpdater updater = aet.getKeyframeUpdater();
                                 try
                                 {
                                     property.setValue(frame, updater.getLiveValue(property.type));
@@ -530,8 +585,14 @@ public class KeyframeAnimationFrame extends JFrame
                                 {
                                     JOptionPane.showMessageDialog(KeyframeEditor.this, "Out of Bounds? " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                                 }
-                                repaint();
+                            } else if (e.getButton() == MouseEvent.BUTTON1 && frame < aNode.getProperty().getValues().length && property.getValues()[frame] != null)
+                            {
+                                currentFrame = frame;
+                                currentProperty = property;
+                                toolsPanel.currentFrameLabel.setText("Frame " + frame + " / " + (currentProperty.getValues().length - 1));
+                                valuePanel.updateValues(currentProperty, currentFrame);
                             }
+                            repaint();
                         }
                     }
                 });
@@ -561,14 +622,17 @@ public class KeyframeAnimationFrame extends JFrame
                             else
                                 g.setColor(Color.darkGray.darker());
                             g.fillRect(0, y - 25, getWidth(), 25);
-                            g.setColor(Color.orange);
                             for (int k = 0; k < an.getProperty().getValues().length; k++)
                             {
                                 if (an.getProperty().getValues()[k] != null)
                                 {
+                                    if (an.getProperty() == currentProperty && k == currentFrame)
+                                        g.setColor(Color.cyan);
+                                    else
+                                        g.setColor(Color.orange);
                                     int radius = (int) (timelinePanel.gapSize > 25 ? 25 : timelinePanel.gapSize) / 4 * 3;
                                     g.fillOval((int) (k * timelinePanel.gapSize + timelinePanel.gapSize / 2 - radius / 2),
-                                            y - 12 /* (25/2) */ - radius / 2,
+                                            y - 12 - radius / 2,
                                             radius, radius);
                                 }
                             }
