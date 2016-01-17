@@ -115,6 +115,8 @@ public class EditPane extends JScrollPane
                             editTaskPane.updateData(false);
                         }
                     }
+                    if (CurrentData.getEditorWindow() != null)
+                        CurrentData.getEditorWindow().getKeyframeAnimationEditor().getValuePanel().refresh();
                 }
             }
         }).start();

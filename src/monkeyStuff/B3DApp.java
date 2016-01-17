@@ -19,6 +19,7 @@ import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.cinematic.events.MotionEvent;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
+import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -175,6 +176,8 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     private boolean waterTexturesSynced = false, returnToNormalSpeed = false;
     private Vector<Spatial> spatials = new Vector<Spatial>();
     private NodeModel currentNodeModel;
+    //AnimationFrame selected
+    private BitmapText frameText;
 
     /**
      * Just settin variables
@@ -270,6 +273,17 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         viewPort.addProcessor(filterPostProcessor);
     }
 
+    public void frameSelected(int frame)
+    {
+        frameText.setText("Animation Frame: " + frame);
+        guiNode.attachChild(frameText);
+    }
+
+    public void frameUnselected()
+    {
+        guiNode.detachChild(frameText);
+    }
+
     public enum InteractionType
     {
 
@@ -282,6 +296,8 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     @Override
     public void simpleInitApp()
     {
+        frameText = new BitmapText(guiFont);
+        frameText.setLocalTranslation(300, 30, 0);
         gizmo = new Gizmo(assetManager);
         flyingEditor = new EditorCamera(cam);
         flyingEditor.registerWithInput(inputManager);

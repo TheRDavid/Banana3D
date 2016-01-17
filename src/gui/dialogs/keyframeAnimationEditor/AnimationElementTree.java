@@ -8,6 +8,7 @@ import b3dElements.B3D_Element;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
+import dialogs.BasicDialog;
 import dialogs.ObserverDialog;
 import general.CurrentData;
 import gui.dialogs.keyframeAnimationEditor.KeyframeAnimationFrame.AttributesPanel;
@@ -17,10 +18,13 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -46,7 +50,7 @@ import other.Wizard;
  *
  * @author User
  */
-public class AnimationElementTree extends JXTree
+public class AnimationElementTree extends JXTree implements ActionListener
 {
 
     private KeyframeUpdater keyframeUpdater;
@@ -59,9 +63,12 @@ public class AnimationElementTree extends JXTree
     /**
      * ********POPUP*************
      */
-    private JPopupMenu popupMenu = new JPopupMenu();
+    private JPopupMenu rootPopup = new JPopupMenu();
     private JMenu addAttributeMenu = new JMenu("Add Attribute");
-    private JMenuItem removeItem = new JMenuItem("Remove Element");
+    private JMenuItem removeElementItem = new JMenuItem("Remove Element");
+    private JPopupMenu leafPopup = new JPopupMenu();
+    private JMenuItem valueListItem = new JMenuItem("Current Values");
+    private JMenuItem removeAttributeItem = new JMenuItem("Remove Attribute");
     private boolean expanded = false;
 
     public AnimationElementTree(B3D_Element e)
@@ -81,7 +88,7 @@ public class AnimationElementTree extends JXTree
                 clearSelection();
             }
         });
-        initPopup();
+        initPopups();
         rootNode.setUserObject(element.getName());
         setRolloverEnabled(true);
         setSearchable(new TreeSearchable(this));
@@ -114,8 +121,9 @@ public class AnimationElementTree extends JXTree
                     if (selectedNode == rootNode)
                     {
                         addAttributeItems();
-                        popupMenu.show(AnimationElementTree.this, e.getX(), e.getY());
-                    }
+                        rootPopup.show(AnimationElementTree.this, e.getX(), e.getY());
+                    } else
+                        leafPopup.show(AnimationElementTree.this, e.getX(), e.getY());
 
             }
         });
@@ -137,13 +145,6 @@ public class AnimationElementTree extends JXTree
         repaint();
     }
 
-    private void initPopup()
-    {
-        popupMenu.add(addAttributeMenu);
-        addAttributeItems();
-        popupMenu.add(removeItem);
-    }
-
     private void addAttributeItems()
     {
         addAttributeMenu.removeAll();
@@ -155,6 +156,44 @@ public class AnimationElementTree extends JXTree
     public B3D_Element getElement()
     {
         return element;
+    }
+
+    private void initPopups()
+    {
+        rootPopup.add(addAttributeMenu);
+        addAttributeItems();
+        rootPopup.add(removeElementItem);
+        leafPopup.add(valueListItem);
+        leafPopup.add(removeAttributeItem);
+        valueListItem.addActionListener(this);
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+        if (e.getSource() == valueListItem)
+            new ValueObserverDialog((AttributeNode) selectedNode);
+    }
+
+    class ValueObserverDialog extends BasicDialog
+    {
+
+        private JList valuesList;
+
+        public ValueObserverDialog(AttributeNode aNode)
+        {
+            valuesList = new JList();
+            DefaultListModel dlm = new DefaultListModel();
+            int i = 0;
+            for (Serializable s : aNode.getProperty().getValues())
+                dlm.add(i, i++ + ": " + s);
+            valuesList.setModel(dlm);
+            add(valuesList);
+            setModal(false);
+            setTitle(aNode.getUserObject().toString() + " - Values");
+            pack();
+            setLocationByPlatform(true);
+            setVisible(true);
+        }
     }
 
     class AttributeItem extends JMenuItem
@@ -176,15 +215,15 @@ public class AnimationElementTree extends JXTree
                             if (AnimationType.valueOf(getText()).equals(AnimationType.Translation))
                             {
                                 property = new Vector3fProperty(AnimationType.valueOf(getText()),
-                                        10, new Vector3f(spatial.getLocalTranslation()),keyframeUpdater);
+                                        10, new Vector3f(spatial.getLocalTranslation()), keyframeUpdater);
                             } else if (AnimationType.valueOf(getText()).equals(AnimationType.Rotation))
                             {
                                 property = new QuaternionProperty(AnimationType.valueOf(getText()),
-                                        10, new Quaternion(spatial.getLocalRotation()),keyframeUpdater);
+                                        10, new Quaternion(spatial.getLocalRotation()), keyframeUpdater);
                             } else if (AnimationType.valueOf(getText()).equals(AnimationType.Scale))
                             {
                                 property = new Vector3fProperty(AnimationType.valueOf(getText()),
-                                        10, new Vector3f(spatial.getLocalScale()),keyframeUpdater);
+                                        10, new Vector3f(spatial.getLocalScale()), keyframeUpdater);
                             }
                         }
                         attributeNodes.add(new AttributeNode(property));

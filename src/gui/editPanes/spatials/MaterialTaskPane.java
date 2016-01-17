@@ -425,10 +425,14 @@ public class MaterialTaskPane extends EditTaskPane
                                 if (propertyList.has(key))
                                 {
                                     StringTokenizer tokenizer = new StringTokenizer(propertyList.getProperty(key).getPropertyValue().substring(1, propertyList.getProperty(key).getPropertyValue().length() - 1));
-                                    newComponent = new Float4Panel(new Vector4f(Float.parseFloat(tokenizer.nextToken(",")), Float.parseFloat(tokenizer.nextToken(",")), Float.parseFloat(tokenizer.nextToken(",")), Float.parseFloat(tokenizer.nextToken(","))));
+                                    newComponent = new Float4Panel(
+                                            new Vector4f(Float.parseFloat(tokenizer.nextToken(",")),
+                                            Float.parseFloat(tokenizer.nextToken(",")),
+                                            Float.parseFloat(tokenizer.nextToken(",")),
+                                            Float.parseFloat(tokenizer.nextToken(","))), Float4Panel.HORIZONTAL);
                                 } else
                                 {
-                                    newComponent = new Float4Panel(null);
+                                    newComponent = new Float4Panel(null, Float4Panel.HORIZONTAL);
                                 }
                             }
                             if (newComponent != null)

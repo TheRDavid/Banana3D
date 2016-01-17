@@ -79,7 +79,7 @@ public class MotionPathTaskPane extends EditTaskPane
     });
     private BColorButton colorButton;
     private MotionEvent motionEvent;
-    private Float4Panel rotationPanel = new Float4Panel(Vector4f.ZERO);
+    private Float4Panel rotationPanel = new Float4Panel(Vector4f.ZERO, Float4Panel.HORIZONTAL);
     private JPanel setRotationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     private Vector<Spatial> allSpatials = new Vector<Spatial>();
     private MotionPathModel motionPathModel;
