@@ -140,7 +140,7 @@ public class AnimationElementTree extends JXTree implements ActionListener
         {
             rootNode.add(an);
         }
-        ((AttributesPanel) getParent()).updateAttributes();
+        ((AttributesPanel) getParent().getParent()).updateAttributes();
         treeModel.reload();
         repaint();
     }

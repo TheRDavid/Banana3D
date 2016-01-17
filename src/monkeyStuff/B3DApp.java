@@ -178,6 +178,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     private NodeModel currentNodeModel;
     //AnimationFrame selected
     private BitmapText frameText;
+    private boolean keyframePlaying = false;
 
     /**
      * Just settin variables
@@ -348,7 +349,14 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             syncWaterTextures();
             waterTexturesSynced = true;
         }
-        Wizard.updateCustomAnimations(tpf);
+        if (CurrentData.getEditorWindow().getKeyframeAnimationEditor().getCurrentAnimation() != null)
+        {
+            keyframePlaying = CurrentData.getEditorWindow().getKeyframeAnimationEditor().getCurrentAnimation().isPlaying();
+            Wizard.updateCustomAnimations(tpf);
+            if (keyframePlaying)
+                CurrentData.getEditorWindow().getKeyframeAnimationEditor().updateOnPlay();
+            keyframePlaying = CurrentData.getEditorWindow().getKeyframeAnimationEditor().getCurrentAnimation().isPlaying();
+        }
         Wizard.updateKeyframeAnimations();
         spatials.clear();
         Wizard.insertAllSpatials(sceneNode, spatials);
