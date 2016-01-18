@@ -166,12 +166,15 @@ public class AnimationElementTree extends JXTree implements ActionListener
         leafPopup.add(valueListItem);
         leafPopup.add(removeAttributeItem);
         valueListItem.addActionListener(this);
+        removeElementItem.addActionListener(this);
     }
 
     public void actionPerformed(ActionEvent e)
     {
         if (e.getSource() == valueListItem)
             new ValueObserverDialog((AttributeNode) selectedNode);
+        else if (e.getSource() == removeElementItem)
+            CurrentData.getEditorWindow().getKeyframeAnimationEditor().removeElement(this);
     }
 
     class ValueObserverDialog extends BasicDialog
