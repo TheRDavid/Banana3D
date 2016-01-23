@@ -36,12 +36,13 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
-import monkeyStuff.keyframeAnimation.KeyframeProperty;
-import monkeyStuff.keyframeAnimation.KeyframeUpdater;
-import monkeyStuff.keyframeAnimation.Properties.QuaternionProperty;
-import monkeyStuff.keyframeAnimation.Properties.Vector3fProperty;
-import monkeyStuff.keyframeAnimation.Updaters.AnimationType;
-import monkeyStuff.keyframeAnimation.Updaters.SpatialUpdater;
+import monkeyStuff.keyframeAnimation.LiveKeyframeProperty;
+import monkeyStuff.keyframeAnimation.LiveKeyframeUpdater;
+import b3dElements.animations.keyframeAnimations.Properties.QuaternionProperty;
+import b3dElements.animations.keyframeAnimations.Properties.Vector3fProperty;
+import b3dElements.animations.keyframeAnimations.AnimationType;
+import javax.swing.JScrollPane;
+import monkeyStuff.keyframeAnimation.Updaters.LiveSpatialUpdater;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.search.TreeSearchable;
 import other.Wizard;
@@ -53,7 +54,7 @@ import other.Wizard;
 public class AnimationElementTree extends JXTree implements ActionListener
 {
 
-    private KeyframeUpdater keyframeUpdater;
+    private LiveKeyframeUpdater keyframeUpdater;
     private Object object;
     private DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(true);
     private DefaultMutableTreeNode selectedNode = rootNode;
@@ -69,16 +70,18 @@ public class AnimationElementTree extends JXTree implements ActionListener
     private JPopupMenu leafPopup = new JPopupMenu();
     private JMenuItem valueListItem = new JMenuItem("Current Values");
     private JMenuItem removeAttributeItem = new JMenuItem("Remove Attribute");
-    private boolean expanded = false;
+    private boolean expanded = true;
 
-    public AnimationElementTree(B3D_Element e)
+    public AnimationElementTree(B3D_Element e, LiveKeyframeUpdater lku)
     {
         element = e;
         object = Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(element.getUUID()));
-        if (object instanceof Spatial)
+        if (lku == null)
         {
-            keyframeUpdater = new SpatialUpdater((Spatial) object);
-        }
+            if (object instanceof Spatial)
+                keyframeUpdater = new LiveSpatialUpdater((Spatial) object);
+        } else
+            keyframeUpdater = lku;
         addFocusListener(new FocusAdapter()
         {
             @Override
@@ -131,9 +134,11 @@ public class AnimationElementTree extends JXTree implements ActionListener
         addTreeExpansionListener(new BTreeExpansionListener());
         setModel(treeModel);
         setEditable(false);
+        for (Object lkp : keyframeUpdater.getKeyframeProperties())
+            attributeNodes.add(new AttributeNode((LiveKeyframeProperty) lkp));
     }
 
-    private void updateElements()
+    public void updateElements()
     {
         rootNode.removeAllChildren();
         for (AttributeNode an : attributeNodes)
@@ -166,6 +171,7 @@ public class AnimationElementTree extends JXTree implements ActionListener
         leafPopup.add(valueListItem);
         leafPopup.add(removeAttributeItem);
         valueListItem.addActionListener(this);
+        removeAttributeItem.addActionListener(this);
         removeElementItem.addActionListener(this);
     }
 
@@ -175,6 +181,17 @@ public class AnimationElementTree extends JXTree implements ActionListener
             new ValueObserverDialog((AttributeNode) selectedNode);
         else if (e.getSource() == removeElementItem)
             CurrentData.getEditorWindow().getKeyframeAnimationEditor().removeElement(this);
+        else if (e.getSource() == removeAttributeItem)
+        {
+            System.out.println("Removing Attribute!");
+            keyframeUpdater.getKeyframeProperties().remove(((AttributeNode) selectedNode).getProperty());
+            attributeNodes.remove(selectedNode);
+            keyframeUpdater.getKeyframeProperties().remove(((AttributeNode) selectedNode).getProperty());
+            expanded = true;
+            updateElements();
+            CurrentData.getEditorWindow().getKeyframeAnimationEditor().arrangeScrollbars();
+            repaint();
+        }
     }
 
     class ValueObserverDialog extends BasicDialog
@@ -190,10 +207,10 @@ public class AnimationElementTree extends JXTree implements ActionListener
             for (Serializable s : aNode.getProperty().getValues())
                 dlm.add(i, i++ + ": " + s);
             valuesList.setModel(dlm);
-            add(valuesList);
+            add(new JScrollPane(valuesList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
             setModal(false);
             setTitle(aNode.getUserObject().toString() + " - Values");
-            pack();
+            setSize(250, 600);
             setLocationByPlatform(true);
             setVisible(true);
         }
@@ -211,7 +228,7 @@ public class AnimationElementTree extends JXTree implements ActionListener
                 {
                     try
                     {
-                        KeyframeProperty property = null;
+                        LiveKeyframeProperty property = null;
                         if (object instanceof Spatial)
                         {
                             Spatial spatial = (Spatial) object;
@@ -237,12 +254,13 @@ public class AnimationElementTree extends JXTree implements ActionListener
                     {
                         Logger.getLogger(AnimationElementTree.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    CurrentData.getEditorWindow().getKeyframeAnimationEditor().arrangeScrollbars();
                 }
             });
         }
     }
 
-    public KeyframeUpdater getKeyframeUpdater()
+    public LiveKeyframeUpdater getKeyframeUpdater()
     {
         return keyframeUpdater;
     }
@@ -255,16 +273,16 @@ public class AnimationElementTree extends JXTree implements ActionListener
     public class AttributeNode extends DefaultMutableTreeNode
     {
 
-        private KeyframeProperty property;
+        private LiveKeyframeProperty property;
 
-        public AttributeNode(KeyframeProperty p)
+        public AttributeNode(LiveKeyframeProperty p)
         {
             property = p;
             setAllowsChildren(false);
             setUserObject(p.type);
         }
 
-        public KeyframeProperty getProperty()
+        public LiveKeyframeProperty getProperty()
         {
             return property;
         }
@@ -281,14 +299,14 @@ public class AnimationElementTree extends JXTree implements ActionListener
         public void treeCollapsed(TreeExpansionEvent event)
         {
             expanded = false;
-            ((AttributesPanel) getParent()).updateAttributes();
+            ((AttributesPanel) getParent().getParent()).updateAttributes();
 
         }
 
         public void treeExpanded(TreeExpansionEvent event)
         {
             expanded = true;
-            ((AttributesPanel) getParent()).updateAttributes();
+            ((AttributesPanel) getParent().getParent()).updateAttributes();
         }
     }
 

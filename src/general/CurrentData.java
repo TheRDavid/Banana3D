@@ -68,7 +68,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
-import monkeyStuff.keyframeAnimation.Updaters.AnimationType;
+import b3dElements.animations.keyframeAnimations.AnimationType;
+import b3dElements.animations.keyframeAnimations.B3D_KeyframeAnimation;
+import monkeyStuff.keyframeAnimation.LiveKeyframeAnimation;
 import other.ElementToObjectConverter;
 import other.ObjectToElementConverter;
 import other.B3D_Scene;
@@ -501,6 +503,9 @@ public class CurrentData
                     scene.getElements().add(newB3D_Element);
                 }
             }
+            // At last, the Keyframe Animations
+            for (LiveKeyframeAnimation lka : Wizard.getKeyframeAnimations())
+                scene.getElements().add(ObjectToElementConverter.convertKeyframeAnimation(lka));
             System.out.println("Saving scene with " + scene.getElements().size() + " Elements at " + scenePath);
             Wizard.saveFile(scenePath, scene);
             ObserverDialog.getObserverDialog().printMessage("Saved to " + scenePath);
@@ -1213,8 +1218,13 @@ public class CurrentData
                         });
                         elementsAdded++;
                     }
+                //Keyframe Animation
+                for (B3D_Element e : scene.getElements())
+                    if (e instanceof B3D_KeyframeAnimation)
+                        Wizard.getKeyframeAnimations().add(ElementToObjectConverter.convertKeyframeAnimation((B3D_KeyframeAnimation) e));
                 System.out.println(elementsAdded + " Elemente registriert von " + scene.getElements().size());
                 editorWindow.getTree().sync();
+                editorWindow.getKeyframeAnimationEditor().updateAnimationCollection();
                 return null;
             }
         });

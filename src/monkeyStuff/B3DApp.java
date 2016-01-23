@@ -264,11 +264,11 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                 return b3D_Filter1.getFilterIndex() - b3D_Filter2.getFilterIndex();
             }
         });
-        System.out.println("Sorting Filters:");
+        //System.out.println("Sorting Filters:");
         int count = 0;
         for (Filter f : filters)
         {
-            System.out.println("Next: " + f.getName() + " at " + count++);
+            //System.out.println("Next: " + f.getName() + " at " + count++);
             filterPostProcessor.addFilter(f);
         }
         viewPort.addProcessor(filterPostProcessor);
@@ -537,7 +537,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     public void setSelectedUUID(UUID uuid)
     {
         selectedUUID = uuid;
-        System.out.println("Selected UUID: " + uuid);
+        //System.out.println("Selected UUID: " + uuid);
         if (selectedUUID != null && !selectedUUID.equals(Wizard.NULL_SELECTION))
         {
             UAManager.curr(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)), uuid);
@@ -606,7 +606,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     public void setSelectedElement(UUID uuid, Spatial spatial)
     {
         selectedUUID = uuid;
-        System.out.println("Selected UUID: " + uuid);
+        //System.out.println("Selected UUID: " + uuid);
         if (selectedUUID != null && !selectedUUID.equals(Wizard.NULL_SELECTION))
             UAManager.curr(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)), uuid);
         if (spatial == null)
@@ -967,7 +967,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                     else
                         checking = false;
                 }
-                System.out.println("Angeklickt: " + pickedGeometry.getName());
+                //System.out.println("Angeklickt: " + pickedGeometry.getName());
                 if (interactionType.equals(InteractionType.Default) && isPressed)
                 {
                     if (pickedGeometry.getParent().equals(gizmo))
@@ -1308,7 +1308,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                 }
             } else if (!Mouse.isButtonDown(1) && wasDragging && !Wizard.NULL_SELECTION.equals(selectedUUID) && selectedUUID != null)
             {
-                System.out.println("Add State for: " + selectedUUID);
+                //System.out.println("Add State for: " + selectedUUID);
                 // selectedObject might be a waypoint or some shit
                 UAManager.add(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(selectedUUID)), "Move " + Wizard.getObjects().getB3D_Element(selectedUUID).getName());
                 wasDragging = false;
