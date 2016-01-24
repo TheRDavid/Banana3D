@@ -120,7 +120,7 @@ public class AnimationElementTree extends JXTree implements ActionListener
             @Override
             public void mouseReleased(MouseEvent e)
             {
-                if (SwingUtilities.isRightMouseButton(e))
+                if (SwingUtilities.isRightMouseButton(e) && CurrentData.getEditorWindow().getKeyframeAnimationEditor().isEditable())
                     if (selectedNode == rootNode)
                     {
                         addAttributeItems();
