@@ -159,7 +159,7 @@ public class KeyframeAnimationFrame extends JFrame
     public void arrangeScrollbars()
     {
         int h = attributesPanel.getRequieredHeight() + 1;
-        keyframePanel.vscrollbar.setValues(editPanel.keyframeEditor.yOffset, editPanel.keyframeEditor.getHeight(), 0, h);
+        keyframePanel.vscrollbar.setValues(editPanel.keyframeEditor.yOffset, editPanel.keyframeEditor.getHeight(), 0, (int)(h*1.25f));
         /* System.out.println("Value: " + editPanel.keyframeEditor.yOffset);
          System.out.println("Req: " + h);
          System.out.println("Ext: " + editPanel.keyframeEditor.getHeight() * 100 / h);

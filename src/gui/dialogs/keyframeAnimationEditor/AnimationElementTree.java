@@ -235,15 +235,15 @@ public class AnimationElementTree extends JXTree implements ActionListener
                             if (AnimationType.valueOf(getText()).equals(AnimationType.Translation))
                             {
                                 property = new Vector3fProperty(AnimationType.valueOf(getText()),
-                                        10, new Vector3f(spatial.getLocalTranslation()), keyframeUpdater);
+                                        61, new Vector3f(spatial.getLocalTranslation()), keyframeUpdater);
                             } else if (AnimationType.valueOf(getText()).equals(AnimationType.Rotation))
                             {
                                 property = new QuaternionProperty(AnimationType.valueOf(getText()),
-                                        10, new Quaternion(spatial.getLocalRotation()), keyframeUpdater);
+                                        61, new Quaternion(spatial.getLocalRotation()), keyframeUpdater);
                             } else if (AnimationType.valueOf(getText()).equals(AnimationType.Scale))
                             {
                                 property = new Vector3fProperty(AnimationType.valueOf(getText()),
-                                        10, new Vector3f(spatial.getLocalScale()), keyframeUpdater);
+                                        61, new Vector3f(spatial.getLocalScale()), keyframeUpdater);
                             }
                         }
                         attributeNodes.add(new AttributeNode(property));
