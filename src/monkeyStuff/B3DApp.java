@@ -417,7 +417,13 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             {
                 if (currentMove.equals(newProjectCombo))
                 {
-                    CurrentData.execNewScene();
+                    SwingUtilities.invokeLater(new Runnable()
+                    {
+                        public void run()
+                        {
+                            CurrentData.execNewScene();
+                        }
+                    });
                 } else if (currentMove.equals(openProjectCombo))
                 {
                     SwingUtilities.invokeLater(new Runnable()
