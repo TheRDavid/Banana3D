@@ -303,6 +303,7 @@ public class KeyframeAnimationFrame extends JFrame
                         if (lka.getName().equals(e.getItem().toString()))
                         {
                             currentAnimation = lka;
+                            currentAnimation.uncalcValues();
                             editPanel.keyframeEditor.repaint();
                             attributesPanel.newUpdaters();
                         }
