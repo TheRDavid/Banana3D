@@ -1244,8 +1244,12 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                                     updateSelectedMotionPath();
                                 }
                                 Vector3f move = new Vector3f(xDiff, yDiff, zDiff);
+                                System.out.println("Diff " + move);
                                 Quaternion rot = tempSpatial.getParent().getWorldRotation().inverse();
-                                tempSpatial.move(rot.mult(move));
+                                System.out.println("Rotate by " + rot);
+                                Vector3f m = rot.mult(move);
+                                System.out.println("Move by " + m);
+                                tempSpatial.move(m.divide(tempSpatial.getParent().getWorldScale())); // much genius
                                 //sync childrens' physics if there are any
                                 if (tempSpatial instanceof Node)
                                 {

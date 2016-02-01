@@ -41,7 +41,11 @@ import monkeyStuff.keyframeAnimation.LiveKeyframeUpdater;
 import b3dElements.animations.keyframeAnimations.Properties.QuaternionProperty;
 import b3dElements.animations.keyframeAnimations.Properties.Vector3fProperty;
 import b3dElements.animations.keyframeAnimations.AnimationType;
+import b3dElements.animations.keyframeAnimations.Properties.BoolProperty;
+import b3dElements.animations.keyframeAnimations.Properties.IntProperty;
 import javax.swing.JScrollPane;
+import monkeyStuff.CustomParticleEmitter;
+import monkeyStuff.keyframeAnimation.Updaters.LiveParticleEmitterUpdater;
 import monkeyStuff.keyframeAnimation.Updaters.LiveSpatialUpdater;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.search.TreeSearchable;
@@ -78,7 +82,9 @@ public class AnimationElementTree extends JXTree implements ActionListener
         object = Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(element.getUUID()));
         if (lku == null)
         {
-            if (object instanceof Spatial)
+            if (object instanceof CustomParticleEmitter)
+                keyframeUpdater = new LiveParticleEmitterUpdater((CustomParticleEmitter) object);
+            else if (object instanceof CustomParticleEmitter)
                 keyframeUpdater = new LiveSpatialUpdater((Spatial) object);
         } else
             keyframeUpdater = lku;
@@ -201,10 +207,12 @@ public class AnimationElementTree extends JXTree implements ActionListener
 
         public ValueObserverDialog(AttributeNode aNode)
         {
+            LiveKeyframeProperty lkp  =aNode.getProperty().createNew(null);
             valuesList = new JList();
             DefaultListModel dlm = new DefaultListModel();
             int i = 0;
-            for (Serializable s : aNode.getProperty().getValues())
+            lkp.calcValues();
+            for (Serializable s : lkp.getValues())
                 dlm.add(i, i++ + ": " + s);
             valuesList.setModel(dlm);
             add(new JScrollPane(valuesList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
@@ -232,19 +240,26 @@ public class AnimationElementTree extends JXTree implements ActionListener
                         if (object instanceof Spatial)
                         {
                             Spatial spatial = (Spatial) object;
-                            if (AnimationType.valueOf(getText()).equals(AnimationType.Translation))
-                            {
-                                property = new Vector3fProperty(AnimationType.valueOf(getText()),
+                            if (AnimationType.valueOfString(getText()).equals(AnimationType.Translation))
+                                property = new Vector3fProperty(AnimationType.valueOfString(getText()),
                                         61, new Vector3f(spatial.getLocalTranslation()), keyframeUpdater);
-                            } else if (AnimationType.valueOf(getText()).equals(AnimationType.Rotation))
-                            {
-                                property = new QuaternionProperty(AnimationType.valueOf(getText()),
+                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Rotation))
+                                property = new QuaternionProperty(AnimationType.valueOfString(getText()),
                                         61, new Quaternion(spatial.getLocalRotation()), keyframeUpdater);
-                            } else if (AnimationType.valueOf(getText()).equals(AnimationType.Scale))
-                            {
-                                property = new Vector3fProperty(AnimationType.valueOf(getText()),
+                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Scale))
+                                property = new Vector3fProperty(AnimationType.valueOfString(getText()),
                                         61, new Vector3f(spatial.getLocalScale()), keyframeUpdater);
-                            }
+
+                        }
+                        if (object instanceof CustomParticleEmitter)
+                        {
+                            CustomParticleEmitter emitter = (CustomParticleEmitter) object;
+                            if (AnimationType.valueOfString(getText()).equals(AnimationType.Frozen))
+                                property = new BoolProperty(AnimationType.valueOfString(getText()),
+                                        61, emitter.isEnabled(), keyframeUpdater);
+                            if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_Per_Second))
+                                property = new IntProperty(AnimationType.valueOfString(getText()),
+                                        61, (int) emitter.getParticlesPerSec(), keyframeUpdater);
                         }
                         attributeNodes.add(new AttributeNode(property));
                         keyframeUpdater.getKeyframeProperties().add(property);

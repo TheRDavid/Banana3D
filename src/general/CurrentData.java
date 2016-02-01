@@ -70,6 +70,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import b3dElements.animations.keyframeAnimations.AnimationType;
 import b3dElements.animations.keyframeAnimations.B3D_KeyframeAnimation;
+import b3dElements.spatials.geometries.particleEmitter.B3D_ParticleEffect;
+import dialogs.ProgressDialog;
 import monkeyStuff.keyframeAnimation.LiveKeyframeAnimation;
 import other.ElementToObjectConverter;
 import other.ObjectToElementConverter;
@@ -450,8 +452,10 @@ public class CurrentData
      *
      * @param scenePath
      */
-    public static void execSaveScene(String scenePath)
+    public static void execSaveScene(final String scenePath)
     {
+
+        final ProgressDialog pd = new ProgressDialog("Saving " + scenePath, 0, Wizard.getObjects().getOriginalObjectsIterator().size() + Wizard.getKeyframeAnimations().size() + Wizard.actualNumChildren(editorWindow.getB3DApp().getSceneNode()) / 2);
         ObjectToElementConverter.convertMode = ObjectToElementConverter.ConvertMode.SAVING;
         synchronized (Wizard.getObjects().getOriginalObjectsIterator())
         {
@@ -473,10 +477,20 @@ public class CurrentData
                     System.out.println("Saving b3dLight with UUID: " + b3D_Light.getUUID());
                     scene.getElements().add(b3D_Light);
                     b3D_Light.setAnimations((ArrayList<B3D_TimedAnimation>) oldB3D_Light.getAnimations().clone());
+
+                    SwingUtilities.invokeLater(new Runnable()
+                    {
+                        public void run()
+                        {
+                            pd.valueUp();
+                        }
+                    });
+
                 }
             }
+            System.out.println("Done with Lights");
             //Now spatials, but only those without a parent, they will also load their children
-            for (Object o : Wizard.getObjects().getOriginalObjectsIterator().toArray())
+            for (final Object o : Wizard.getObjects().getOriginalObjectsIterator().toArray())
             {
                 if (o instanceof Spatial)
                 {
@@ -486,9 +500,20 @@ public class CurrentData
                     {
                         B3D_Spatial b3D_Spatial = (B3D_Spatial) ObjectToElementConverter.convertToElement(o);
                         scene.getElements().add(b3D_Spatial);
+                        SwingUtilities.invokeLater(new Runnable()
+                        {
+                            public void run()
+                            {
+                                if (o instanceof Node)
+                                    pd.valueUp(Wizard.actualNumChildren((Node) o));
+                                else
+                                    pd.valueUp();
+                            }
+                        });
                     }
                 }
             }
+            System.out.println("Done with Spatials");
             // Now the Filters, MotionEvents
             for (Object o : Wizard.getObjects().getOriginalObjectsIterator().toArray())
             {
@@ -501,11 +526,27 @@ public class CurrentData
                         ((B3D_Filter) newB3D_Element).changeFilterIndex(((B3D_Filter) oldB3D_Element).getFilterIndex());
                     newB3D_Element.setAnimations((ArrayList<B3D_TimedAnimation>) oldB3D_Element.getAnimations().clone());
                     scene.getElements().add(newB3D_Element);
+                    SwingUtilities.invokeLater(new Runnable()
+                    {
+                        public void run()
+                        {
+                            pd.valueUp();
+                        }
+                    });
                 }
             }
             // At last, the Keyframe Animations
             for (LiveKeyframeAnimation lka : Wizard.getKeyframeAnimations())
+            {
                 scene.getElements().add(ObjectToElementConverter.convertKeyframeAnimation(lka));
+                SwingUtilities.invokeLater(new Runnable()
+                {
+                    public void run()
+                    {
+                        pd.valueUp();
+                    }
+                });
+            }
             System.out.println("Saving scene with " + scene.getElements().size() + " Elements at " + scenePath);
             Wizard.saveFile(scenePath, scene);
             ObserverDialog.getObserverDialog().printMessage("Saved to " + scenePath);
@@ -519,8 +560,17 @@ public class CurrentData
                 e.printStackTrace();
                 ObserverDialog.getObserverDialog().printError("Saving XML failed", e);
             }
+            pd.valueMax();
             Wizard.saveFile(project.getMainFolder().getAbsolutePath() + "//" + project.getMainFolder().getName() + ".b3dp", project);
+            SwingUtilities.invokeLater(new Runnable()
+            {
+                public void run()
+                {
+                    pd.dispose();
+                }
+            });
         }
+
     }
 
     /**
@@ -584,6 +634,7 @@ public class CurrentData
                 }
             });
             UAManager.reset();
+            editorWindow.getKeyframeAnimationEditor().updateAnimationCollection();
         }
     }
 
@@ -715,10 +766,18 @@ public class CurrentData
                                 Wizard.getObjects().add(newObject, newElement);
                                 //Just use hashcode ((Spatial) newObject).setUserData("index", newElement.getUUID());
                                 CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild((Spatial) newObject);
+
+
+
+
+
+
                                 if (((Spatial) newObject).getControl(RigidBodyControl.class) != null)
                                 {
-                                    System.out.println("Adding to Bullet");
-                                    CurrentData.getEditorWindow().getB3DApp().getBulletAppState().getPhysicsSpace().add(newObject);
+                                    System.out.println(
+                                            "Adding to Bullet");
+                                    CurrentData.getEditorWindow()
+                                            .getB3DApp().getBulletAppState().getPhysicsSpace().add(newObject);
                                 }
                                 UAManager.curr(null, null);
                                 UAManager.add(newObject, "Duplicate " + oldElement.getName());
@@ -833,15 +892,29 @@ public class CurrentData
                                 lc.getSpatial().removeControl(lc);
                             }
                         spatial.getParent().detachChild(spatial);
+
+
+
+
+
+
                         if (spatial.getControl(RigidBodyControl.class) != null)
                             CurrentData.getEditorWindow()
                                     .getB3DApp().getBulletAppState().getPhysicsSpace().remove(spatial);
-                        Wizard.getObjects().remove(spatial.hashCode());
-                        CurrentData.getEditorWindow().getB3DApp().setSelectedElement(Wizard.NULL_SELECTION, null);
-                        CurrentData.getEditorWindow().getEditPane().arrange(false);
-                        editorWindow.getTree().sync();
+                        Wizard.getObjects()
+                                .remove(spatial.hashCode());
+                        CurrentData.getEditorWindow()
+                                .getB3DApp().setSelectedElement(Wizard.NULL_SELECTION, null);
+                        CurrentData.getEditorWindow()
+                                .getEditPane().arrange(false);
+                        editorWindow.getTree()
+                                .sync();
                         if (registerUserAction)
-                            UAManager.add(null, "Delete " + spatial.getName());
+                            UAManager.add(
+                                    null, "Delete " + spatial.getName());
+
+
+
                         return null;
                     }
                 });
@@ -942,7 +1015,14 @@ public class CurrentData
                         return null;
                     }
                 });
-            } else if (className.equals(B3D_MotionEvent.class.getName()))
+
+
+
+
+
+
+            } else if (className.equals(B3D_MotionEvent.class
+                    .getName()))
             {
                 CurrentData.getEditorWindow()
                         .getB3DApp().enqueue(new Callable<Void>()
@@ -1244,12 +1324,19 @@ public class CurrentData
     public static void updateAssetRegister()
     {
         updateAssetRegister(CurrentData.getProject().getAssetsFolder());
+
+
+
+
+
+
     }
 
     private static void updateAssetRegister(File assetsFolder)
     {
         getEditorWindow().getB3DApp().getAssetManager().registerLocator(assetsFolder.getAbsolutePath(), FileLocator.class);
-        for (File f : assetsFolder.listFiles())
+        for (File f
+                : assetsFolder.listFiles())
             if (f.isDirectory())
                 updateAssetRegister(f);
     }
@@ -1295,6 +1382,12 @@ public class CurrentData
     public static Vector<AnimationType> getAttributes(B3D_Element element, ArrayList<AnimationElementTree.AttributeNode> nodes)
     {
         Vector<AnimationType> attribs = new Vector<AnimationType>();
+        if (element instanceof B3D_ParticleEffect)
+        {
+            add(attribs, AnimationType.Frozen, nodes);
+            add(attribs, AnimationType.Particles_Per_Second, nodes);
+        }
+
         if (element instanceof B3D_Spatial)
         {
             add(attribs, AnimationType.Translation, nodes);
