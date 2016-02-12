@@ -3,8 +3,16 @@ Installer
 Neues Error Handling für den User
 AnimationPanel
 Neuer Startbildschirm (Coole Scene -> Coole Models benötigt)
+Unload
+5 coole Screenshots
+3 coole Videos
+New Gizmo
 
 1.x
+Select multiple Keyframes
+Edit Keyframe translations like MotionPaths
+Keyframe bezier / Culling - Time ease in / out
+
 CanvasPanel in B3D_GUI -> Wiederverwendung in Apps
 EditTaskpane header knöpfe?
 Globale Einstellungen (Physics Speed, ViewportColor, Framerate (max), etc) in extra Element verpacken (und somit bei un - / redo mit einbeziehen)
