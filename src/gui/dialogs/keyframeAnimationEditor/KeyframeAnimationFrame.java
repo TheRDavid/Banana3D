@@ -165,6 +165,11 @@ public class KeyframeAnimationFrame extends JFrame
 
     public void arrangeScrollbars()
     {
+        if (currentAnimation != null)
+        {
+            currentAnimation.calcMaxFrames();
+            maxFrame = (currentAnimation.getMaxFrames() > maxFrame ? currentAnimation.getMaxFrames() : maxFrame);
+        }
         int h = attributesPanel.getRequieredHeight() + 1;
         keyframePanel.vscrollbar.setValues(editPanel.keyframeEditor.yOffset, editPanel.keyframeEditor.getHeight(), 0, (int) (h * 1.25f));
         keyframePanel.vscrollbar.repaint();
@@ -176,7 +181,7 @@ public class KeyframeAnimationFrame extends JFrame
                 editPanel.keyframeEditor.xOffset,
                 editPanel.keyframeEditor.getWidth(),
                 0,
-                (int) (maxFrame * timelinePanel.gapSize * 1.5));
+                (int) (maxFrame * timelinePanel.gapSize * 1.05));
         editPanel.hscrollbar.repaint();
 
     }
@@ -766,12 +771,12 @@ public class KeyframeAnimationFrame extends JFrame
             //System.out.println("Width: " + getWidth());
             //System.out.println("Zoom: " + zoom);
             //   System.out.println("Gap Size: " + gapSize);
-            for (int i = minFrame; i < zoom + 1; i++)
+            for (int i = 0; i < zoom + 1 + editPanel.keyframeEditor.xOffset; i++)
             {
-                x = i * gapSize /*- editPanel.keyframeEditor.xOffset*/;
+                x = i * gapSize - editPanel.keyframeEditor.xOffset;
                 //System.out.println("New x: " + x);
                 g.drawLine((int) x, 0, (int) x, getHeight());
-                String frameNumber = "" + i;
+                String frameNumber = "" + (i);
                 if (gapSize > 20)
                     g.drawString(frameNumber, (int) x + (int) gapSize / 2 - g.getFontMetrics().stringWidth(frameNumber) / 2, TIMELINE_HEIGHT / 2 - 7);
             }
@@ -962,6 +967,7 @@ public class KeyframeAnimationFrame extends JFrame
                     keyframeEditor.repaint();
                 }
             }
+            arrangeScrollbars();
         }
 
         class KeyframeEditor extends JPanel
@@ -995,7 +1001,7 @@ public class KeyframeAnimationFrame extends JFrame
                     @Override
                     public void mouseDragged(MouseEvent e)
                     {
-                        int selectedX = e.getX() - keyframeEditor.xOffset;
+                        int selectedX = e.getX() + keyframeEditor.xOffset;
                         if (editingEnabled && dragging)
                         {
                             int cFrame = (int) (selectedX / timelinePanel.gapSize);
@@ -1020,9 +1026,14 @@ public class KeyframeAnimationFrame extends JFrame
                         }
                     }
                 });
-                addMouseListener(
-                        new MouseAdapter()
+                addMouseListener(new MouseAdapter()
                 {
+                    @Override
+                    public void mouseReleased(MouseEvent e)
+                    {
+                        arrangeScrollbars();
+                    }
+
                     @Override
                     public void mousePressed(MouseEvent e)
                     {
@@ -1048,6 +1059,7 @@ public class KeyframeAnimationFrame extends JFrame
                                     try
                                     {
                                         property.setValue(frame, updater.getLiveValue(property.type));
+                                        arrangeScrollbars();
                                     } catch (Exception ex)
                                     {
                                         JOptionPane.showMessageDialog(KeyframeEditor.this, "Out of Bounds? " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
