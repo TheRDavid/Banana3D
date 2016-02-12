@@ -34,7 +34,7 @@ public class UAManager implements Serializable
     public static void add(Object o, String name)
     {
         ObjectToElementConverter.convertMode = ObjectToElementConverter.ConvertMode.SAVING;
-        System.out.println("addState [ " + name + " ] \t(" + o + ")");
+        //System.out.println("addState [ " + name + " ] \t(" + o + ")");
         redoStack.clear();
         B3D_Element e = null;
         if (o != null)
@@ -100,7 +100,7 @@ public class UAManager implements Serializable
             if (secondaryElement == null)
             {
                 // Recover Element
-                System.out.println("UPDATE RECOVER");
+                //System.out.println("UPDATE RECOVER");
                 if (primaryElement instanceof B3D_Filter)
                     ((B3D_Filter) primaryElement).changeFilterIndex(CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().getFilterList().size());
 
@@ -127,7 +127,7 @@ public class UAManager implements Serializable
         } else if (secondaryElement != null)
         {
             //Delete Element
-            System.out.println("UPDATE DELETE");
+            //System.out.println("UPDATE DELETE");
             CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(((direction == 1) ? ua.before : ua.after).getUUID());
             CurrentData.execDelete(false);
             CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(null);

@@ -58,8 +58,12 @@ import monkeyStuff.keyframeAnimation.LiveKeyframeAnimation;
 import monkeyStuff.keyframeAnimation.LiveKeyframeProperty;
 import monkeyStuff.keyframeAnimation.LiveKeyframeUpdater;
 import b3dElements.animations.keyframeAnimations.AnimationType;
+import com.jme3.effect.ParticleEmitter;
+import components.BSpinnerNumberModel;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import javax.swing.JSpinner;
+import monkeyStuff.CustomParticleEmitter;
 import org.jdesktop.swingx.VerticalLayout;
 import other.Wizard;
 import se.datadosen.component.RiverLayout;
@@ -189,6 +193,7 @@ public class KeyframeAnimationFrame extends JFrame
     public final void updateAnimationCollection()
     {
         Object selection = null;
+        currentAnimation = null;
         if (toolsPanel.animationSelector.getSelectedItem() != null)
             selection = toolsPanel.animationSelector.getSelectedItem().toString();
         toolsPanel.animationSelector.removeAllItems();
@@ -203,8 +208,8 @@ public class KeyframeAnimationFrame extends JFrame
                 if (toolsPanel.animationSelector.getItemAt(i).equals(selection))
                     toolsPanel.animationSelector.setSelectedIndex(i);
             currentAnimation.uncalcValues();
-            attributesPanel.newUpdaters();
         }
+        attributesPanel.newUpdaters();
     }
 
     @Override
@@ -327,6 +332,7 @@ public class KeyframeAnimationFrame extends JFrame
                         if (lka.getName().equals(e.getItem().toString()))
                         {
                             currentAnimation = lka;
+                            currentAnimation.uncalcValues();
                             editPanel.keyframeEditor.repaint();
                             attributesPanel.newUpdaters();
                         }
@@ -580,6 +586,31 @@ public class KeyframeAnimationFrame extends JFrame
                         }
                     });
                     add("br hfill", valueComponent);
+                } else if (property.type == AnimationType.Frozen)
+                {
+                    //Index 2
+                    valueComponent = new Checker();
+                    ((Checker) valueComponent).setChecked((Boolean) property.getValues()[frame]);
+                    ((Checker) valueComponent).addMouseListener(new MouseAdapter()
+                    {
+                        @Override
+                        public void mouseReleased(MouseEvent e)
+                        {
+                            property.setValue(frame, ((Checker) valueComponent).isChecked());
+                        }
+                    });
+                    add("br", valueComponent);
+                } else if (property.type == AnimationType.Particles_Per_Second)
+                {
+                    valueComponent = new JSpinner(new BSpinnerNumberModel(0, (Integer) property.getValues()[frame], 0, Integer.MAX_VALUE, 1));
+                    ((JSpinner) valueComponent).addChangeListener(new ChangeListener()
+                    {
+                        public void stateChanged(ChangeEvent e)
+                        {
+                            property.setValue(frame, (Serializable) ((JSpinner) valueComponent).getValue());
+                        }
+                    });
+                    add("br", valueComponent);
                 }
                 add("br", new JLabel("Use Live-Value: "));
                 add("tab", liveValuesChecker);
@@ -643,6 +674,16 @@ public class KeyframeAnimationFrame extends JFrame
                         Quaternion newQuat = new Quaternion(((Spatial) property.getUpdater().getObject()).getLocalRotation());
                         ((Float4Panel) valueComponent).setFloats(newQuat);
                         property.setValue(frame, newQuat);
+                    } else if (property.type == AnimationType.Frozen)
+                    {
+                        boolean enabled = ((ParticleEmitter) property.getUpdater().getObject()).isEnabled();
+                        ((Checker) valueComponent).setChecked(enabled);
+                        property.setValue(frame, enabled);
+                    } else if (property.type == AnimationType.Particles_Per_Second)
+                    {
+                        int pps = (int) ((CustomParticleEmitter) property.getUpdater().getObject()).getParticlesPerSec();
+                        ((JSpinner) valueComponent).setValue(pps);
+                        property.setValue(frame, pps);
                     }
         }
 
@@ -706,6 +747,7 @@ public class KeyframeAnimationFrame extends JFrame
                     if (sed.getSelectedElement() != null)
                         keyframePanel.addElement(sed.getSelectedElement());
                     setAlwaysOnTop((Boolean) CurrentData.getPrefs().get(Preference.KEY_ANIMATION_EDITOR_ON_TOP));
+                    attributesPanel.treePanel.setSize(attributesPanel.treePanel.getWidth(), attributesPanel.treePanel.getHeight() + 300);
                     arrangeScrollbars();
                 }
             }
@@ -838,15 +880,19 @@ public class KeyframeAnimationFrame extends JFrame
             attributesPanel.treePanel.add(aet);
             aet.updateElements();
             repaint();
-            attributesPanel.repaint();
+            //attributesPanel.treePanel.setBounds(0, attributesPanel.treePanel.getBounds().y, 200, 1000 * keyframePanel.animationElementTrees.size());
+            attributesPanel.treePanel.repaint();
+            attributesPanel.treePanel.revalidate();
+            attributesPanel.revalidate();
+            editPanel.keyframeEditor.repaint();
             revalidate();
         }
 
         public void adjustmentValueChanged(AdjustmentEvent e)
         {
             editPanel.keyframeEditor.yOffset = e.getValue();
+            attributesPanel.treePanel.setBounds(0, -e.getValue(), 200, 1000 * keyframePanel.animationElementTrees.size());
             editPanel.keyframeEditor.repaint();
-            attributesPanel.treePanel.setBounds(0, -editPanel.keyframeEditor.yOffset, 200, 5000);
             attributesPanel.repaint();
         }
     }
@@ -858,7 +904,7 @@ public class KeyframeAnimationFrame extends JFrame
 
         public AttributesPanel()
         {
-            treePanel.setBounds(0, 0, 200, 5000);
+            treePanel.setBounds(0, 0, 200, 10000);
             setLayout(null);
             setBackground(Color.GRAY);
             add(treePanel);
@@ -873,17 +919,21 @@ public class KeyframeAnimationFrame extends JFrame
         {
             keyframePanel.animationElementTrees.clear();
             treePanel.removeAll();
-            for (LiveKeyframeUpdater lku : currentAnimation.getUpdaters())
-            {
-                B3D_Element element = Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(lku.getObject().hashCode()));
-                AnimationElementTree aet = new AnimationElementTree(element, lku);
-                keyframePanel.animationElementTrees.add(aet);
-                treePanel.add(aet);
-                aet.updateElements();
-                int aetMax = aet.getKeyframeUpdater().calcMaxFrames();
-                maxFrame = maxFrame > aetMax ? maxFrame : aetMax;
-            }
+            if (currentAnimation != null)
+                for (LiveKeyframeUpdater lku : currentAnimation.getUpdaters())
+                {
+                    B3D_Element element = Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(lku.getObject().hashCode()));
+                    AnimationElementTree aet = new AnimationElementTree(element, lku);
+                    keyframePanel.animationElementTrees.add(aet);
+                    treePanel.add(aet);
+                    aet.updateElements();
+                    int aetMax = aet.getKeyframeUpdater().calcMaxFrames();
+                    maxFrame = maxFrame > aetMax ? maxFrame : aetMax;
+                }
+            //attributesPanel.treePanel.setBounds(0, attributesPanel.treePanel.getBounds().y, 200, 1000 * keyframePanel.animationElementTrees.size());
             treePanel.repaint();
+            treePanel.revalidate();
+            attributesPanel.revalidate();
             editPanel.keyframeEditor.repaint();
             arrangeScrollbars();
         }
