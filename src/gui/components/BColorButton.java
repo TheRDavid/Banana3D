@@ -5,7 +5,6 @@ import components.ColorButton;
 import other.Wizard;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * A BButton, used to set the Color of an Object
@@ -14,6 +13,7 @@ public class BColorButton extends ColorButton
 {
 
     private Color color;
+    
 
     public BColorButton(Color initColor)
     {

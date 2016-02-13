@@ -441,6 +441,7 @@ public class CurrentData
                         selectedElement.setName(newName);
                         editorWindow.getB3DApp().setTreeSyncNeeded(true);
                         UAManager.add(CurrentData.getEditorWindow().getB3DApp().getSelectedObject(), "Rename to \"" + newName + "\"");
+                        editorWindow.getKeyframeAnimationEditor().updateNames();
                     }
                 }
             }
@@ -454,7 +455,6 @@ public class CurrentData
      */
     public static void execSaveScene(final String scenePath)
     {
-
         final ProgressDialog pd = new ProgressDialog("Saving " + scenePath, 0, Wizard.getObjects().getOriginalObjectsIterator().size() + Wizard.getKeyframeAnimations().size() + Wizard.actualNumChildren(editorWindow.getB3DApp().getSceneNode()) / 2);
         ObjectToElementConverter.convertMode = ObjectToElementConverter.ConvertMode.SAVING;
         synchronized (Wizard.getObjects().getOriginalObjectsIterator())
@@ -465,7 +465,12 @@ public class CurrentData
             /*
              * Ignoring the Filters, MotionEvents and LightControls here so their spatials and lights will be refreshed first
              */
-            //Lights first
+            //Keyframe Animations first
+            if (editorWindow.getKeyframeAnimationEditor().getCurrentAnimation() != null)
+                editorWindow.getKeyframeAnimationEditor().compileCurrent();
+            for (LiveKeyframeAnimation lka : Wizard.getKeyframeAnimations())
+                lka.calcValues();
+            //Lights next
             for (Object o : Wizard.getObjects().getOriginalObjectsIterator().toArray())
             {
                 if (o instanceof Light)
@@ -634,6 +639,7 @@ public class CurrentData
                 }
             });
             UAManager.reset();
+            Wizard.getKeyframeAnimations().clear();
             editorWindow.getKeyframeAnimationEditor().updateAnimationCollection();
         }
     }
@@ -766,12 +772,6 @@ public class CurrentData
                                 Wizard.getObjects().add(newObject, newElement);
                                 //Just use hashcode ((Spatial) newObject).setUserData("index", newElement.getUUID());
                                 CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild((Spatial) newObject);
-
-
-
-
-
-
                                 if (((Spatial) newObject).getControl(RigidBodyControl.class) != null)
                                 {
                                     System.out.println(
@@ -892,12 +892,6 @@ public class CurrentData
                                 lc.getSpatial().removeControl(lc);
                             }
                         spatial.getParent().detachChild(spatial);
-
-
-
-
-
-
                         if (spatial.getControl(RigidBodyControl.class) != null)
                             CurrentData.getEditorWindow()
                                     .getB3DApp().getBulletAppState().getPhysicsSpace().remove(spatial);
@@ -1299,6 +1293,7 @@ public class CurrentData
                         elementsAdded++;
                     }
                 //Keyframe Animation
+                Wizard.getKeyframeAnimations().clear();
                 for (B3D_Element e : scene.getElements())
                     if (e instanceof B3D_KeyframeAnimation)
                         Wizard.getKeyframeAnimations().add(ElementToObjectConverter.convertKeyframeAnimation((B3D_KeyframeAnimation) e));
@@ -1384,8 +1379,11 @@ public class CurrentData
         Vector<AnimationType> attribs = new Vector<AnimationType>();
         if (element instanceof B3D_ParticleEffect)
         {
-            add(attribs, AnimationType.Frozen, nodes);
+            add(attribs, AnimationType.Particles_Frozen, nodes);
             add(attribs, AnimationType.Particles_Per_Second, nodes);
+            add(attribs, AnimationType.Particles_Emit_All, nodes);
+            add(attribs, AnimationType.Particles_End_Color, nodes);
+            add(attribs, AnimationType.Particles_Start_Color, nodes);
         }
 
         if (element instanceof B3D_Spatial)
