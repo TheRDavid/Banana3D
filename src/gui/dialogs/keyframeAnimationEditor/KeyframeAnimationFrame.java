@@ -1,5 +1,6 @@
 package gui.dialogs.keyframeAnimationEditor;
 
+import Other.GUI_Tools;
 import b3dElements.B3D_Element;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -59,7 +60,9 @@ import monkeyStuff.keyframeAnimation.LiveKeyframeProperty;
 import monkeyStuff.keyframeAnimation.LiveKeyframeUpdater;
 import b3dElements.animations.keyframeAnimations.AnimationType;
 import com.jme3.effect.ParticleEmitter;
+import com.jme3.math.ColorRGBA;
 import components.BSpinnerNumberModel;
+import gui.components.BColorButton;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.JSpinner;
@@ -83,7 +86,7 @@ public class KeyframeAnimationFrame extends JFrame
     private TimelinePanel timelinePanel = new TimelinePanel();
     private EditorPanel editorPanel = new EditorPanel();
     private static final int TIMELINE_HEIGHT = 40;
-    private int minFrame = 0, zoom = 20, maxFrame = 60;
+    private int zoom = 20, maxFrame = 60;
     private boolean firstPaint = true;
     private LiveKeyframeAnimation currentAnimation = null;
     private boolean editingEnabled = true;
@@ -91,13 +94,6 @@ public class KeyframeAnimationFrame extends JFrame
     public ValuePanel getValuePanel()
     {
         return valuePanel;
-    }
-
-    private void setMaxFrame(int mF)
-    {
-        maxFrame = mF;
-        editPanel.keyframeEditor.xOffset = (int) (timelinePanel.currentFrame * timelinePanel.gapSize);
-        arrangeScrollbars();
     }
 
     private void editingEnabled(boolean b)
@@ -156,7 +152,7 @@ public class KeyframeAnimationFrame extends JFrame
             @Override
             public void componentResized(ComponentEvent e)
             {
-                super.componentResized(e); //To change body of generated methods, choose Tools | Templates.
+                super.componentResized(e); //To change body of generated methods, choose GUI_Tools | Templates.
                 arrangeSizes();
                 arrangeScrollbars();
                 CurrentData.getPrefs().set(Preference.KEY_ANIMATION_DIALOG_SIZE, getSize());
@@ -185,7 +181,7 @@ public class KeyframeAnimationFrame extends JFrame
                 editPanel.keyframeEditor.xOffset,
                 editPanel.keyframeEditor.getWidth(),
                 0,
-                (int) (maxFrame * timelinePanel.gapSize * 1.05));
+                (int) (maxFrame * timelinePanel.gapSize * 1.1));
         editPanel.hscrollbar.repaint();
 
     }
@@ -194,11 +190,14 @@ public class KeyframeAnimationFrame extends JFrame
     {
         Object selection = null;
         currentAnimation = null;
-        if (toolsPanel.animationSelector.getSelectedItem() != null)
-            selection = toolsPanel.animationSelector.getSelectedItem().toString();
         toolsPanel.animationSelector.removeAllItems();
         for (LiveKeyframeAnimation lka : Wizard.getKeyframeAnimations())
             toolsPanel.animationSelector.addItem(lka.getName());
+        if (toolsPanel.animationSelector.getItemCount() > 0)
+            toolsPanel.animationSelector.setSelectedIndex(0);
+        System.out.println("SELECTEC: " + toolsPanel.animationSelector.getSelectedItem());
+        if (toolsPanel.animationSelector.getSelectedItem() != null)
+            selection = toolsPanel.animationSelector.getSelectedItem().toString();
         if (selection != null)
         {
             for (LiveKeyframeAnimation lka : Wizard.getKeyframeAnimations())
@@ -210,6 +209,7 @@ public class KeyframeAnimationFrame extends JFrame
             currentAnimation.uncalcValues();
         }
         attributesPanel.newUpdaters();
+        GUI_Tools.repaintAll(this);
     }
 
     @Override
@@ -283,6 +283,13 @@ public class KeyframeAnimationFrame extends JFrame
         return editingEnabled;
     }
 
+    public void compileCurrent()
+    {
+        currentAnimation.removeAllUpdaters();
+        for (AnimationElementTree aet : keyframePanel.animationElementTrees)
+            currentAnimation.addUpdater(aet.getKeyframeUpdater().createNew());
+    }
+
     class ToolsPanel extends JPanel implements ActionListener
     {
 
@@ -328,14 +335,26 @@ public class KeyframeAnimationFrame extends JFrame
             {
                 public void itemStateChanged(ItemEvent e)
                 {
-                    for (LiveKeyframeAnimation lka : Wizard.getKeyframeAnimations())
-                        if (lka.getName().equals(e.getItem().toString()))
+                    if (e.getStateChange() == ItemEvent.SELECTED)
+                    {
+                        if (currentAnimation != null)
                         {
-                            currentAnimation = lka;
-                            currentAnimation.uncalcValues();
-                            editPanel.keyframeEditor.repaint();
-                            attributesPanel.newUpdaters();
+                            currentAnimation.removeAllUpdaters();
+                            System.out.println("Trees: " + keyframePanel.animationElementTrees.size());
+                            for (AnimationElementTree aet : keyframePanel.animationElementTrees)
+                                currentAnimation.addUpdater(aet.getKeyframeUpdater().createNew());
+                            currentAnimation.calcValues();
+                            currentAnimation.uncalcValues(); //kek
                         }
+                        for (LiveKeyframeAnimation lka : Wizard.getKeyframeAnimations())
+                            if (lka.getName().equals(e.getItem().toString()))
+                            {
+                                currentAnimation = lka;
+                                currentAnimation.uncalcValues();
+                                editPanel.keyframeEditor.repaint();
+                                attributesPanel.newUpdaters();
+                            }
+                    }
                 }
             });
             zoomSlider.addChangeListener(new ChangeListener()
@@ -408,8 +427,12 @@ public class KeyframeAnimationFrame extends JFrame
                         }
                     LiveKeyframeAnimation kfa = new LiveKeyframeAnimation(name);
                     Wizard.getKeyframeAnimations().add(kfa);
+                    //currentAnimation = kfa;
+                    //updateAnimationCollection();
                     animationSelector.addItem(kfa.getName());
-                    currentAnimation = kfa;
+                    //animationSelector.setSelectedIndex(animationSelector.getItemCount() - 1);
+                    //attributesPanel.newUpdaters();
+                    GUI_Tools.repaintAll(KeyframeAnimationFrame.this);
                 }
             } else if (e.getActionCommand().equals("prev"))
             {
@@ -586,7 +609,7 @@ public class KeyframeAnimationFrame extends JFrame
                         }
                     });
                     add("br hfill", valueComponent);
-                } else if (property.type == AnimationType.Frozen)
+                } else if (property.type == AnimationType.Particles_Frozen)
                 {
                     //Index 2
                     valueComponent = new Checker();
@@ -599,7 +622,23 @@ public class KeyframeAnimationFrame extends JFrame
                             property.setValue(frame, ((Checker) valueComponent).isChecked());
                         }
                     });
-                    add("br", valueComponent);
+                    add("br", new JLabel("Freeze: "));
+                    add("tab", valueComponent);
+                } else if (property.type == AnimationType.Particles_Emit_All)
+                {
+                    //Index 2
+                    valueComponent = new Checker();
+                    ((Checker) valueComponent).setChecked((Boolean) property.getValues()[frame]);
+                    ((Checker) valueComponent).addMouseListener(new MouseAdapter()
+                    {
+                        @Override
+                        public void mouseReleased(MouseEvent e)
+                        {
+                            property.setValue(frame, ((Checker) valueComponent).isChecked());
+                        }
+                    });
+                    add("br", new JLabel("Emit 'em ALL!: "));
+                    add("tab", valueComponent);
                 } else if (property.type == AnimationType.Particles_Per_Second)
                 {
                     valueComponent = new JSpinner(new BSpinnerNumberModel(0, (Integer) property.getValues()[frame], 0, Integer.MAX_VALUE, 1));
@@ -610,7 +649,21 @@ public class KeyframeAnimationFrame extends JFrame
                             property.setValue(frame, (Serializable) ((JSpinner) valueComponent).getValue());
                         }
                     });
-                    add("br", valueComponent);
+                    add("br", new JLabel("Particles Per Second: "));
+                    add("tab", valueComponent);
+                } else if (property.type == AnimationType.Particles_End_Color || property.type == AnimationType.Particles_Start_Color)
+                {
+                    valueComponent = new BColorButton(Wizard.makeColor((ColorRGBA) property.getValues()[frame]))
+                    {
+                        @Override
+                        public void andThenDoThis()
+                        {
+                            property.setValue(frame, (Serializable) Wizard.makeColorRGBA(((BColorButton) valueComponent).getColor()));
+
+                        }
+                    };
+                    add("br", new JLabel("Color: "));
+                    add("tab", valueComponent);
                 }
                 add("br", new JLabel("Use Live-Value: "));
                 add("tab", liveValuesChecker);
@@ -674,9 +727,14 @@ public class KeyframeAnimationFrame extends JFrame
                         Quaternion newQuat = new Quaternion(((Spatial) property.getUpdater().getObject()).getLocalRotation());
                         ((Float4Panel) valueComponent).setFloats(newQuat);
                         property.setValue(frame, newQuat);
-                    } else if (property.type == AnimationType.Frozen)
+                    } else if (property.type == AnimationType.Particles_Frozen)
                     {
                         boolean enabled = ((ParticleEmitter) property.getUpdater().getObject()).isEnabled();
+                        ((Checker) valueComponent).setChecked(enabled);
+                        property.setValue(frame, enabled);
+                    } else if (property.type == AnimationType.Particles_Emit_All)
+                    {
+                        boolean enabled = false;
                         ((Checker) valueComponent).setChecked(enabled);
                         property.setValue(frame, enabled);
                     } else if (property.type == AnimationType.Particles_Per_Second)
@@ -684,6 +742,16 @@ public class KeyframeAnimationFrame extends JFrame
                         int pps = (int) ((CustomParticleEmitter) property.getUpdater().getObject()).getParticlesPerSec();
                         ((JSpinner) valueComponent).setValue(pps);
                         property.setValue(frame, pps);
+                    } else if (property.type == AnimationType.Particles_Start_Color)
+                    {
+                        ColorRGBA color = (ColorRGBA) ((CustomParticleEmitter) property.getUpdater().getObject()).getStartColor();
+                        ((BColorButton) valueComponent).setColor(Wizard.makeColor(color));
+                        property.setValue(frame, color);
+                    } else if (property.type == AnimationType.Particles_End_Color)
+                    {
+                        ColorRGBA color = (ColorRGBA) ((CustomParticleEmitter) property.getUpdater().getObject()).getEndColor();
+                        ((BColorButton) valueComponent).setColor(Wizard.makeColor(color));
+                        property.setValue(frame, color);
                     }
         }
 
@@ -895,6 +963,11 @@ public class KeyframeAnimationFrame extends JFrame
             editPanel.keyframeEditor.repaint();
             attributesPanel.repaint();
         }
+    }
+
+    public void updateNames()
+    {
+        attributesPanel.newUpdaters();
     }
 
     class AttributesPanel extends JPanel
@@ -1112,7 +1185,7 @@ public class KeyframeAnimationFrame extends JFrame
                                         arrangeScrollbars();
                                     } catch (Exception ex)
                                     {
-                                        JOptionPane.showMessageDialog(KeyframeEditor.this, "Out of Bounds? " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                        ex.printStackTrace();
                                     }
                                 else if (frame < aNode.getProperty().getValues().length && property.getValues()[frame] != null)
                                 {

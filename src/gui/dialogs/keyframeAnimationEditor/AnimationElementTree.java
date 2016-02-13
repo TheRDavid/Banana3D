@@ -42,6 +42,7 @@ import b3dElements.animations.keyframeAnimations.Properties.QuaternionProperty;
 import b3dElements.animations.keyframeAnimations.Properties.Vector3fProperty;
 import b3dElements.animations.keyframeAnimations.AnimationType;
 import b3dElements.animations.keyframeAnimations.Properties.BoolProperty;
+import b3dElements.animations.keyframeAnimations.Properties.ColorRGBAProperty;
 import b3dElements.animations.keyframeAnimations.Properties.IntProperty;
 import javax.swing.JScrollPane;
 import monkeyStuff.CustomParticleEmitter;
@@ -84,7 +85,7 @@ public class AnimationElementTree extends JXTree implements ActionListener
         {
             if (object instanceof CustomParticleEmitter)
                 keyframeUpdater = new LiveParticleEmitterUpdater((CustomParticleEmitter) object);
-            else if (object instanceof CustomParticleEmitter)
+            else if (object instanceof Spatial)
                 keyframeUpdater = new LiveSpatialUpdater((Spatial) object);
         } else
             keyframeUpdater = lku;
@@ -254,12 +255,21 @@ public class AnimationElementTree extends JXTree implements ActionListener
                         if (object instanceof CustomParticleEmitter)
                         {
                             CustomParticleEmitter emitter = (CustomParticleEmitter) object;
-                            if (AnimationType.valueOfString(getText()).equals(AnimationType.Frozen))
+                            if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_Frozen))
                                 property = new BoolProperty(AnimationType.valueOfString(getText()),
                                         61, emitter.isEnabled(), keyframeUpdater);
-                            if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_Per_Second))
+                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_Per_Second))
                                 property = new IntProperty(AnimationType.valueOfString(getText()),
                                         61, (int) emitter.getParticlesPerSec(), keyframeUpdater);
+                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_Emit_All))
+                                property = new BoolProperty(AnimationType.valueOfString(getText()),
+                                        61, true, keyframeUpdater);
+                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_End_Color))
+                                property = new ColorRGBAProperty(AnimationType.valueOfString(getText()),
+                                        61, emitter.getEndColor(), keyframeUpdater);
+                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_Start_Color))
+                                property = new ColorRGBAProperty(AnimationType.valueOfString(getText()),
+                                        61, emitter.getStartColor(), keyframeUpdater);
                         }
                         attributeNodes.add(new AttributeNode(property));
                         keyframeUpdater.getKeyframeProperties().add(property);
