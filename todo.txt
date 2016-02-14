@@ -1,18 +1,29 @@
 1.0
-Installer
-Neues Error Handling für den User
-AnimationPanel
+More Keyframe-Types
+    -Lights
+        -Position
+        -Rotation
+        -Radius
+Code einbinden
 Neuer Startbildschirm (Coole Scene -> Coole Models benötigt)
-Unload
 5 coole Screenshots
 3 coole Videos
-New Gizmo
+3.1 (+fixing)
+Installer
+badass fucking website (blues?)
 
 1.x
+Keyframes for
+    - Active ParticleEmitter
+    - Basic Camera Stuff
+        -Position
+        -Rotation
+KeyframeEditor sort Updaters (Combobox)
 Select multiple Keyframes
 Edit Keyframe translations like MotionPaths
 Keyframe bezier / Culling - Time ease in / out
-
+Save Particles of Emitter
+Neues Error Handling für den User
 CanvasPanel in B3D_GUI -> Wiederverwendung in Apps
 EditTaskpane header knöpfe?
 Globale Einstellungen (Physics Speed, ViewportColor, Framerate (max), etc) in extra Element verpacken (und somit bei un - / redo mit einbeziehen)
