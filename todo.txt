@@ -6,8 +6,8 @@ More Keyframe-Types
         -Radius
 Code einbinden
 Neuer Startbildschirm (Coole Scene -> Coole Models benötigt)
-5 coole Screenshots
-3 coole Videos
+coole Screenshots
+coole Videos
 3.1 (+fixing)
 Installer
 badass fucking website (blues?)
