@@ -40,12 +40,14 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.Callable;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import se.datadosen.component.RiverLayout;
 
-public class AdditionalCameraDialog extends BasicDialog implements SceneProcessor
+public class AdditionalCameraDialog extends JFrame implements SceneProcessor
 {
 
     private CameraPanel camPanel = new CameraPanel();
@@ -118,6 +120,7 @@ public class AdditionalCameraDialog extends BasicDialog implements SceneProcesso
             AssetManager aManager,
             final boolean onTop)
     {
+        setIconImage(new ImageIcon("dat//img//other//logo.png").getImage());
         renderManager = rManager;
         assetManager = aManager;
         node = n;
@@ -138,7 +141,6 @@ public class AdditionalCameraDialog extends BasicDialog implements SceneProcesso
             number = CurrentData.getEditorWindow().getB3DApp().getAdditionalCameraDialogs().size() + 1;
         }
         setTitle("Cam " + number);
-        setModal(false);
         frameBuffer = new FrameBuffer(width, height, 1);
         frameBuffer.setDepthBuffer(Image.Format.Depth);
         frameBuffer.setColorBuffer(Image.Format.RGB8);

@@ -54,6 +54,7 @@ public class EmitterTaskPane extends EditTaskPane
     private BTextField imgXField = new BTextField("int");
     private BTextField imgYField = new BTextField("int");
     private Checker firingChecker = new Checker();
+    private Checker frozenChecker = new Checker();
     private Checker depthWriteChecker = new Checker();
     private Checker faceVelocityChecker = new Checker();
     private Float3Panel faceNormalPanel = new Float3Panel(null, Wizard.getCamera(), Float3Panel.HORIZONTAL);
@@ -104,6 +105,7 @@ public class EmitterTaskPane extends EditTaskPane
         imgXField.setText("" + particleEmitter.getImagesX());
         imgYField.setText("" + particleEmitter.getImagesY());
         firingChecker.setChecked(particleEmitter.isFiring());
+        frozenChecker.setChecked(!particleEmitter.isEnabled());
         directionVelocityPanel.setVector(particleEmitter.getParticleInfluencer().getInitialVelocity());
         taskPane.setLayout(new RiverLayout());
         firingChecker.addMouseListener(new MouseAdapter()
@@ -117,7 +119,24 @@ public class EmitterTaskPane extends EditTaskPane
                     @Override
                     public Void call() throws Exception
                     {
-                        UAManager.add(particleEmitter, "Set Velocity Variation to " + velocityVariationSlider._getValue());
+                        UAManager.add(particleEmitter, (firingChecker.isEnabled() ? "Activate" : "Deactivate " + particleEmitter.getName()));
+                        return null;
+                    }
+                });
+            }
+        });
+        frozenChecker.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+                particleEmitter.setEnabled(!frozenChecker.isChecked());
+                CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                {
+                    @Override
+                    public Void call() throws Exception
+                    {
+                        UAManager.add(particleEmitter, (firingChecker.isEnabled() ? "Freeze" : "Unfreeze " + particleEmitter.getName()));
                         return null;
                     }
                 });
@@ -204,6 +223,8 @@ public class EmitterTaskPane extends EditTaskPane
         taskPane.add("br tab tab hfill", triangleTypeRadioButton);
         taskPane.add("br left", new JLabel("Active:"));
         taskPane.add("tab", firingChecker);
+        taskPane.add("br left", new JLabel("Frozen:"));
+        taskPane.add("tab", frozenChecker);
         taskPane.add("br left", new JLabel("Max. Particles:"));
         taskPane.add("tab hfill", maxParticlesField);
         taskPane.add("br left", new JLabel("Particles per Sec.:"));

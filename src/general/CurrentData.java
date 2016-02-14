@@ -1379,13 +1379,16 @@ public class CurrentData
         Vector<AnimationType> attribs = new Vector<AnimationType>();
         if (element instanceof B3D_ParticleEffect)
         {
-            add(attribs, AnimationType.Particles_Frozen, nodes);
+            add(attribs, AnimationType.Frozen, nodes);
             add(attribs, AnimationType.Particles_Per_Second, nodes);
-            add(attribs, AnimationType.Particles_Emit_All, nodes);
-            add(attribs, AnimationType.Particles_End_Color, nodes);
-            add(attribs, AnimationType.Particles_Start_Color, nodes);
+            add(attribs, AnimationType.Emit_All, nodes);
+            add(attribs, AnimationType.End_Color_Blend, nodes);
+            add(attribs, AnimationType.Start_Color_Blend, nodes);
         }
-
+        if (element instanceof B3D_Light)
+        {
+            add(attribs, AnimationType.Light_Color_Blend, nodes);
+        }
         if (element instanceof B3D_Spatial)
         {
             add(attribs, AnimationType.Translation, nodes);

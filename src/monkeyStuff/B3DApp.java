@@ -973,13 +973,13 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                     else
                         checking = false;
                 }
-                //System.out.println("Angeklickt: " + pickedGeometry.getName());
+                System.out.println("Angeklickt: " + pickedGeometry.getName());
                 if (interactionType.equals(InteractionType.Default) && isPressed)
                 {
-                    if (pickedGeometry.getParent().equals(gizmo))
-                        if (pickedGeometry == gizmo.getxArrow())
+                    if (pickedGeometry.hasAncestor(gizmo))
+                        if (pickedGeometry.hasAncestor(gizmo.getxArrow()))
                             gizmo.select(Gizmo.Arrow.X);
-                        else if (pickedGeometry == gizmo.getyArrow())
+                        else if (pickedGeometry.hasAncestor(gizmo.getyArrow()))
                             gizmo.select(Gizmo.Arrow.Y);
                         else
                             gizmo.select(Gizmo.Arrow.Z);

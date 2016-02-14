@@ -60,6 +60,7 @@ import monkeyStuff.keyframeAnimation.LiveKeyframeProperty;
 import monkeyStuff.keyframeAnimation.LiveKeyframeUpdater;
 import b3dElements.animations.keyframeAnimations.AnimationType;
 import com.jme3.effect.ParticleEmitter;
+import com.jme3.light.Light;
 import com.jme3.math.ColorRGBA;
 import components.BSpinnerNumberModel;
 import gui.components.BColorButton;
@@ -414,7 +415,17 @@ public class KeyframeAnimationFrame extends JFrame
                 zoomSlider.setValue(zoomSlider.getValue() + 1);
             else if (e.getActionCommand().equals("-"))
                 zoomSlider.setValue(zoomSlider.getValue() - 1);
-            else if (e.getActionCommand().equals("new"))
+            else if (e.getActionCommand().equals("delete"))
+            {
+                if (currentAnimation != null && JOptionPane.showConfirmDialog(deleteAnimationButton, "Are you sure that you want to delete this animation?") == JOptionPane.YES_OPTION)
+                {
+                    Wizard.getKeyframeAnimations().remove(currentAnimation);
+                    currentAnimation = null;
+                    animationSelector.removeItemAt(animationSelector.getSelectedIndex());
+                    attributesPanel.newUpdaters();
+                    GUI_Tools.repaintAll(KeyframeAnimationFrame.this);
+                }
+            } else if (e.getActionCommand().equals("new"))
             {
                 String name = JOptionPane.showInputDialog(this, "Animation Name", "New Animation", JOptionPane.INFORMATION_MESSAGE);
                 if (name != null && !"".equals(name))
@@ -609,7 +620,7 @@ public class KeyframeAnimationFrame extends JFrame
                         }
                     });
                     add("br hfill", valueComponent);
-                } else if (property.type == AnimationType.Particles_Frozen)
+                } else if (property.type == AnimationType.Frozen)
                 {
                     //Index 2
                     valueComponent = new Checker();
@@ -624,7 +635,7 @@ public class KeyframeAnimationFrame extends JFrame
                     });
                     add("br", new JLabel("Freeze: "));
                     add("tab", valueComponent);
-                } else if (property.type == AnimationType.Particles_Emit_All)
+                } else if (property.type == AnimationType.Emit_All)
                 {
                     //Index 2
                     valueComponent = new Checker();
@@ -651,7 +662,7 @@ public class KeyframeAnimationFrame extends JFrame
                     });
                     add("br", new JLabel("Particles Per Second: "));
                     add("tab", valueComponent);
-                } else if (property.type == AnimationType.Particles_End_Color || property.type == AnimationType.Particles_Start_Color)
+                } else if (property.type == AnimationType.End_Color_Blend || property.type == AnimationType.Start_Color_Blend || property.type == AnimationType.Light_Color_Blend)
                 {
                     valueComponent = new BColorButton(Wizard.makeColor((ColorRGBA) property.getValues()[frame]))
                     {
@@ -659,7 +670,6 @@ public class KeyframeAnimationFrame extends JFrame
                         public void andThenDoThis()
                         {
                             property.setValue(frame, (Serializable) Wizard.makeColorRGBA(((BColorButton) valueComponent).getColor()));
-
                         }
                     };
                     add("br", new JLabel("Color: "));
@@ -711,48 +721,55 @@ public class KeyframeAnimationFrame extends JFrame
         public void refresh()
         {
             if (property != null && valueComponent != null && liveValuesChecker.isChecked())
-                if (property.getUpdater().getObject() instanceof Spatial)
-                    if (property.type == AnimationType.Translation)
-                    {
-                        Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalTranslation());
-                        ((Float3Panel) valueComponent).setVector(newVec);
-                        property.setValue(frame, newVec);
-                    } else if (property.type == AnimationType.Scale)
-                    {
-                        Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalScale());
-                        ((Float3Panel) valueComponent).setVector(newVec);
-                        property.setValue(frame, newVec);
-                    } else if (property.type == AnimationType.Rotation)
-                    {
-                        Quaternion newQuat = new Quaternion(((Spatial) property.getUpdater().getObject()).getLocalRotation());
-                        ((Float4Panel) valueComponent).setFloats(newQuat);
-                        property.setValue(frame, newQuat);
-                    } else if (property.type == AnimationType.Particles_Frozen)
-                    {
-                        boolean enabled = ((ParticleEmitter) property.getUpdater().getObject()).isEnabled();
-                        ((Checker) valueComponent).setChecked(enabled);
-                        property.setValue(frame, enabled);
-                    } else if (property.type == AnimationType.Particles_Emit_All)
-                    {
-                        boolean enabled = false;
-                        ((Checker) valueComponent).setChecked(enabled);
-                        property.setValue(frame, enabled);
-                    } else if (property.type == AnimationType.Particles_Per_Second)
-                    {
-                        int pps = (int) ((CustomParticleEmitter) property.getUpdater().getObject()).getParticlesPerSec();
-                        ((JSpinner) valueComponent).setValue(pps);
-                        property.setValue(frame, pps);
-                    } else if (property.type == AnimationType.Particles_Start_Color)
-                    {
-                        ColorRGBA color = (ColorRGBA) ((CustomParticleEmitter) property.getUpdater().getObject()).getStartColor();
-                        ((BColorButton) valueComponent).setColor(Wizard.makeColor(color));
-                        property.setValue(frame, color);
-                    } else if (property.type == AnimationType.Particles_End_Color)
-                    {
-                        ColorRGBA color = (ColorRGBA) ((CustomParticleEmitter) property.getUpdater().getObject()).getEndColor();
-                        ((BColorButton) valueComponent).setColor(Wizard.makeColor(color));
-                        property.setValue(frame, color);
-                    }
+            {
+                if (property.type == AnimationType.Translation)
+                {
+                    Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalTranslation());
+                    ((Float3Panel) valueComponent).setVector(newVec);
+                    property.setValue(frame, newVec);
+                } else if (property.type == AnimationType.Scale)
+                {
+                    Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalScale());
+                    ((Float3Panel) valueComponent).setVector(newVec);
+                    property.setValue(frame, newVec);
+                } else if (property.type == AnimationType.Rotation)
+                {
+                    Quaternion newQuat = new Quaternion(((Spatial) property.getUpdater().getObject()).getLocalRotation());
+                    ((Float4Panel) valueComponent).setFloats(newQuat);
+                    property.setValue(frame, newQuat);
+                } else if (property.type == AnimationType.Frozen)
+                {
+                    boolean enabled = ((ParticleEmitter) property.getUpdater().getObject()).isEnabled();
+                    ((Checker) valueComponent).setChecked(enabled);
+                    property.setValue(frame, enabled);
+                } else if (property.type == AnimationType.Emit_All)
+                {
+                    boolean enabled = false;
+                    ((Checker) valueComponent).setChecked(enabled);
+                    property.setValue(frame, enabled);
+                } else if (property.type == AnimationType.Particles_Per_Second)
+                {
+                    int pps = (int) ((CustomParticleEmitter) property.getUpdater().getObject()).getParticlesPerSec();
+                    ((JSpinner) valueComponent).setValue(pps);
+                    property.setValue(frame, pps);
+                } else if (property.type == AnimationType.Start_Color_Blend)
+                {
+                    ColorRGBA color = (ColorRGBA) ((CustomParticleEmitter) property.getUpdater().getObject()).getStartColor();
+                    ((BColorButton) valueComponent).setColor(Wizard.makeColor(color));
+                    property.setValue(frame, color);
+                } else if (property.type == AnimationType.End_Color_Blend)
+                {
+                    ColorRGBA color = (ColorRGBA) ((CustomParticleEmitter) property.getUpdater().getObject()).getEndColor();
+                    ((BColorButton) valueComponent).setColor(Wizard.makeColor(color));
+                    property.setValue(frame, color);
+                } else if (property.type == AnimationType.Light_Color_Blend)
+                {
+                    ColorRGBA color = (ColorRGBA) ((Light) property.getUpdater().getObject()).getColor();
+                    ((BColorButton) valueComponent).setColor(Wizard.makeColor(color));
+                    property.setValue(frame, color);
+                }
+                valueComponent.repaint();
+            }
         }
 
         private void setLive(boolean b)
@@ -792,7 +809,7 @@ public class KeyframeAnimationFrame extends JFrame
             {
                 setLayout(new RiverLayout(0, 0));
                 setBorder(new EmptyBorder(5, 0, 0, 0));
-                add(sortTypes);
+                //  add(sortTypes);
                 add(addElementButton);
                 addElementButton.setActionCommand("add");
                 addElementButton.addActionListener(this);

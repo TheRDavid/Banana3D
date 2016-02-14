@@ -44,8 +44,10 @@ import b3dElements.animations.keyframeAnimations.AnimationType;
 import b3dElements.animations.keyframeAnimations.Properties.BoolProperty;
 import b3dElements.animations.keyframeAnimations.Properties.ColorRGBAProperty;
 import b3dElements.animations.keyframeAnimations.Properties.IntProperty;
+import com.jme3.light.Light;
 import javax.swing.JScrollPane;
 import monkeyStuff.CustomParticleEmitter;
+import monkeyStuff.keyframeAnimation.Updaters.LiveLightUpdater;
 import monkeyStuff.keyframeAnimation.Updaters.LiveParticleEmitterUpdater;
 import monkeyStuff.keyframeAnimation.Updaters.LiveSpatialUpdater;
 import org.jdesktop.swingx.JXTree;
@@ -87,6 +89,8 @@ public class AnimationElementTree extends JXTree implements ActionListener
                 keyframeUpdater = new LiveParticleEmitterUpdater((CustomParticleEmitter) object);
             else if (object instanceof Spatial)
                 keyframeUpdater = new LiveSpatialUpdater((Spatial) object);
+            else if (object instanceof Light)
+                keyframeUpdater = new LiveLightUpdater((Light) object);
         } else
             keyframeUpdater = lku;
         addFocusListener(new FocusAdapter()
@@ -208,7 +212,7 @@ public class AnimationElementTree extends JXTree implements ActionListener
 
         public ValueObserverDialog(AttributeNode aNode)
         {
-            LiveKeyframeProperty lkp  =aNode.getProperty().createNew(null);
+            LiveKeyframeProperty lkp = aNode.getProperty().createNew(null);
             valuesList = new JList();
             DefaultListModel dlm = new DefaultListModel();
             int i = 0;
@@ -255,21 +259,28 @@ public class AnimationElementTree extends JXTree implements ActionListener
                         if (object instanceof CustomParticleEmitter)
                         {
                             CustomParticleEmitter emitter = (CustomParticleEmitter) object;
-                            if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_Frozen))
+                            if (AnimationType.valueOfString(getText()).equals(AnimationType.Frozen))
                                 property = new BoolProperty(AnimationType.valueOfString(getText()),
                                         61, emitter.isEnabled(), keyframeUpdater);
                             else if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_Per_Second))
                                 property = new IntProperty(AnimationType.valueOfString(getText()),
                                         61, (int) emitter.getParticlesPerSec(), keyframeUpdater);
-                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_Emit_All))
+                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Emit_All))
                                 property = new BoolProperty(AnimationType.valueOfString(getText()),
                                         61, true, keyframeUpdater);
-                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_End_Color))
+                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.End_Color_Blend))
                                 property = new ColorRGBAProperty(AnimationType.valueOfString(getText()),
                                         61, emitter.getEndColor(), keyframeUpdater);
-                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Particles_Start_Color))
+                            else if (AnimationType.valueOfString(getText()).equals(AnimationType.Start_Color_Blend))
                                 property = new ColorRGBAProperty(AnimationType.valueOfString(getText()),
                                         61, emitter.getStartColor(), keyframeUpdater);
+                        }
+                        if (object instanceof Light)
+                        {
+                            Light light = (Light) object;
+                            if (AnimationType.valueOfString(getText()).equals(AnimationType.Light_Color_Blend))
+                                property = new ColorRGBAProperty(AnimationType.valueOfString(getText()),
+                                        61, light.getColor(), keyframeUpdater);
                         }
                         attributeNodes.add(new AttributeNode(property));
                         keyframeUpdater.getKeyframeProperties().add(property);
