@@ -1,19 +1,17 @@
 1.0
-More Keyframe-Types
-    -Lights
-        -Position
-        -Rotation
-        -Radius
-Code einbinden
 Neuer Startbildschirm (Coole Scene -> Coole Models benötigt)
 coole Screenshots
 coole Videos
 3.1 (+fixing)
+Code einbinden
 Installer
 badass fucking website (blues?)
 
 1.x
 Keyframes for
+    -Lights
+        -Stärke(DL)
+        -Radius(PL)
     - Active ParticleEmitter
     - Basic Camera Stuff
         -Position
@@ -22,6 +20,7 @@ KeyframeEditor sort Updaters (Combobox)
 Select multiple Keyframes
 Edit Keyframe translations like MotionPaths
 Keyframe bezier / Culling - Time ease in / out
+Ghost Mode: getMaterial().getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.FrontAndBack);?????
 Save Particles of Emitter
 Neues Error Handling für den User
 CanvasPanel in B3D_GUI -> Wiederverwendung in Apps
