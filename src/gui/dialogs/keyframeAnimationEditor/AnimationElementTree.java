@@ -44,11 +44,19 @@ import b3dElements.animations.keyframeAnimations.AnimationType;
 import b3dElements.animations.keyframeAnimations.Properties.BoolProperty;
 import b3dElements.animations.keyframeAnimations.Properties.ColorRGBAProperty;
 import b3dElements.animations.keyframeAnimations.Properties.IntProperty;
+import com.jme3.light.AmbientLight;
+import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
+import com.jme3.light.PointLight;
+import com.jme3.light.SpotLight;
+import com.jme3.math.ColorRGBA;
 import javax.swing.JScrollPane;
 import monkeyStuff.CustomParticleEmitter;
-import monkeyStuff.keyframeAnimation.Updaters.LiveLightUpdater;
+import monkeyStuff.keyframeAnimation.Updaters.LiveALightUpdater;
+import monkeyStuff.keyframeAnimation.Updaters.LiveDLightUpdater;
+import monkeyStuff.keyframeAnimation.Updaters.LivePLightUpdater;
 import monkeyStuff.keyframeAnimation.Updaters.LiveParticleEmitterUpdater;
+import monkeyStuff.keyframeAnimation.Updaters.LiveSLightUpdater;
 import monkeyStuff.keyframeAnimation.Updaters.LiveSpatialUpdater;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.search.TreeSearchable;
@@ -89,8 +97,14 @@ public class AnimationElementTree extends JXTree implements ActionListener
                 keyframeUpdater = new LiveParticleEmitterUpdater((CustomParticleEmitter) object);
             else if (object instanceof Spatial)
                 keyframeUpdater = new LiveSpatialUpdater((Spatial) object);
-            else if (object instanceof Light)
-                keyframeUpdater = new LiveLightUpdater((Light) object);
+            else if (object instanceof AmbientLight)
+                keyframeUpdater = new LiveALightUpdater((AmbientLight) object);
+            else if (object instanceof DirectionalLight)
+                keyframeUpdater = new LiveDLightUpdater((DirectionalLight) object);
+            else if (object instanceof SpotLight)
+                keyframeUpdater = new LiveSLightUpdater((SpotLight) object);
+            else if (object instanceof PointLight)
+                keyframeUpdater = new LivePLightUpdater((PointLight) object);
         } else
             keyframeUpdater = lku;
         addFocusListener(new FocusAdapter()
@@ -194,7 +208,7 @@ public class AnimationElementTree extends JXTree implements ActionListener
             CurrentData.getEditorWindow().getKeyframeAnimationEditor().removeElement(this);
         else if (e.getSource() == removeAttributeItem)
         {
-            System.out.println("Removing Attribute!");
+            // System.out.println("Removing Attribute!");
             keyframeUpdater.getKeyframeProperties().remove(((AttributeNode) selectedNode).getProperty());
             attributeNodes.remove(selectedNode);
             keyframeUpdater.getKeyframeProperties().remove(((AttributeNode) selectedNode).getProperty());
@@ -280,7 +294,25 @@ public class AnimationElementTree extends JXTree implements ActionListener
                             Light light = (Light) object;
                             if (AnimationType.valueOfString(getText()).equals(AnimationType.Light_Color_Blend))
                                 property = new ColorRGBAProperty(AnimationType.valueOfString(getText()),
-                                        61, light.getColor(), keyframeUpdater);
+                                        61, new ColorRGBA(light.getColor()), keyframeUpdater);
+                            else if (light instanceof DirectionalLight)
+                            {
+                                if (AnimationType.valueOfString(getText()).equals(AnimationType.Direction))
+                                    property = new Vector3fProperty(AnimationType.valueOfString(getText()),
+                                            61, ((DirectionalLight) light).getDirection(), keyframeUpdater);
+                            } else if (light instanceof SpotLight)
+                            {
+                                SpotLight sLight = (SpotLight) light;
+                                if (AnimationType.valueOfString(getText()).equals(AnimationType.Direction))
+                                    property = new Vector3fProperty(AnimationType.valueOfString(getText()),
+                                            61, sLight.getDirection(), keyframeUpdater);
+                                else if (AnimationType.valueOfString(getText()).equals(AnimationType.Position))
+                                    property = new Vector3fProperty(AnimationType.valueOfString(getText()),
+                                            61, sLight.getPosition(), keyframeUpdater);
+                            }else if(light instanceof PointLight)
+                                if (AnimationType.valueOfString(getText()).equals(AnimationType.Position))
+                                    property = new Vector3fProperty(AnimationType.valueOfString(getText()),
+                                            61, ((PointLight)light).getPosition(), keyframeUpdater);
                         }
                         attributeNodes.add(new AttributeNode(property));
                         keyframeUpdater.getKeyframeProperties().add(property);

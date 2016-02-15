@@ -70,6 +70,10 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import b3dElements.animations.keyframeAnimations.AnimationType;
 import b3dElements.animations.keyframeAnimations.B3D_KeyframeAnimation;
+import b3dElements.lights.B3D_AmbientLight;
+import b3dElements.lights.B3D_DirectionalLight;
+import b3dElements.lights.B3D_PointLight;
+import b3dElements.lights.B3D_SpotLight;
 import b3dElements.spatials.geometries.particleEmitter.B3D_ParticleEffect;
 import dialogs.ProgressDialog;
 import monkeyStuff.keyframeAnimation.LiveKeyframeAnimation;
@@ -479,7 +483,7 @@ public class CurrentData
                     B3D_Light oldB3D_Light = (B3D_Light) Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(o.hashCode()));
                     B3D_Light b3D_Light = ObjectToElementConverter.convertLight((Light) o);
                     b3D_Light.setUuid(oldB3D_Light.getUUID());
-                    System.out.println("Saving b3dLight with UUID: " + b3D_Light.getUUID());
+                    //System.out.println("Saving b3dLight with UUID: " + b3D_Light.getUUID());
                     scene.getElements().add(b3D_Light);
                     b3D_Light.setAnimations((ArrayList<B3D_TimedAnimation>) oldB3D_Light.getAnimations().clone());
 
@@ -493,7 +497,7 @@ public class CurrentData
 
                 }
             }
-            System.out.println("Done with Lights");
+            //System.out.println("Done with Lights");
             //Now spatials, but only those without a parent, they will also load their children
             for (final Object o : Wizard.getObjects().getOriginalObjectsIterator().toArray())
             {
@@ -518,7 +522,7 @@ public class CurrentData
                     }
                 }
             }
-            System.out.println("Done with Spatials");
+            //System.out.println("Done with Spatials");
             // Now the Filters, MotionEvents
             for (Object o : Wizard.getObjects().getOriginalObjectsIterator().toArray())
             {
@@ -754,7 +758,7 @@ public class CurrentData
                         newElement.getAnimations().add((B3D_TimedAnimation) copy);
                     }
                     final Object newObject = ElementToObjectConverter.convertToObject(newElement);
-                    System.out.println("New Element: " + newElement + " -> " + newObject);
+                    //System.out.println("New Element: " + newElement + " -> " + newObject);
                     /* if (newObject instanceof Node)
                      {
                      CurrentData.getEditorWindow().getB3DApp().setSelectedNode(((Node) CurrentData.getEditorWindow().getB3DApp().getSelectedObject()).getParent());
@@ -774,8 +778,8 @@ public class CurrentData
                                 CurrentData.getEditorWindow().getB3DApp().getSceneNode().attachChild((Spatial) newObject);
                                 if (((Spatial) newObject).getControl(RigidBodyControl.class) != null)
                                 {
-                                    System.out.println(
-                                            "Adding to Bullet");
+                                    //System.out.println(
+                                    //        "Adding to Bullet");
                                     CurrentData.getEditorWindow()
                                             .getB3DApp().getBulletAppState().getPhysicsSpace().add(newObject);
                                 }
@@ -786,7 +790,7 @@ public class CurrentData
                         });
                     } else if (newObject instanceof Light)
                     {
-                        System.out.println("add light");
+                        //System.out.println("add light");
                         Wizard.getObjects().add(newObject, newElement);
                         UAManager.curr(null, null);
                         UAManager.add(newObject, "Duplicate " + oldElement.getName());
@@ -1056,7 +1060,7 @@ public class CurrentData
 
     public static void setPhysicsRunning(final boolean running)
     {
-        System.out.println("running: " + running);
+        //System.out.println("running: " + running);
         if (!running)
             CurrentData.getEditorWindow().getB3DApp().pausePhysics();
         else
@@ -1297,7 +1301,7 @@ public class CurrentData
                 for (B3D_Element e : scene.getElements())
                     if (e instanceof B3D_KeyframeAnimation)
                         Wizard.getKeyframeAnimations().add(ElementToObjectConverter.convertKeyframeAnimation((B3D_KeyframeAnimation) e));
-                System.out.println(elementsAdded + " Elemente registriert von " + scene.getElements().size());
+                // System.out.println(elementsAdded + " Elemente registriert von " + scene.getElements().size());
                 editorWindow.getTree().sync();
                 editorWindow.getKeyframeAnimationEditor().updateAnimationCollection();
                 return null;
@@ -1319,12 +1323,6 @@ public class CurrentData
     public static void updateAssetRegister()
     {
         updateAssetRegister(CurrentData.getProject().getAssetsFolder());
-
-
-
-
-
-
     }
 
     private static void updateAssetRegister(File assetsFolder)
@@ -1385,9 +1383,23 @@ public class CurrentData
             add(attribs, AnimationType.End_Color_Blend, nodes);
             add(attribs, AnimationType.Start_Color_Blend, nodes);
         }
-        if (element instanceof B3D_Light)
+        if (element instanceof B3D_AmbientLight)
+            add(attribs, AnimationType.Light_Color_Blend, nodes);
+        if (element instanceof B3D_DirectionalLight)
         {
             add(attribs, AnimationType.Light_Color_Blend, nodes);
+            add(attribs, AnimationType.Direction, nodes);
+        }
+        if (element instanceof B3D_SpotLight)
+        {
+            add(attribs, AnimationType.Light_Color_Blend, nodes);
+            add(attribs, AnimationType.Direction, nodes);
+            add(attribs, AnimationType.Position, nodes);
+        }
+        if (element instanceof B3D_PointLight)
+        {
+            add(attribs, AnimationType.Light_Color_Blend, nodes);
+            add(attribs, AnimationType.Position, nodes);
         }
         if (element instanceof B3D_Spatial)
         {

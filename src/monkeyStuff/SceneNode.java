@@ -3,10 +3,13 @@ package monkeyStuff;
 import b3dElements.spatials.B3D_Spatial;
 import general.CurrentData;
 import com.jme3.light.Light;
+import com.jme3.material.RenderState;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import general.Preference;
+import java.util.Vector;
 import other.Wizard;
 
 public class SceneNode extends Node
@@ -56,7 +59,7 @@ public class SceneNode extends Node
         LightModel newLightModel = new LightModel(light);
         CurrentData.getEditorWindow().getB3DApp().getLightModels().add(newLightModel);
         CurrentData.getEditorWindow().getB3DApp().setSyncTree(true);
-        System.out.println("Added to LightModels");
+        //System.out.println("Added to LightModels");
         super.addLight(light);
     }
 
@@ -73,7 +76,7 @@ public class SceneNode extends Node
             CurrentData.getEditorWindow().getB3DApp().getNodeModels().add(new NodeModel((Node) spatial));
         if (CurrentData.getEditorWindow().getB3DApp().getSelectedNode() == this || CurrentData.getEditorWindow().getB3DApp().getSelectedNode() == spatial)
         {
-            System.out.println("Adding " + spatial + " to sceneNode -> " + spatial.getVertexCount());
+            //System.out.println("Adding " + spatial + " to sceneNode -> " + spatial.getVertexCount());
             //Just in case
             ((B3D_Spatial) Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(spatial.hashCode()))).setParentUUID(Wizard.NULL_SELECTION);
             super.attachChild(spatial);

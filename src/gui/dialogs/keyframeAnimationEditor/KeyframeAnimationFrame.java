@@ -60,10 +60,14 @@ import monkeyStuff.keyframeAnimation.LiveKeyframeProperty;
 import monkeyStuff.keyframeAnimation.LiveKeyframeUpdater;
 import b3dElements.animations.keyframeAnimations.AnimationType;
 import com.jme3.effect.ParticleEmitter;
+import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
+import com.jme3.light.PointLight;
+import com.jme3.light.SpotLight;
 import com.jme3.math.ColorRGBA;
 import components.BSpinnerNumberModel;
 import gui.components.BColorButton;
+import gui.components.LightDirectionPanel;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.JSpinner;
@@ -196,7 +200,7 @@ public class KeyframeAnimationFrame extends JFrame
             toolsPanel.animationSelector.addItem(lka.getName());
         if (toolsPanel.animationSelector.getItemCount() > 0)
             toolsPanel.animationSelector.setSelectedIndex(0);
-        System.out.println("SELECTEC: " + toolsPanel.animationSelector.getSelectedItem());
+        //System.out.println("SELECTEC: " + toolsPanel.animationSelector.getSelectedItem());
         if (toolsPanel.animationSelector.getSelectedItem() != null)
             selection = toolsPanel.animationSelector.getSelectedItem().toString();
         if (selection != null)
@@ -341,7 +345,7 @@ public class KeyframeAnimationFrame extends JFrame
                         if (currentAnimation != null)
                         {
                             currentAnimation.removeAllUpdaters();
-                            System.out.println("Trees: " + keyframePanel.animationElementTrees.size());
+                            //System.out.println("Trees: " + keyframePanel.animationElementTrees.size());
                             for (AnimationElementTree aet : keyframePanel.animationElementTrees)
                                 currentAnimation.addUpdater(aet.getKeyframeUpdater().createNew());
                             currentAnimation.calcValues();
@@ -590,7 +594,9 @@ public class KeyframeAnimationFrame extends JFrame
                 });
                 add("hfill", new JLabel(property.type.toString() + " [" + frame + "]", SwingConstants.CENTER));
                 add("br hfill", new JSeparator(JSeparator.HORIZONTAL));
-                if (property.type == AnimationType.Translation || property.type == AnimationType.Scale)
+                if (property.type == AnimationType.Translation
+                        || property.type == AnimationType.Scale
+                        || property.type == AnimationType.Position)
                 {
                     //Index 2
                     valueComponent = new Float3Panel((Vector3f) property.getValues()[frame],
@@ -604,6 +610,19 @@ public class KeyframeAnimationFrame extends JFrame
                             property.setValue(frame, ((Float3Panel) valueComponent).getVector());
                         }
                     });
+                    add("br hfill", valueComponent);
+                } else if (property.type == AnimationType.Direction)
+                {
+                    //Index 2
+                    valueComponent = new LightDirectionPanel((Vector3f) property.getValues()[frame])
+                    {
+                        @Override
+                        public void updateDirection(Vector3f direction)
+                        {
+                            property.setValue(frame, ((LightDirectionPanel) valueComponent).getVector());
+                        }
+                    };
+                    add("br", new JLabel("Rotation: "));
                     add("br hfill", valueComponent);
                 } else if (property.type == AnimationType.Rotation)
                 {
@@ -664,7 +683,9 @@ public class KeyframeAnimationFrame extends JFrame
                     add("tab", valueComponent);
                 } else if (property.type == AnimationType.End_Color_Blend || property.type == AnimationType.Start_Color_Blend || property.type == AnimationType.Light_Color_Blend)
                 {
-                    valueComponent = new BColorButton(Wizard.makeColor((ColorRGBA) property.getValues()[frame]))
+                    System.out.println("At frame " + frame + ": " + property.getValues()[frame]);
+                    Color newColor = Wizard.makeColor((ColorRGBA) property.getValues()[frame]);
+                    valueComponent = new BColorButton(new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue()))
                     {
                         @Override
                         public void andThenDoThis()
@@ -722,15 +743,34 @@ public class KeyframeAnimationFrame extends JFrame
         {
             if (property != null && valueComponent != null && liveValuesChecker.isChecked())
             {
+                System.out.println("Refresh");
                 if (property.type == AnimationType.Translation)
                 {
                     Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalTranslation());
+                    ((Float3Panel) valueComponent).setVector(newVec);
+                    property.setValue(frame, newVec);
+                }else if (property.type == AnimationType.Position)
+                {
+                    Vector3f newVec;
+                    if (property.getUpdater().getObject() instanceof PointLight)
+                        newVec = new Vector3f(((PointLight) property.getUpdater().getObject()).getPosition());
+                    else
+                        newVec = new Vector3f(((SpotLight) property.getUpdater().getObject()).getPosition());
                     ((Float3Panel) valueComponent).setVector(newVec);
                     property.setValue(frame, newVec);
                 } else if (property.type == AnimationType.Scale)
                 {
                     Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalScale());
                     ((Float3Panel) valueComponent).setVector(newVec);
+                    property.setValue(frame, newVec);
+                } else if (property.type == AnimationType.Direction)
+                {
+                    Vector3f newVec;
+                    if (property.getUpdater().getObject() instanceof DirectionalLight)
+                        newVec = new Vector3f(((DirectionalLight) property.getUpdater().getObject()).getDirection());
+                    else
+                        newVec = new Vector3f(((SpotLight) property.getUpdater().getObject()).getDirection());
+                    ((LightDirectionPanel) valueComponent).setVector(newVec);
                     property.setValue(frame, newVec);
                 } else if (property.type == AnimationType.Rotation)
                 {
