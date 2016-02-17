@@ -25,6 +25,7 @@ public class UAManager implements Serializable
     {
         if (o != null)
         {
+            ObjectToElementConverter.convertMode = ObjectToElementConverter.ConvertMode.SAVING;
             current = ObjectToElementConverter.convertToElement(o);
             current.setUuid(uuid);
         } else
@@ -96,7 +97,7 @@ public class UAManager implements Serializable
         final B3D_Element primaryElement = (direction == 0) ? ua.before : ua.after, secondaryElement = (direction == 1) ? ua.before : ua.after;
         if (primaryElement != null)
         {
-            Object newObject = ElementToObjectConverter.convertToObject(primaryElement);
+            final Object newObject = ElementToObjectConverter.convertToObject(primaryElement);
             if (secondaryElement == null)
             {
                 // Recover Element
@@ -104,12 +105,12 @@ public class UAManager implements Serializable
                 if (primaryElement instanceof B3D_Filter)
                     ((B3D_Filter) primaryElement).changeFilterIndex(CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().getFilterList().size());
 
-                CurrentData.addToScene(newObject, primaryElement);
-                CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(primaryElement.getUUID());
                 CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
                 {
                     public Void call() throws Exception
                     {
+                        CurrentData.addToScene(newObject, primaryElement);
+                        CurrentData.getEditorWindow().getB3DApp().setSelectedUUID(primaryElement.getUUID());
                         CurrentData.getEditorWindow().getEditPane().arrange(true);
                         return null;
                     }

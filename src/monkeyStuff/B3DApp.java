@@ -555,46 +555,33 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     {
         CurrentData.getEditorWindow().getTree().setCodeSelect(false);
         if (lastSelectedLightModel != null)
-        {
             lastSelectedLightModel.setSymbolVisible(false);
-        }
         if (object instanceof Spatial)
         {
             Spatial tempSpatial = (Spatial) object;
             if (tempSpatial.getName().equals("LightModel"))
             {
                 for (int i = 0; i < lightModels.size(); i++)
-                {
                     if (lightModels.get(i).getNode().equals(tempSpatial))
-                    {
                         setSelectedObject(lightModels.get(i).getLight());
-                    }
-                }
             } else
             {
                 selectedObject = object;
                 if (!(object instanceof TerrainQuad) && object instanceof Node && !(Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(object.hashCode())) instanceof B3D_Model))
-                {
                     setSelectedNode((Node) object);
-                } else
-                {
+                else
                     setSelectedNode(sceneNode);
-                }
             }
         } else
         {
             selectedObject = object;
             if (selectedObject instanceof Light)
-            {
                 for (int i = 0; i < lightModels.size(); i++)
-                {
                     if (lightModels.get(i).getLight().equals(selectedObject))
                     {
                         lightModels.get(i).setSymbolVisible(true);
                         lastSelectedLightModel = lightModels.get(i);
                     }
-                }
-            }
         }
         if (Wizard.getObjects().getB3D_Element(selectedUUID) instanceof B3D_MotionEvent)
         {
@@ -616,9 +603,8 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         if (selectedUUID != null && !selectedUUID.equals(Wizard.NULL_SELECTION))
             UAManager.curr(Wizard.getObjects().getOriginalObject(Wizard.getObjectReferences().getID(uuid)), uuid);
         if (spatial == null)
-        {
             setSelectedObject(null);
-        } else
+        else
         {
             int objectID = Wizard.getObjectReferences().getID(uuid);
             setSelectedObject(Wizard.getObjects().getOriginalObject(objectID), spatial);
@@ -635,32 +621,25 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
         UAManager.curr(object, Wizard.getObjectReferences().getUUID(object.hashCode()));
         CurrentData.getEditorWindow().getTree().setCodeSelect(true);
         if (lastSelectedLightModel != null)
-        {
             lastSelectedLightModel.setSymbolVisible(false);
-        }
         if (object instanceof Spatial)
         {
             Spatial tempSpatial = (Spatial) object;
             if (tempSpatial.getName().equals("LightModel"))
             {
                 for (int i = 0; i < lightModels.size(); i++)
-                {
                     if (lightModels.get(i).getNode().equals(tempSpatial))
                     {
                         setSelectedObject(lightModels.get(i).getLight());
                         break;
                     }
-                }
             } else
             {
                 selectedObject = object;
                 if (!(object instanceof TerrainQuad) && object instanceof Node && !(Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(object.hashCode())) instanceof B3D_Model))
-                {
                     setSelectedNode((Node) object);
-                } else
-                {
+                else
                     setSelectedNode(sceneNode);
-                }
             }
             CurrentData.getEditorWindow().getEditPane().arrange(false);
         } else if (object instanceof MotionEvent)
@@ -668,31 +647,21 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             if (spatial.getName().equals("motionPathSymbol"))
             {
                 for (MotionPathModel mpm : motionPathModels)
-                {
                     if (mpm.getSymbol().equals(spatial))
-                    {
                         selectedObject = mpm.getMotionEvent();
-                    }
-                }
             } else
-            {
                 selectedObject = spatial;
-            }
         } else
         {
             selectedObject = object;
             if (selectedObject instanceof Light)
-            {
                 for (int i = 0; i < lightModels.size(); i++)
-                {
                     if (lightModels.get(i).getLight().equals(selectedObject))
                     {
                         lightModels.get(i).setSymbolVisible(true);
                         lastSelectedLightModel = lightModels.get(i);
                         break;
                     }
-                }
-            }
         }
         CurrentData.getEditorWindow().getEditPane().arrange(false);
         updateSelection();
