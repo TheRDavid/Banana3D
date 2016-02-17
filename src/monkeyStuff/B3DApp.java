@@ -1155,7 +1155,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                     }
                 } else
                 {
-                    rootNode.collideWith(ray, results);
+                    editorNode.collideWith(ray, results);
                     boolean selectionLegit = false;
                     int resultNr = 0;
                     while (!selectionLegit)

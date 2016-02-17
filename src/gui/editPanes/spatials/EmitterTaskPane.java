@@ -39,7 +39,7 @@ public class EmitterTaskPane extends EditTaskPane
     private ButtonGroup typeGroup = new ButtonGroup();
     private JRadioButton pointTypeRadioButton = new JRadioButton("Point", false);
     private JRadioButton triangleTypeRadioButton = new JRadioButton("Triangle", true);
-    private BTextField maxParticlesField = new BTextField("int");
+    private BTextField maxParticlesField = new BTextField("Integer");
     private BTextField particlesPerSecondField = new BTextField("float");
     private BTextField startSizeField = new BTextField("float");
     private BTextField endSizeField = new BTextField("float");
@@ -51,8 +51,8 @@ public class EmitterTaskPane extends EditTaskPane
     private BColorButton startColorButton = new BColorButton(Color.white);
     private BColorButton endColorButton = new BColorButton(Color.white);
     private BTextField rotateSpeedField = new BTextField("float");
-    private BTextField imgXField = new BTextField("int");
-    private BTextField imgYField = new BTextField("int");
+    private BTextField imgXField = new BTextField("Integer");
+    private BTextField imgYField = new BTextField("Integer");
     private Checker firingChecker = new Checker();
     private Checker frozenChecker = new Checker();
     private Checker depthWriteChecker = new Checker();
@@ -380,7 +380,7 @@ public class EmitterTaskPane extends EditTaskPane
             public SphereShapePanel(Vector3f center, float radius)
             {
                 centerPanel = new Float3Panel(center, Wizard.getCamera(), Float3Panel.HORIZONTAL);
-                radiusField = new BTextField("Int", radius + "");
+                radiusField = new BTextField("Integer", radius + "");
                 setLayout(new RiverLayout());
                 add("left", new JLabel("Center:"));
                 add("tab hfill", centerPanel);

@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -140,7 +141,7 @@ public class Basic3DTaskPane extends EditTaskPane
                         basicSpatial.setUserData("angles", rotationPanel.getVector());
                         basicSpatial.setLocalTranslation(positionPanel.getVector().getX(), positionPanel.getVector().getY(), positionPanel.getVector().getZ());
                         basicSpatial.setLocalScale(scalePanel.getVector());
-                UAManager.add(basicSpatial, "Edit " + basicSpatial.getName());
+                        UAManager.add(basicSpatial, "Edit " + basicSpatial.getName());
                         return null;
                     }
                 });
@@ -162,7 +163,23 @@ public class Basic3DTaskPane extends EditTaskPane
         public RotationPanel(Spatial tempSpatial)
         {
             spatial = tempSpatial;
-            rotationFloatPanel = new Float3Panel((Vector3f) spatial.getUserData("angles"), Wizard.getCamera(), Float3Panel.HORIZONTAL);
+            rotationFloatPanel = new Float3Panel((Vector3f) spatial.getUserData("angles"), Wizard.getCamera(), Float3Panel.HORIZONTAL)
+            {
+                @Override
+                public void setVector(final Vector3f vec)
+                {
+                    CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                    {
+                        @Override
+                        public Void call() throws Exception
+                        {
+                            updateSliderAndSpatial();
+                            return null;
+                        }
+                    });
+                    super.setVector(vec);
+                }
+            };
             rotationFloatPanel.addFieldFocusListener(new FocusListener()
             {
                 @Override
@@ -191,25 +208,15 @@ public class Basic3DTaskPane extends EditTaskPane
                     sliderPanel.setVector3f(new Vector3f(rotationFloatPanel.getVector().getX(), rotationFloatPanel.getVector().getY(), rotationFloatPanel.getVector().getZ()));
                 }
             });
-            rotationFloatPanel.addFieldKeyListener(new KeyListener()
+            rotationFloatPanel.addFieldKeyListener(new KeyAdapter()
             {
-                @Override
-                public void keyTyped(KeyEvent e)
-                {
-                }
-
-                @Override
-                public void keyPressed(KeyEvent e)
-                {
-                }
-
                 @Override
                 public void keyReleased(KeyEvent e)
                 {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER)
                     {
                         updateSliderAndSpatial();
-                UAManager.add(basicSpatial, "Rotate " + basicSpatial.getName());
+                        UAManager.add(basicSpatial, "Rotate " + basicSpatial.getName());
                     }
                 }
             });

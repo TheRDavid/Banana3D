@@ -10,6 +10,7 @@ import monkeyStuff.B3DApp;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 import components.BButton;
+import components.BToggleButton;
 import components.StatusBar;
 import dialogs.ObserverDialog;
 import general.Preference;
@@ -18,7 +19,9 @@ import gui.dialogs.keyframeAnimationEditor.KeyframeAnimationFrame;
 import other.B3D_Scene;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.Callable;
 import javax.swing.*;
+import monkeyStuff.NodeModel;
 import org.jdesktop.swingx.VerticalLayout;
 
 public class EditorWindow extends JFrame
@@ -37,6 +40,7 @@ public class EditorWindow extends JFrame
     private JPanel upperPanel = new JPanel();
     private KeyframeAnimationFrame kfad;
     private BButton fieldOfViewButton = new BButton("FOV", new ImageIcon("dat//img//menu//fieldOfView.png")), addCamButton = new BButton("Add Camera", new ImageIcon("dat//img//menu//camera.png"));
+    private BToggleButton showNodeHierarchyButton = new BToggleButton(new ImageIcon("dat//img//menu//c_node.png"), true);
     private JComboBox sortModeComboBox = new JComboBox(new String[]
     {
         "A - Z", "Z - A", "A - Z (case sensitive)", "Z - A (case sensitive)"
@@ -55,6 +59,7 @@ public class EditorWindow extends JFrame
         tree = new ElementTree();
         tree.init();
         fieldOfViewButton.setEnabled(false);
+        showNodeHierarchyButton.setSelected((Boolean) CurrentData.getPrefs().get(Preference.SHOW_NODE_HIERARCHY));
         addCamButton.setEnabled(false);
         if (CurrentData.getPrefs().get(Preference.TREESORT).equals("z-a(no_cs)"))
             sortModeComboBox.setSelectedIndex(1);
@@ -83,6 +88,26 @@ public class EditorWindow extends JFrame
                         break;
                 }
                 tree.sync();
+            }
+        });
+        showNodeHierarchyButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                CurrentData.getPrefs().set(Preference.SHOW_NODE_HIERARCHY, showNodeHierarchyButton.isSelected());
+                CurrentData.getPrefs().save();
+                b3DSimpleApplication.enqueue(new Callable<Void>()
+                {
+                    public Void call() throws Exception
+                    {
+                        for (NodeModel nm : b3DSimpleApplication.getNodeModels())
+                            if (showNodeHierarchyButton.isSelected())
+                                b3DSimpleApplication.getEditorNode().attachChild(nm.getModel());
+                            else
+                                b3DSimpleApplication.getEditorNode().detachChild(nm.getModel());
+                        return null;
+                    }
+                });
             }
         });
         addCamButton.addActionListener(new ActionListener()
@@ -171,6 +196,7 @@ public class EditorWindow extends JFrame
         middlePanel.add(upperPanel);
         upperPanel.setLayout(new BorderLayout());
         upperPanel.add(addCamButton, BorderLayout.WEST);
+        upperPanel.add(showNodeHierarchyButton, BorderLayout.EAST);
         upperPanel.add(fieldOfViewButton, BorderLayout.CENTER);
         middlePanel.add(canvasPanel);
         middlePanel.add(toolbar);

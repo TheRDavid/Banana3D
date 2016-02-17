@@ -201,7 +201,7 @@ public class MaterialTaskPane extends EditTaskPane
                                     {
                                         ObserverDialog.getObserverDialog().printMessage("Fail: NumberFormatException -> Invalid input in FloatTextField (MaterialTaskPane)");
                                     }
-                                } else if (bTextField.getValueType().equals("Int"))
+                                } else if (bTextField.getValueType().equals("Integer"))
                                 {
                                     try
                                     {
@@ -211,7 +211,7 @@ public class MaterialTaskPane extends EditTaskPane
                                             propertyList.change(e.getKey(), bTextField.getText());
                                         } else
                                         {
-                                            propertyList.add(e.getKey(), "Int", bTextField.getText());
+                                            propertyList.add(e.getKey(), "Integer", bTextField.getText());
                                         }
                                     } catch (NumberFormatException nfe)
                                     {
@@ -316,14 +316,14 @@ public class MaterialTaskPane extends EditTaskPane
                                 {
                                     newComponent = new BTextField("Float");
                                 }
-                            } else if (properties.get(key).equals("Int"))
+                            } else if (properties.get(key).equals("Integer"))
                             {
                                 if (propertyList.has(key))
                                 {
-                                    newComponent = new BTextField("Int", propertyList.getProperty(key).getPropertyValue());
+                                    newComponent = new BTextField("Integer", propertyList.getProperty(key).getPropertyValue());
                                 } else
                                 {
-                                    newComponent = new BTextField("Int");
+                                    newComponent = new BTextField("Integer");
                                 }
                             } else if (properties.get(key).equals("Color"))
                             {

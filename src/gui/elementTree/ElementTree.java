@@ -204,25 +204,7 @@ public class ElementTree extends JXTree
             List<B3D_Element> list = new ArrayList<B3D_Element>();
             for (B3D_Element e : Wizard.getObjects().getB3D_ElementsIterator())
                 list.add(e);
-            Collections.sort(list, new Comparator<B3D_Element>()
-            {
-                @Override
-                public int compare(B3D_Element o1, B3D_Element o2)
-                {
-                    if (o1 != null && o2 != null && o1.getName() != null && o2.getName() != null)
-                    {
-                        if (CurrentData.getPrefs().get(Preference.TREESORT).equals("a-z(cs)"))
-                            return o1.getName().compareTo(o2.getName());
-                        else if (CurrentData.getPrefs().get(Preference.TREESORT).equals("a-z(no_cs)"))
-                            return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-                        else if (CurrentData.getPrefs().get(Preference.TREESORT).equals("z-a(cs)"))
-                            return -o1.getName().compareTo(o2.getName());
-                        else
-                            return -o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-                    } else
-                        return 0;
-                }
-            });
+            Collections.sort(list, CurrentData.elementNameComparator);
             List<B3D_Filter> filterList = new ArrayList<B3D_Filter>();
             for (B3D_Element element : list)
                 if (element != null)
@@ -299,13 +281,17 @@ public class ElementTree extends JXTree
                     && (spatial.getUserData("modelName") == null))
             {
                 Node node = (Node) spatial;
+                ArrayList<B3D_Element> children = new ArrayList<B3D_Element>();
                 for (Spatial child : node.getChildren())
                 {
                     UUID childElementUUID = Wizard.getObjectReferences().getUUID(child.hashCode());
                     B3D_Element ele = Wizard.getObjects().getB3D_Element(childElementUUID);
                     if (ele != null)
-                        handleChild(tempNode, ele);
+                        children.add(ele);
                 }
+                Collections.sort(children, CurrentData.elementNameComparator);
+                for (B3D_Element e : children)
+                    handleChild(tempNode, e);
             }
         }
     }
