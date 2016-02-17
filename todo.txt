@@ -1,12 +1,5 @@
 1.0
-Subtree sort
-better 3d dragging
-Tree dragging performance
-    -> Skybox
-Float - / int - Field per drag in - / decrease value
-FIX: LightScatteringFilter to cam location
 Swing GUI Performance (Checker vs Checkbox?)
-Hide Node Hierarchy Option
 Spot - / PointLight Shadow wrong UUID (also DL??)
 WaveScale Slider must not be 0
 Material Queue Bucket Option
@@ -22,6 +15,7 @@ Installer
 badass fucking website (blues?)
 
 1.x
+Save Camera position
 Keyframes for
     -Lights
         -Stärke(DL)
@@ -88,5 +82,3 @@ New meshes
 Menu -> Search liefert bei mehreren Ergebnissen List zurück
 Search: Tell if nothing was found
 JavaFX instead of Swing
-
-------------------------------------------------------------------------------------
