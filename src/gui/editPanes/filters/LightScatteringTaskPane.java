@@ -1,5 +1,6 @@
 package gui.editPanes.filters;
 
+import com.jme3.math.Vector3f;
 import general.CurrentData;
 import monkeyStuff.LightScatteringModel;
 import com.jme3.post.filters.LightScatteringFilter;
@@ -38,7 +39,15 @@ public class LightScatteringTaskPane extends EditTaskPane
     public LightScatteringTaskPane(LightScatteringFilter scatteringFilter)
     {
         lightScatteringFilter = scatteringFilter;
-        positionPanel = new Float3Panel(scatteringFilter.getLightPosition(), Wizard.getCamera(), Float3Panel.HORIZONTAL);
+        positionPanel = new Float3Panel(scatteringFilter.getLightPosition(), Wizard.getCamera(), Float3Panel.HORIZONTAL)
+        {
+            @Override
+            public void setVector(Vector3f vec)
+            {
+                super.setVector(vec); //To change body of generated methods, choose Tools | Templates.
+                lightScatteringFilter.setLightPosition(vec);
+            }
+        };
         positionPanel.addFieldKeyListener(new KeyListener()
         {
             @Override

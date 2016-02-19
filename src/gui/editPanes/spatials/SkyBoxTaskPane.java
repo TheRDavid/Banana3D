@@ -35,12 +35,12 @@ public class SkyBoxTaskPane extends EditTaskPane
     public SkyBoxTaskPane(Spatial sky)
     {
         skyBox = sky;
-        northButton = new SelectButton(0);
-        southButton = new SelectButton(1);
-        westButton = new SelectButton(2);
-        eastButton = new SelectButton(3);
-        topButton = new SelectButton(4);
-        bottomButton = new SelectButton(5);
+        northButton = new SelectButton("Loading...", 0);
+        southButton = new SelectButton("Loading...", 1);
+        westButton = new SelectButton("Loading...", 2);
+        eastButton = new SelectButton("Loading...", 3);
+        topButton = new SelectButton("Loading...", 4);
+        bottomButton = new SelectButton("Loading...", 5);
         taskPane.setLayout(new RiverLayout());
         taskPane.setTitle("Sky Box");
         taskPane.add("br", new JLabel("North Texture: "));
@@ -61,38 +61,45 @@ public class SkyBoxTaskPane extends EditTaskPane
     private class SelectButton extends AssetButton
     {
 
-        public SelectButton(int nmbr)
+        public SelectButton(String text, final int nmbr)
         {
-            setAssetType(AssetType.Texture);
-            switch (nmbr)
+            new Thread(new Runnable()
             {
-                case 0:
-                    getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("north"));
-                    setText((String) skyBox.getUserData("north"));
-                    break;
-                case 1:
-                    getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("south"));
-                    setText((String) skyBox.getUserData("south"));
-                    break;
-                case 2:
-                    getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("west"));
-                    setText((String) skyBox.getUserData("west"));
-                    break;
-                case 3:
-                    getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("east"));
-                    setText((String) skyBox.getUserData("east"));
-                    break;
-                case 4:
-                    getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("top"));
-                    setText((String) skyBox.getUserData("top"));
-                    break;
-                case 5:
-                    getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("bottom"));
-                    setText((String) skyBox.getUserData("bottom"));
-            }
+                public void run()
+                {
+                    setAssetType(AssetType.Texture);
+                    switch (nmbr)
+                    {
+                        case 0:
+                            getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("north"));
+                            setText((String) skyBox.getUserData("north"));
+                            break;
+                        case 1:
+                            getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("south"));
+                            setText((String) skyBox.getUserData("south"));
+                            break;
+                        case 2:
+                            getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("west"));
+                            setText((String) skyBox.getUserData("west"));
+                            break;
+                        case 3:
+                            getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("east"));
+                            setText((String) skyBox.getUserData("east"));
+                            break;
+                        case 4:
+                            getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("top"));
+                            setText((String) skyBox.getUserData("top"));
+                            break;
+                        case 5:
+                            getAssetChooser().setSelectedAssetName((String) skyBox.getUserData("bottom"));
+                            setText((String) skyBox.getUserData("bottom"));
+                    }
+                }
+            }).start();
+            setText(text);
             addActionListener(new ActionListener()
             {
-                @Override 
+                @Override
                 public void actionPerformed(ActionEvent e)
                 {
                     setText(new AssetChooserDialog(AssetType.Texture, true).getSelectedAssetName());

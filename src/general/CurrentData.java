@@ -109,6 +109,25 @@ public class CurrentData
     private static Thread autosaveThread;
     private static AutosaveRunnable autosaveRunnable = new AutosaveRunnable();
     private static AnimationScriptDialog asd = new AnimationScriptDialog();
+    public static final Comparator<B3D_Element> elementNameComparator = new Comparator<B3D_Element>()
+    {
+        @Override
+        public int compare(B3D_Element o1, B3D_Element o2)
+        {
+            if (o1 != null && o2 != null && o1.getName() != null && o2.getName() != null)
+            {
+                if (CurrentData.getPrefs().get(Preference.TREESORT).equals("a-z(cs)"))
+                    return o1.getName().compareTo(o2.getName());
+                else if (CurrentData.getPrefs().get(Preference.TREESORT).equals("a-z(no_cs)"))
+                    return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+                else if (CurrentData.getPrefs().get(Preference.TREESORT).equals("z-a(cs)"))
+                    return -o1.getName().compareTo(o2.getName());
+                else
+                    return -o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+            } else
+                return 0;
+        }
+    };
 
     static void loadPreferences()
     {
@@ -1360,6 +1379,7 @@ public class CurrentData
         prefs.set(Preference.FRAMERATE, 60);
         prefs.set(Preference.GUI_SPEED, GUI_DEFAULT);
         prefs.set(Preference.COLOR_DEPTH, 8);
+        prefs.set(Preference.SHOW_NODE_HIERARCHY, true);
         prefs.set(Preference.MULTISAMPLING, 0);
         prefs.set(Preference.DEPTH_BITS, 24);
         prefs.set(Preference.KEY_ANIMATION_EDITOR_SHOWN, false);

@@ -8,6 +8,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Line;
+import general.Preference;
 import other.Wizard;
 import java.util.Vector;
 
@@ -64,7 +65,8 @@ public class NodeModel
         model.setLocalScale(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().distance(model.getWorldTranslation()) / 60);
         if (selected)
         {
-            CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(model);
+            if ((Boolean) CurrentData.getPrefs().get(Preference.SHOW_NODE_HIERARCHY))
+                CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(model);
             for (Spatial spatial : node.getChildren())
             {
                 if (spatial instanceof Node)
@@ -76,7 +78,8 @@ public class NodeModel
                 lineGeometry.setMaterial(lineMaterial);
                 lineNode.attachChild(lineGeometry);
             }
-            CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(lineNode);
+            if ((Boolean) CurrentData.getPrefs().get(Preference.SHOW_NODE_HIERARCHY))
+                CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(lineNode);
         }
     }
 

@@ -113,8 +113,8 @@ public class MeshTaskPane extends EditTaskPane
         {
             setLayout(new RiverLayout(5, 5));
             Sphere tempSphere = (Sphere) mesh;
-            radialSamplesTextField = new BTextField("Int", Integer.toString(tempSphere.getRadialSamples()));
-            zSamplesTextField = new BTextField("Int", Integer.toString(tempSphere.getZSamples()));
+            radialSamplesTextField = new BTextField("Integer", Integer.toString(tempSphere.getRadialSamples()));
+            zSamplesTextField = new BTextField("Integer", Integer.toString(tempSphere.getZSamples()));
             radiusTextField = new BTextField("Float", Float.toString(tempSphere.getRadius()));
             add("br left", new JLabel("Radial Samples:"));
             add("tab hfill", radialSamplesTextField);
@@ -160,8 +160,8 @@ public class MeshTaskPane extends EditTaskPane
         {
             setLayout(new RiverLayout(5, 5));
             final Cylinder tempCylinder = (Cylinder) mesh;
-            axisSamplesTextField = new BTextField("Int", Integer.toString(tempCylinder.getAxisSamples()));
-            radialSamplesTextField = new BTextField("Int", Integer.toString(tempCylinder.getRadialSamples()));
+            axisSamplesTextField = new BTextField("Integer", Integer.toString(tempCylinder.getAxisSamples()));
+            radialSamplesTextField = new BTextField("Integer", Integer.toString(tempCylinder.getRadialSamples()));
             heightTextField = new BTextField("Float", Float.toString(tempCylinder.getHeight()));
             radiusTextField = new BTextField("Float", Float.toString(tempCylinder.getRadius()));
             radius2TextField = new BTextField("Float", Float.toString(tempCylinder.getRadius2()));
@@ -228,8 +228,8 @@ public class MeshTaskPane extends EditTaskPane
         {
             setLayout(new RiverLayout(5, 5));
             Torus tempCylinder = (Torus) mesh;
-            circleSamplesTextField = new BTextField("Int", Integer.toString(tempCylinder.getCircleSamples()));
-            radialSamplesTextField = new BTextField("Int", Integer.toString(tempCylinder.getRadialSamples()));
+            circleSamplesTextField = new BTextField("Integer", Integer.toString(tempCylinder.getCircleSamples()));
+            radialSamplesTextField = new BTextField("Integer", Integer.toString(tempCylinder.getRadialSamples()));
             innerRadiusTextField = new BTextField("Float", Float.toString(tempCylinder.getInnerRadius()));
             outerRadiusTextField = new BTextField("Float", Float.toString(tempCylinder.getOuterRadius()));
             add("br left", new JLabel("Circle Samples:"));
