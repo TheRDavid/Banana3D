@@ -1,13 +1,5 @@
-1.0
-Swing GUI Performance (Checker vs Checkbox?)
-Spot - / PointLight Shadow wrong UUID (also DL??)
-WaveScale Slider must not be 0
-Material Queue Bucket Option
-FIX: Deactivate Filter?
-Delete Shadow when LightSource deleted
-Memory usage increase when major node selected??
-------------
-Neuer Startbildschirm (Coole Scene -> Coole Models benötigt)
+1.0 - Cinemonkey, Theatre, Theater?
+Neuer Startbildschirm (Coole Scene -> Coole Models benötigt? Oder Animation?)
 coole Screenshots
 coole Videos
 Code einbinden
@@ -15,6 +7,10 @@ Installer
 badass fucking website (blues?)
 
 1.x
+selectElementDialog aktualisiert nicht, wenn objekte gelöscht wurden?
+UAManager -> Save complete Scene
+Memory usage increase when major node selected?? <-improve!
+AnimationControlCenter (to start various keyframe animations)
 Save Camera position
 Keyframes for
     -Lights
@@ -25,7 +21,13 @@ Keyframes for
         -Position
         -Rotation
 KeyframeEditor sort Updaters (Combobox)
-Select multiple Keyframes
+KeyframeEditor copy updater / property
+KeyframeEditor execute single Updaters / Properties
+KeyframeEditor duplicate whole Animation
+tasten shortcuts rot, scal, translation (alt+r,s,t)
+EditorGUI: Lichtquellen ein/ausblenden
+Lichter ein-ausschalten
+Swing GUI Performance (Checker vs Checkbox?)
 Edit Keyframe translations like MotionPaths
 Keyframe bezier / Culling - Time ease in / out
 Ghost Mode: getMaterial().getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.FrontAndBack);?????
@@ -82,3 +84,10 @@ New meshes
 Menu -> Search liefert bei mehreren Ergebnissen List zurück
 Search: Tell if nothing was found
 JavaFX instead of Swing
+TaskPane GUI via Config Files, bsp:
+PointLight.gui:
+    Color: ColorButton,
+    Position: Float3Panel,
+    Radius: BTextField_Float
+   -> GUI generieren lassen
+Material Queue Bucket Option
