@@ -60,26 +60,26 @@ public class NodeModel
 
     void update(boolean selected)
     {
+        if (!(Boolean) CurrentData.getPrefs().get(Preference.SHOW_NODE_HIERARCHY))
+            return;
         lineNode.detachAllChildren();
         model.setLocalTransform(node.getWorldTransform());
         model.setLocalScale(CurrentData.getEditorWindow().getB3DApp().getCamera().getLocation().distance(model.getWorldTranslation()) / 60);
         if (selected)
         {
-            if ((Boolean) CurrentData.getPrefs().get(Preference.SHOW_NODE_HIERARCHY))
-                CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(model);
+            CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(model);
             for (Spatial spatial : node.getChildren())
             {
-                if (spatial instanceof Node)
-                    for (NodeModel nm : CurrentData.getEditorWindow().getB3DApp().getNodeModels())
-                        if (nm.getNode().equals(spatial))
-                            nm.update(true);
+                /* if (spatial instanceof Node)
+                 for (NodeModel nm : CurrentData.getEditorWindow().getB3DApp().getNodeModels())
+                 if (nm.getNode().equals(spatial))
+                 nm.update(true);*/
                 lineGeometry = new Geometry("connection", new Line(Vector3f.ZERO, spatial.getWorldTranslation().subtract(model.getWorldTranslation())));
                 lineGeometry.setLocalTranslation(model.getWorldTranslation());
                 lineGeometry.setMaterial(lineMaterial);
                 lineNode.attachChild(lineGeometry);
             }
-            if ((Boolean) CurrentData.getPrefs().get(Preference.SHOW_NODE_HIERARCHY))
-                CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(lineNode);
+            CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(lineNode);
         }
     }
 

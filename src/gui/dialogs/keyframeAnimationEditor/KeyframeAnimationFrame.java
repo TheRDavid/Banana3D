@@ -188,7 +188,7 @@ public class KeyframeAnimationFrame extends JFrame
                 0,
                 (int) (maxFrame * timelinePanel.gapSize * 1.1));
         editPanel.hscrollbar.repaint();
-
+        attributesPanel.repaint();
     }
 
     public final void updateAnimationCollection()
@@ -749,7 +749,7 @@ public class KeyframeAnimationFrame extends JFrame
                     Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalTranslation());
                     ((Float3Panel) valueComponent).setVector(newVec);
                     property.setValue(frame, newVec);
-                }else if (property.type == AnimationType.Position)
+                } else if (property.type == AnimationType.Position)
                 {
                     Vector3f newVec;
                     if (property.getUpdater().getObject() instanceof PointLight)
@@ -1050,6 +1050,8 @@ public class KeyframeAnimationFrame extends JFrame
             keyframePanel.animationElementTrees.clear();
             treePanel.removeAll();
             if (currentAnimation != null)
+            {
+                currentAnimation.uncalcValues();
                 for (LiveKeyframeUpdater lku : currentAnimation.getUpdaters())
                 {
                     B3D_Element element = Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(lku.getObject().hashCode()));
@@ -1060,6 +1062,7 @@ public class KeyframeAnimationFrame extends JFrame
                     int aetMax = aet.getKeyframeUpdater().calcMaxFrames();
                     maxFrame = maxFrame > aetMax ? maxFrame : aetMax;
                 }
+            }
             //attributesPanel.treePanel.setBounds(0, attributesPanel.treePanel.getBounds().y, 200, 1000 * keyframePanel.animationElementTrees.size());
             treePanel.repaint();
             treePanel.revalidate();
@@ -1114,9 +1117,24 @@ public class KeyframeAnimationFrame extends JFrame
             {
                 if (currentFrame == 0)
                     JOptionPane.showMessageDialog(this, "There has to be a Startvalue!", "Error", JOptionPane.ERROR_MESSAGE);
-                else if (currentProperty.numKeyframes() > 2)
+                else if (currentProperty == null && keyframeEditor.mksd != null)
                 {
-                    currentProperty.setValue(currentFrame, null);
+                    for (LiveKeyframeProperty lkp : keyframeEditor.mksd.properties)
+                        for (int i = keyframeEditor.mksd.firstFrame; i <= keyframeEditor.mksd.lastFrame; i++)
+                        {
+                            System.out.println("frames between " + keyframeEditor.mksd.firstFrame + " and " + keyframeEditor.mksd.lastFrame);
+                            if (lkp.getValues().length > i)
+                                lkp.setValue(i, null);
+                        }
+                } else if (currentProperty.numKeyframes() > 2)
+                {
+                    if (editPanel.keyframeEditor.mksd == null)
+                        currentProperty.setValue(currentFrame, null);
+                    else
+                        for (LiveKeyframeProperty lkp : keyframeEditor.mksd.properties)
+                            for (int i = keyframeEditor.mksd.firstFrame; i <= keyframeEditor.mksd.lastFrame; i++)
+                                if (lkp.getValues().length > i)
+                                    lkp.setValue(i, null);
                     keyframeEditor.repaint();
                 } else
                     JOptionPane.showMessageDialog(this, "At least 2 Keyframes requiered!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1153,7 +1171,139 @@ public class KeyframeAnimationFrame extends JFrame
         class KeyframeEditor extends JPanel
         {
 
-            private boolean dragging = false;
+            private Color selectionColor = new Color(180, 220, 180, 80);
+            private int dragX = 0;
+
+            private class MultipleKeyframeSelectionData
+            {
+
+                private int xStart, xEnd = Integer.MIN_VALUE, yStart, yEnd, firstFrame, lastFrame, dragStart, dragEnd;
+                private ArrayList<LiveKeyframeProperty> properties = new ArrayList<LiveKeyframeProperty>();
+                private boolean active = false, ready = false, dragging = false;
+
+                public MultipleKeyframeSelectionData(int xStart, int yStart)
+                {
+                    active = true;
+                    this.xStart = xStart;
+                    this.xEnd = xStart;
+                    this.yStart = yStart;
+                    this.yEnd = xStart;
+                }
+
+                public void update(int xE, int yE)
+                {
+                    xEnd = xE;
+                    yEnd = yE;
+                }
+
+                public void done()
+                {
+                    ready = true;
+                    active = false;
+
+                    // Correct values
+
+                    if (xStart > xEnd)
+                    {
+                        int temp = xStart;
+                        xStart = xEnd;
+                        xEnd = temp;
+                    }
+
+                    if (yStart > yEnd)
+                    {
+                        int temp = yStart;
+                        yStart = yEnd;
+                        yEnd = temp;
+                    }
+
+                    // Get all involved Properties
+                    int frameCount = 0;
+                    for (int i = yStart; i <= yEnd; i += 10)
+                    {
+
+                        Component comp = attributesPanel.getComponent(0).getComponentAt(66, i + keyframeEditor.yOffset);
+                        AnimationElementTree.AttributeNode aNode = null;
+                        AnimationElementTree aet = null;
+                        if (comp instanceof AnimationElementTree)
+                        {
+                            aet = (AnimationElementTree) comp;
+                            if (aet.getClosestPathForLocation(10, -aet.getLocation().y + i + keyframeEditor.yOffset).
+                                    getLastPathComponent() instanceof AnimationElementTree.AttributeNode)
+                                aNode = (AnimationElementTree.AttributeNode) aet.getClosestPathForLocation(
+                                        10, -aet.getLocation().y + i + keyframeEditor.yOffset).getLastPathComponent();
+                        }
+                        if (aNode != null && aet != null)
+                        {
+                            LiveKeyframeProperty property = aNode.getProperty();
+                            if (!properties.contains(property))
+                                properties.add(property);
+                        }
+                    }
+
+                    if (properties.size() > 0)
+                    {
+
+                        firstFrame = (int) ((xStart + keyframeEditor.xOffset) / timelinePanel.gapSize);
+                        if (firstFrame < 1)
+                            firstFrame = 1;
+                        lastFrame = (int) ((xEnd + keyframeEditor.xOffset) / timelinePanel.gapSize);
+
+                        // System.out.println("MULTISELECT: ");
+                        // System.out.println("Keyframes from " + firstFrame + " to " + lastFrame);
+                        // System.out.println("Involved Properties:");
+                        for (LiveKeyframeProperty lkp : properties)
+                            for (int i = firstFrame; i <= lastFrame; i++)
+                                if (lkp.getValues().length > i && lkp.getValues()[i] != null)
+                                    frameCount++;
+                        if (frameCount < 2)
+                        {
+                            ready = false;
+                            System.out.println("No multiple selection!");
+                        }
+                    } else
+                    {
+                        ready = false;
+                    }
+
+                }
+
+                private boolean contains(LiveKeyframeProperty property, int frame)
+                {
+                    return frame >= firstFrame && frame <= lastFrame && properties.contains(property);
+                }
+
+                private void drag()
+                {
+                    int dragDifference = dragEnd - dragStart;
+                    for (LiveKeyframeProperty property : properties)
+                    {
+                        Serializable[] copy = new Serializable[property.getValues().length + Math.abs(dragDifference)];
+                        for (int i = 0; i < property.getValues().length; i++)
+                            copy[i] = property.getValues()[i];
+                        for (int i = (dragDifference > 0 ? lastFrame : firstFrame); (dragDifference > 0 ? i >= firstFrame : i <= (lastFrame > property.getValues().length ? property.getValues().length : lastFrame)); i += (dragDifference > 0 ? -1 : 1))
+                            if (property.getValues()[i] != null)
+                            {
+                                copy[i + dragDifference] = property.getValues()[i];
+                                copy[i] = null;
+                            }
+                        for (int i = 0; i < copy.length; i++)
+                            property.setValue(i, copy[i]);
+                    }
+                    xStart += dragDifference;
+                    xEnd += dragDifference;
+                    firstFrame += dragDifference;
+                    if (firstFrame < 1)
+                        firstFrame = 1;
+                    lastFrame += dragDifference;
+                    if (lastFrame < 2)
+                        lastFrame = 2;
+                    dragging = false;
+                    repaint();
+                }
+            }
+            private boolean draggingSingle = false;
+            private MultipleKeyframeSelectionData mksd = null;
             protected int dragStart = -1, xOffset = 0, yOffset = 0;
             private Serializable dragData = null;
 
@@ -1182,7 +1332,11 @@ public class KeyframeAnimationFrame extends JFrame
                     public void mouseDragged(MouseEvent e)
                     {
                         int selectedX = e.getX() + keyframeEditor.xOffset;
-                        if (editingEnabled && dragging)
+
+                        if (mksd != null && mksd.dragging)
+                        {
+                            repaint();
+                        } else if (editingEnabled && draggingSingle)
                         {
                             int cFrame = (int) (selectedX / timelinePanel.gapSize);
                             if (cFrame != dragStart)
@@ -1200,9 +1354,15 @@ public class KeyframeAnimationFrame extends JFrame
                                     currentProperty.cutValues();
                                     toolsPanel.currentFrameLabel.setText("Frame " + currentFrame + " / " + (currentProperty.getValues().length - 1));
                                     timelinePanel.repaint();
+                                    currentProperty.storeIndexes();
                                     repaint();
                                 }
                             }
+                        }
+                        if (mksd != null && mksd.active)
+                        {
+                            mksd.update(e.getX(), e.getY());
+                            repaint();
                         }
                     }
                 });
@@ -1212,12 +1372,27 @@ public class KeyframeAnimationFrame extends JFrame
                     public void mouseReleased(MouseEvent e)
                     {
                         arrangeScrollbars();
+                        draggingSingle = false;
+                        if (mksd != null)
+                            if (mksd.dragging)
+                            {
+                                mksd.dragEnd = (int) ((e.getX() + keyframeEditor.xOffset) / timelinePanel.gapSize);
+                                if (mksd.dragStart != mksd.dragEnd)
+                                    mksd.drag();
+                                else if (e.getButton() == MouseEvent.BUTTON1)
+                                    mksd = null;
+                            } else
+                                mksd.done();
+                        repaint();
                     }
 
                     @Override
                     public void mousePressed(MouseEvent e)
                     {
-                        boolean selected = false;
+                        if (mksd != null)
+                        {
+                            mksd.dragging = false;
+                        }
                         if (editingEnabled)
                         {
                             int selectedX = e.getX() + keyframeEditor.xOffset;
@@ -1247,32 +1422,60 @@ public class KeyframeAnimationFrame extends JFrame
                                 else if (frame < aNode.getProperty().getValues().length && property.getValues()[frame] != null)
                                 {
                                     if (e.getButton() == MouseEvent.BUTTON1)
-                                        if (dragging || currentFrame != frame || currentProperty != property)
+                                    {
+                                        if (draggingSingle || currentFrame != frame || currentProperty != property)
                                         {
                                             currentFrame = frame;
                                             currentProperty = property;
                                             select(currentFrame);
-                                        } else
-                                        {
-                                            selected = true;
-                                            currentProperty = null;
-                                            currentFrame = -1;
-                                            select(currentFrame);
                                         }
-                                    else if (e.getButton() == MouseEvent.BUTTON3)
+                                    } /*else
+                                     {
+                                     selected = true;
+                                     currentProperty = null;
+                                     currentFrame = -1;
+                                     select(currentFrame);
+                                     }*/ else if (e.getButton() == MouseEvent.BUTTON3)
                                         keyPopup.show(KeyframeEditor.this, e.getX(), e.getY());
                                 }
-                                dragging = false;
+                                draggingSingle = false;
                                 dragStart = -1;
-                                repaint();
                             }
-                            if (!selected && editingEnabled && currentFrame > 0 && currentProperty != null && currentFrame < currentProperty.getValues().length)
+                            if (currentProperty != null)
                             {
-                                dragging = true;
-                                dragStart = currentFrame;
-                                dragData = currentProperty.getValues()[currentFrame];
+                                currentProperty.storeIndexes();
+                                //  for (int i = 0; i < currentProperty.getIndices().size(); i++)
+                                //      System.out.println(i + ": " + currentProperty.getIndices().get(i));
+                            }
+                            if (currentProperty != null // potential drag-start?
+                                    //   && !selected
+                                    && editingEnabled
+                                    && currentFrame > 0
+                                    && currentFrame < currentProperty.getValues().length
+                                    && currentProperty.getIndices().contains(frame)
+                                    && e.getButton() != MouseEvent.BUTTON3)
+                            {
+                                //  System.out.println("MKSD: " + mksd);
+                                //  if (mksd != null)
+                                //      System.out.println("MKSD READY: " + mksd.ready);
+                                if (mksd == null || !mksd.ready || !mksd.contains(currentProperty, frame))
+                                {
+                                    draggingSingle = true;
+                                    dragStart = currentFrame;
+                                    dragData = currentProperty.getValues()[frame];
+                                    mksd = null;
+                                } else
+                                {
+                                    mksd.dragging = true;
+                                    mksd.dragStart = frame;
+                                    dragX = e.getX();
+                                }
+                            } else if( e.getButton() != MouseEvent.BUTTON3)// potential multi-select
+                            {
+                                mksd = new MultipleKeyframeSelectionData(e.getX(), e.getY());
                             }
                         }
+                        repaint();
                     }
                 });
             }
@@ -1304,10 +1507,11 @@ public class KeyframeAnimationFrame extends JFrame
                             for (int k = 0; k < an.getProperty().getValues().length; k++)
                                 if (an.getProperty().getValues()[k] != null)
                                 {
-                                    if (an.getProperty() == currentProperty && k == currentFrame)
-                                        g.setColor(Color.cyan);
-                                    else if (k == 0)
+                                    if (k == 0)
                                         g.setColor(Color.red);
+                                    else if ((mksd != null && mksd.ready && mksd.contains(an.getProperty(), k) // is it one of the selected?
+                                            || (an.getProperty() == currentProperty && k == currentFrame))) // is it the selected?
+                                        g.setColor(Color.cyan);
                                     else
                                         g.setColor(Color.orange);
                                     int radius = (int) (timelinePanel.gapSize > 25 ? 25 : timelinePanel.gapSize) / 4 * 3;
@@ -1327,6 +1531,36 @@ public class KeyframeAnimationFrame extends JFrame
                 {
                     g.setColor(new Color(200, 200, 200, 30));
                     g.fillRect(0, 0, getWidth(), getHeight());
+                }
+                if (mksd != null)
+                {
+                    if (mksd.xEnd != Integer.MIN_VALUE && mksd.active)
+                    {
+                        int xStart = mksd.xStart, xEnd = mksd.xEnd, yStart = mksd.yStart, yEnd = mksd.yEnd;
+
+                        if (xStart > xEnd)
+                        {
+                            int temp = xStart;
+                            xStart = xEnd;
+                            xEnd = temp;
+                        }
+
+                        if (yStart > yEnd)
+                        {
+                            int temp = yStart;
+                            yStart = yEnd;
+                            yEnd = temp;
+                        }
+                        g.setColor(selectionColor);
+                        g.fillRect(xStart, yStart, xEnd - xStart, yEnd - yStart);
+                        g.setColor(Color.ORANGE);
+                        g.drawRect(xStart, yStart, xEnd - xStart, yEnd - yStart);
+                    }
+                    if (mksd.dragging && getMousePosition() != null)
+                    {
+                        g.setColor(Color.cyan);
+                        g.drawLine(dragX, getMousePosition().y, getMousePosition().x, getMousePosition().y);
+                    }
                 }
             }
         }

@@ -70,13 +70,20 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import b3dElements.animations.keyframeAnimations.AnimationType;
 import b3dElements.animations.keyframeAnimations.B3D_KeyframeAnimation;
+import b3dElements.animations.keyframeAnimations.Properties.BoolProperty;
 import b3dElements.lights.B3D_AmbientLight;
 import b3dElements.lights.B3D_DirectionalLight;
 import b3dElements.lights.B3D_PointLight;
 import b3dElements.lights.B3D_SpotLight;
 import b3dElements.spatials.geometries.particleEmitter.B3D_ParticleEffect;
+import com.jme3.light.AmbientLight;
+import com.jme3.shadow.DirectionalLightShadowFilter;
+import com.jme3.shadow.PointLightShadowFilter;
+import com.jme3.shadow.SpotLightShadowFilter;
 import dialogs.ProgressDialog;
 import monkeyStuff.keyframeAnimation.LiveKeyframeAnimation;
+import monkeyStuff.keyframeAnimation.LiveKeyframeProperty;
+import monkeyStuff.keyframeAnimation.LiveKeyframeUpdater;
 import other.ElementToObjectConverter;
 import other.ObjectToElementConverter;
 import other.B3D_Scene;
@@ -128,6 +135,7 @@ public class CurrentData
                 return 0;
         }
     };
+    public static Object clipboardData = null;
 
     static void loadPreferences()
     {
@@ -502,7 +510,7 @@ public class CurrentData
                     B3D_Light oldB3D_Light = (B3D_Light) Wizard.getObjects().getB3D_Element(Wizard.getObjectReferences().getUUID(o.hashCode()));
                     B3D_Light b3D_Light = ObjectToElementConverter.convertLight((Light) o);
                     b3D_Light.setUuid(oldB3D_Light.getUUID());
-                    //System.out.println("Saving b3dLight with UUID: " + b3D_Light.getUUID());
+                    System.out.println("Saving b3dLight with UUID: " + b3D_Light.getUUID());
                     scene.getElements().add(b3D_Light);
                     b3D_Light.setAnimations((ArrayList<B3D_TimedAnimation>) oldB3D_Light.getAnimations().clone());
 
@@ -896,6 +904,22 @@ public class CurrentData
         {
             //Class-name of element
             final String className = Wizard.getObjects().getB3D_Element(CurrentData.getEditorWindow().getB3DApp().getSelectedUUID()).getClass().getName();
+            for (LiveKeyframeAnimation lka : Wizard.getKeyframeAnimations())
+                for (int i = lka.getUpdaters().size() - 1; i >= 0; i--)
+                {
+                    LiveKeyframeUpdater lku = lka.getUpdaters().get(i);
+                    if (lku.getObject() == CurrentData.getEditorWindow().getB3DApp().getSelectedObject())
+                        lka.getUpdaters().remove(lku);
+                    else if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Node)
+                    {
+                        Vector<Spatial> allSpatials = new Vector<Spatial>();
+                        Wizard.insertAllSpatials((Node) CurrentData.getEditorWindow().getB3DApp().getSelectedObject(), allSpatials);
+                        for (Spatial s : allSpatials)
+                            if (s == lku.getObject())
+                                lka.getUpdaters().remove(lku);
+                    }
+                }
+            editorWindow.getKeyframeAnimationEditor().updateAnimationCollection();
             if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Spatial)
             {
                 if (CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof Node && !(CurrentData.getEditorWindow().getB3DApp().getSelectedObject() instanceof TerrainQuad)
@@ -924,14 +948,9 @@ public class CurrentData
                                 .getB3DApp().setSelectedElement(Wizard.NULL_SELECTION, null);
                         CurrentData.getEditorWindow()
                                 .getEditPane().arrange(false);
-                        editorWindow.getTree()
-                                .sync();
+                        editorWindow.getTree().sync();
                         if (registerUserAction)
-                            UAManager.add(
-                                    null, "Delete " + spatial.getName());
-
-
-
+                            UAManager.add(null, "Delete " + spatial.getName());
                         return null;
                     }
                 });
@@ -991,6 +1010,17 @@ public class CurrentData
                         editorWindow.getTree().sync();
                         if (registerUserAction)
                             UAManager.add(null, "Delete " + light.getName());
+
+                        //Is there a Shadow depending on this Light? If so, delete it.
+                        if (!(light instanceof AmbientLight))
+                            for (Object o : Wizard.getObjects().getOriginalObjectsIterator())
+                                if ((o instanceof DirectionalLightShadowFilter && ((DirectionalLightShadowFilter) o).getLight().equals(light))
+                                        || o instanceof SpotLightShadowFilter && ((SpotLightShadowFilter) o).getLight().equals(light)
+                                        || o instanceof PointLightShadowFilter && ((PointLightShadowFilter) o).getLight().equals(light))
+                                {
+                                    editorWindow.getB3DApp().setSelectedUUID(Wizard.getObjectReferences().getUUID(o.hashCode()));
+                                    execDelete(false);
+                                }
                         return null;
                     }
                 });
@@ -1006,6 +1036,8 @@ public class CurrentData
                         for (Filter f : CurrentData.getEditorWindow().getB3DApp().getFilterPostProcessor().getFilterList())
                             if (f != filter)
                             {
+                                System.out.println("Filter der geloescht wird: " + filter.getName() + " -> " + filter);
+                                System.out.println("Anderer Filter: " + filter.getName() + " -> " + filter);
                                 UUID tempFilter1UUID = Wizard.getObjectReferences().getUUID(f.hashCode());
                                 B3D_Filter tempFilter1 = (B3D_Filter) Wizard.getObjects().getB3D_Element(tempFilter1UUID);
                                 UUID tempFilter2UUID = Wizard.getObjectReferences().getUUID(filter.hashCode());
@@ -1032,12 +1064,6 @@ public class CurrentData
                         return null;
                     }
                 });
-
-
-
-
-
-
             } else if (className.equals(B3D_MotionEvent.class
                     .getName()))
             {
@@ -1392,7 +1418,7 @@ public class CurrentData
         prefs.save();
     }
 
-    public static Vector<AnimationType> getAttributes(B3D_Element element, ArrayList<AnimationElementTree.AttributeNode> nodes)
+    public static boolean insertAttributes(Vector<AnimationType> aTypesVec, B3D_Element element, ArrayList<AnimationElementTree.AttributeNode> nodes)
     {
         Vector<AnimationType> attribs = new Vector<AnimationType>();
         if (element instanceof B3D_ParticleEffect)
@@ -1427,7 +1453,20 @@ public class CurrentData
             add(attribs, AnimationType.Rotation, nodes);
             add(attribs, AnimationType.Scale, nodes);
         }
-        return attribs;
+        boolean insertAllowed = false;
+        if (clipboardData != null && clipboardData instanceof LiveKeyframeProperty)
+        {
+            LiveKeyframeProperty lkp = (LiveKeyframeProperty) clipboardData;
+            for (AnimationType at : attribs)
+                if (at.legit(lkp.getClass()))
+                {
+                    System.out.println(lkp.getClass() + " legit for " + at);
+                    insertAllowed = true;
+                    break;
+                }
+        }
+        aTypesVec.addAll(attribs);
+        return insertAllowed;
     }
 
     private static void add(Vector<AnimationType> vec, AnimationType at, ArrayList<AnimationElementTree.AttributeNode> nodes)

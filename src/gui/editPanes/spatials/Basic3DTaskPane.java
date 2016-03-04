@@ -312,7 +312,7 @@ public class Basic3DTaskPane extends EditTaskPane
                     @Override
                     public void stateChanged(ChangeEvent e)
                     {
-                        updateRotation(getVector());
+                        updateRotation(getVector(),false);
                     }
                 });
                 ySlider.addChangeListener(new ChangeListener()
@@ -320,7 +320,7 @@ public class Basic3DTaskPane extends EditTaskPane
                     @Override
                     public void stateChanged(ChangeEvent e)
                     {
-                        updateRotation(getVector());
+                        updateRotation(getVector(),false);
                     }
                 });
                 zSlider.addChangeListener(new ChangeListener()
@@ -328,7 +328,7 @@ public class Basic3DTaskPane extends EditTaskPane
                     @Override
                     public void stateChanged(ChangeEvent e)
                     {
-                        updateRotation(getVector());
+                        updateRotation(getVector(),false);
                     }
                 });
                 MouseAdapter rotationAdapter = new MouseAdapter()
@@ -344,7 +344,7 @@ public class Basic3DTaskPane extends EditTaskPane
                 zSlider.addMouseListener(rotationAdapter);
             }
 
-            private void updateRotation(Vector3f vec)
+            private void updateRotation(Vector3f vec, boolean updateSlider)
             {
                 final Quaternion nextRotation = new Quaternion(new float[]
                 {
@@ -353,7 +353,8 @@ public class Basic3DTaskPane extends EditTaskPane
                     FastMath.DEG_TO_RAD * vec.getZ()
                 });
                 float3Panel.setVector(vec);
-                setVector3f(vec);
+                if (updateSlider)
+                    setVector3f(vec);
                 spatial.setUserData("angles", vec);
                 CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
                 {
@@ -413,7 +414,7 @@ public class Basic3DTaskPane extends EditTaskPane
                 && !rotationPanel.getRotationFloatPanel().getyField().hasFocus()
                 && !rotationPanel.getRotationFloatPanel().getzField().hasFocus())
         {
-            rotationPanel.getSliderPanel().updateRotation((Vector3f) basicSpatial.getUserData("angles"));
+            rotationPanel.getSliderPanel().updateRotation((Vector3f) basicSpatial.getUserData("angles"),true);
         }
         if (!basicSpatial.getLocalTranslation().equals(positionPanel.getVector())
                 && !positionPanel.getyField().hasFocus()

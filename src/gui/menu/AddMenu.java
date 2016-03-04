@@ -60,7 +60,7 @@ import com.shaderblow.filter.frostedglass.FrostedGlassFilter;
 import com.shaderblow.filter.oldfilm.OldFilmFilter;
 import com.simsilica.lemur.geom.MBox;
 import dialogs.ObserverDialog;
-import dialogs.SelectDialog;
+import gui.dialogs.SelectDialog;
 import general.Preference;
 import general.UAManager;
 import other.Wizard;

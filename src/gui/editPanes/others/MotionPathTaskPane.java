@@ -21,7 +21,7 @@ import components.EditTaskPane;
 import components.Float3Panel;
 import components.Float4Panel;
 import dialogs.ObserverDialog;
-import dialogs.SelectDialog;
+import gui.dialogs.SelectDialog;
 import general.UAManager;
 import java.awt.BasicStroke;
 import other.Wizard;

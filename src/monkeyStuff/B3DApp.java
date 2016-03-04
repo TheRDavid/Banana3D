@@ -84,7 +84,7 @@ import tonegod.gui.core.Screen;
 
 public class B3DApp extends SimpleApplication implements ActionListener, AnalogListener
 {
-    
+
     //Nodes, bullet, cam-stuff, object-lists, predefined spatials & their mats
     private B3D_Scene initialScene;
     private SceneNode sceneNode = new SceneNode();
@@ -1419,8 +1419,11 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             {
                 if (nodeModel.getNode().equals(selectedObject))
                     currentNodeModel = nodeModel;
-                editorNode.detachChild(nodeModel.getModel());
-                editorNode.detachChild(nodeModel.getLineNode());
+                else
+                {
+                    editorNode.detachChild(nodeModel.getModel());
+                    editorNode.detachChild(nodeModel.getLineNode());
+                }
             }
             if (currentNodeModel != null)
                 currentNodeModel.update(true);

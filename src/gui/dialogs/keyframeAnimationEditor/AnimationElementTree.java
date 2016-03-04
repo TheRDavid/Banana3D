@@ -51,6 +51,7 @@ import com.jme3.light.PointLight;
 import com.jme3.light.SpotLight;
 import com.jme3.math.ColorRGBA;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import monkeyStuff.CustomParticleEmitter;
 import monkeyStuff.keyframeAnimation.Updaters.LiveALightUpdater;
 import monkeyStuff.keyframeAnimation.Updaters.LiveDLightUpdater;
@@ -84,6 +85,8 @@ public class AnimationElementTree extends JXTree implements ActionListener
     private JMenuItem removeElementItem = new JMenuItem("Remove Element");
     private JPopupMenu leafPopup = new JPopupMenu();
     private JMenuItem valueListItem = new JMenuItem("Current Values");
+    private JMenuItem copyAttributeItem = new JMenuItem("Copy Attribute");
+    private JMenuItem insertAttributeItem = new JMenuItem("Insert Attribute");
     private JMenuItem removeAttributeItem = new JMenuItem("Remove Attribute");
     private boolean expanded = true;
 
@@ -178,7 +181,8 @@ public class AnimationElementTree extends JXTree implements ActionListener
     private void addAttributeItems()
     {
         addAttributeMenu.removeAll();
-        Vector<AnimationType> attributeTypes = CurrentData.getAttributes(element, attributeNodes);
+        Vector<AnimationType> attributeTypes = new Vector<AnimationType>();
+        insertAttributeItem.setEnabled(CurrentData.insertAttributes(attributeTypes, element, attributeNodes));
         for (AnimationType s : attributeTypes)
             addAttributeMenu.add(new AttributeItem(s.toString()));
     }
@@ -191,10 +195,15 @@ public class AnimationElementTree extends JXTree implements ActionListener
     private void initPopups()
     {
         rootPopup.add(addAttributeMenu);
+        rootPopup.add(insertAttributeItem);
         addAttributeItems();
         rootPopup.add(removeElementItem);
         leafPopup.add(valueListItem);
+        leafPopup.add(copyAttributeItem);
+        leafPopup.add(new JSeparator());
         leafPopup.add(removeAttributeItem);
+        copyAttributeItem.addActionListener(this);
+        insertAttributeItem.addActionListener(this);
         valueListItem.addActionListener(this);
         removeAttributeItem.addActionListener(this);
         removeElementItem.addActionListener(this);
@@ -216,6 +225,15 @@ public class AnimationElementTree extends JXTree implements ActionListener
             updateElements();
             CurrentData.getEditorWindow().getKeyframeAnimationEditor().arrangeScrollbars();
             repaint();
+        } else if (e.getSource() == copyAttributeItem)
+            CurrentData.clipboardData = ((AttributeNode) selectedNode).getProperty().createNew(null);
+        else if (e.getSource() == insertAttributeItem)
+        {
+            LiveKeyframeProperty lkp = ((LiveKeyframeProperty) CurrentData.clipboardData).createNew(keyframeUpdater);
+            attributeNodes.add(new AttributeNode(lkp));
+            keyframeUpdater.getKeyframeProperties().add(lkp);
+            expanded = true;
+            updateElements();
         }
     }
 
@@ -309,10 +327,10 @@ public class AnimationElementTree extends JXTree implements ActionListener
                                 else if (AnimationType.valueOfString(getText()).equals(AnimationType.Position))
                                     property = new Vector3fProperty(AnimationType.valueOfString(getText()),
                                             61, sLight.getPosition(), keyframeUpdater);
-                            }else if(light instanceof PointLight)
+                            } else if (light instanceof PointLight)
                                 if (AnimationType.valueOfString(getText()).equals(AnimationType.Position))
                                     property = new Vector3fProperty(AnimationType.valueOfString(getText()),
-                                            61, ((PointLight)light).getPosition(), keyframeUpdater);
+                                            61, ((PointLight) light).getPosition(), keyframeUpdater);
                         }
                         attributeNodes.add(new AttributeNode(property));
                         keyframeUpdater.getKeyframeProperties().add(property);

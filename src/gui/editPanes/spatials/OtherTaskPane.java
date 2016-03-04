@@ -14,7 +14,7 @@ import components.BButton;
 import components.BComboBox;
 import components.Checker;
 import components.EditTaskPane;
-import dialogs.SelectDialog;
+import gui.dialogs.SelectDialog;
 import general.UAManager;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
