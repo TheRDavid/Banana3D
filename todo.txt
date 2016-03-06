@@ -5,8 +5,10 @@ coole Videos
 Code einbinden
 Installer
 badass fucking website (blues?)
+KeyframeAnimation Constrains
 
 1.x
+on resize: change camera, not ratio
 selectElementDialog aktualisiert nicht, wenn objekte gelöscht wurden?
 UAManager -> Save complete Scene
 Memory usage increase when major node selected?? <-improve!
