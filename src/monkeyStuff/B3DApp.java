@@ -1426,7 +1426,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
                 }
             }
             if (currentNodeModel != null)
-                currentNodeModel.update(true);
+                currentNodeModel.update(true, true);
         }
     }
 

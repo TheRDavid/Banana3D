@@ -68,8 +68,10 @@ import com.jme3.math.ColorRGBA;
 import components.BSpinnerNumberModel;
 import gui.components.BColorButton;
 import gui.components.LightDirectionPanel;
+import java.awt.Cursor;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Collections;
 import javax.swing.JSpinner;
 import monkeyStuff.CustomParticleEmitter;
 import org.jdesktop.swingx.VerticalLayout;
@@ -293,6 +295,32 @@ public class KeyframeAnimationFrame extends JFrame
         currentAnimation.removeAllUpdaters();
         for (AnimationElementTree aet : keyframePanel.animationElementTrees)
             currentAnimation.addUpdater(aet.getKeyframeUpdater().createNew());
+    }
+
+    void drag(AnimationElementTree updater, int y)
+    {
+        Component c = attributesPanel.getComponent(0).getComponentAt(66, y + updater.getY());
+        if (c instanceof AnimationElementTree)
+        {
+            AnimationElementTree other = (AnimationElementTree) c;
+            int oldIndex = keyframePanel.animationElementTrees.indexOf(updater);
+            int newIndex = keyframePanel.animationElementTrees.indexOf(other);
+            Collections.swap(keyframePanel.animationElementTrees, oldIndex, newIndex);
+
+            // System.out.println("Switching " + updater.getRootNode().getUserObject() + " with " + other.getRootNode().getUserObject());
+
+            currentAnimation.removeAllUpdaters();
+            for (AnimationElementTree aet : keyframePanel.animationElementTrees)
+                currentAnimation.addUpdater(aet.getKeyframeUpdater().createNew());
+            currentAnimation.calcValues();
+            attributesPanel.newUpdaters();
+        }
+    }
+
+    void updateTreeDragging(AnimationElementTree aet, int y)
+    {
+        attributesPanel.drag = aet.getY() + y;
+        attributesPanel.treePanel.repaint();
     }
 
     class ToolsPanel extends JPanel implements ActionListener
@@ -879,6 +907,11 @@ public class KeyframeAnimationFrame extends JFrame
         }
     }
 
+    public void setTreePanelCursor(Cursor c)
+    {
+        attributesPanel.treePanel.setCursor(c);
+    }
+
     class TimelinePanel extends JPanel
     {
 
@@ -896,7 +929,7 @@ public class KeyframeAnimationFrame extends JFrame
                 @Override
                 public void mouseDragged(MouseEvent e)
                 {
-                    int x = e.getX();
+                    int x = e.getX() + editPanel.keyframeEditor.xOffset;
                     if (x < 0)
                         x = 0;
                     currentFrame = (int) (x / timelinePanel.gapSize);
@@ -1030,7 +1063,22 @@ public class KeyframeAnimationFrame extends JFrame
     class AttributesPanel extends JPanel
     {
 
-        private JPanel treePanel = new JPanel(new VerticalLayout(0));
+        private JPanel treePanel = new JPanel(new VerticalLayout(0))
+        {
+            @Override
+            public void paintChildren(Graphics g)
+            {
+                System.out.println("repainting at " + drag);
+                super.paintChildren(g);
+                if (drag != -1)
+                {
+                    g.setColor(Color.orange);
+                    g.drawLine(0, drag, getWidth(), drag);
+                    attributesPanel.drag = -1;
+                }
+            }
+        };
+        private int drag = -1;
 
         public AttributesPanel()
         {
@@ -1118,7 +1166,6 @@ public class KeyframeAnimationFrame extends JFrame
                 if (currentFrame == 0)
                     JOptionPane.showMessageDialog(this, "There has to be a Startvalue!", "Error", JOptionPane.ERROR_MESSAGE);
                 else if (currentProperty == null && keyframeEditor.mksd != null)
-                {
                     for (LiveKeyframeProperty lkp : keyframeEditor.mksd.properties)
                         for (int i = keyframeEditor.mksd.firstFrame; i <= keyframeEditor.mksd.lastFrame; i++)
                         {
@@ -1126,7 +1173,7 @@ public class KeyframeAnimationFrame extends JFrame
                             if (lkp.getValues().length > i)
                                 lkp.setValue(i, null);
                         }
-                } else if (currentProperty.numKeyframes() > 2)
+                else if (currentProperty.numKeyframes() > 2)
                 {
                     if (editPanel.keyframeEditor.mksd == null)
                         currentProperty.setValue(currentFrame, null);
@@ -1243,7 +1290,6 @@ public class KeyframeAnimationFrame extends JFrame
 
                     if (properties.size() > 0)
                     {
-
                         firstFrame = (int) ((xStart + keyframeEditor.xOffset) / timelinePanel.gapSize);
                         if (firstFrame < 1)
                             firstFrame = 1;
@@ -1262,9 +1308,7 @@ public class KeyframeAnimationFrame extends JFrame
                             System.out.println("No multiple selection!");
                         }
                     } else
-                    {
                         ready = false;
-                    }
 
                 }
 
@@ -1281,7 +1325,7 @@ public class KeyframeAnimationFrame extends JFrame
                         Serializable[] copy = new Serializable[property.getValues().length + Math.abs(dragDifference)];
                         for (int i = 0; i < property.getValues().length; i++)
                             copy[i] = property.getValues()[i];
-                        for (int i = (dragDifference > 0 ? lastFrame : firstFrame); (dragDifference > 0 ? i >= firstFrame : i <= (lastFrame > property.getValues().length ? property.getValues().length : lastFrame)); i += (dragDifference > 0 ? -1 : 1))
+                        for (int i = (dragDifference > 0 ? (lastFrame >= property.getValues().length ? property.getValues().length - 1 : lastFrame) : firstFrame); (dragDifference > 0 ? i >= firstFrame : i <= (lastFrame > property.getValues().length ? property.getValues().length - 1 : lastFrame)); i += (dragDifference > 0 ? -1 : 1))
                             if (property.getValues()[i] != null)
                             {
                                 copy[i + dragDifference] = property.getValues()[i];
@@ -1334,9 +1378,8 @@ public class KeyframeAnimationFrame extends JFrame
                         int selectedX = e.getX() + keyframeEditor.xOffset;
 
                         if (mksd != null && mksd.dragging)
-                        {
                             repaint();
-                        } else if (editingEnabled && draggingSingle)
+                        else if (editingEnabled && draggingSingle)
                         {
                             int cFrame = (int) (selectedX / timelinePanel.gapSize);
                             if (cFrame != dragStart)
@@ -1390,12 +1433,11 @@ public class KeyframeAnimationFrame extends JFrame
                     public void mousePressed(MouseEvent e)
                     {
                         if (mksd != null)
-                        {
                             mksd.dragging = false;
-                        }
                         if (editingEnabled)
                         {
                             int selectedX = e.getX() + keyframeEditor.xOffset;
+                            valuePanel.frame = -1;
                             int frame = (int) (selectedX / timelinePanel.gapSize);
                             Component comp = attributesPanel.getComponent(0).getComponentAt(66, e.getY() + keyframeEditor.yOffset);
                             AnimationElementTree.AttributeNode aNode = null;
@@ -1442,11 +1484,7 @@ public class KeyframeAnimationFrame extends JFrame
                                 dragStart = -1;
                             }
                             if (currentProperty != null)
-                            {
                                 currentProperty.storeIndexes();
-                                //  for (int i = 0; i < currentProperty.getIndices().size(); i++)
-                                //      System.out.println(i + ": " + currentProperty.getIndices().get(i));
-                            }
                             if (currentProperty != null // potential drag-start?
                                     //   && !selected
                                     && editingEnabled
@@ -1470,10 +1508,8 @@ public class KeyframeAnimationFrame extends JFrame
                                     mksd.dragStart = frame;
                                     dragX = e.getX();
                                 }
-                            } else if( e.getButton() != MouseEvent.BUTTON3)// potential multi-select
-                            {
+                            } else if (e.getButton() != MouseEvent.BUTTON3)// potential multi-select
                                 mksd = new MultipleKeyframeSelectionData(e.getX(), e.getY());
-                            }
                         }
                         repaint();
                     }

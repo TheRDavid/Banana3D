@@ -348,7 +348,7 @@ public class EditorWindow extends JFrame
                     {
                         CurrentData.execPlayPauseMotionPath();
                         ret = true;
-                    } else if ((e.getKeyCode() == KeyEvent.VK_DELETE) /*&& ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)*/)
+                    } else if ((e.getKeyCode() == KeyEvent.VK_DELETE) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0))
                     {
                         System.out.println("EXEC DELETE");
                         CurrentData.execDelete(true);

@@ -50,6 +50,8 @@ import com.jme3.light.Light;
 import com.jme3.light.PointLight;
 import com.jme3.light.SpotLight;
 import com.jme3.math.ColorRGBA;
+import java.awt.Cursor;
+import java.awt.event.MouseMotionAdapter;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import monkeyStuff.CustomParticleEmitter;
@@ -88,7 +90,8 @@ public class AnimationElementTree extends JXTree implements ActionListener
     private JMenuItem copyAttributeItem = new JMenuItem("Copy Attribute");
     private JMenuItem insertAttributeItem = new JMenuItem("Insert Attribute");
     private JMenuItem removeAttributeItem = new JMenuItem("Remove Attribute");
-    private boolean expanded = true;
+    private boolean expanded = true, dragging = false;
+    private int dragStart = 0;
 
     public AnimationElementTree(B3D_Element e, LiveKeyframeUpdater lku)
     {
@@ -146,16 +149,45 @@ public class AnimationElementTree extends JXTree implements ActionListener
         addMouseListener(new MouseAdapter()
         {
             @Override
+            public void mousePressed(MouseEvent e)
+            {
+                dragStart = e.getY();
+            }
+
+            @Override
             public void mouseReleased(MouseEvent e)
             {
+                if (dragging)
+                {
+                    //CurrentData.getEditorWindow().getKeyframeAnimationEditor().drag(AnimationElementTree.this, e.getY() - dragStart);
+                    CurrentData.getEditorWindow().getKeyframeAnimationEditor().drag(AnimationElementTree.this, e.getY());
+                    dragStart = 0;
+                    dragging = false;
+                    CurrentData.getEditorWindow().getKeyframeAnimationEditor().setTreePanelCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
                 if (SwingUtilities.isRightMouseButton(e) && CurrentData.getEditorWindow().getKeyframeAnimationEditor().isEditable())
-                    if (selectedNode == rootNode)
+                    try
                     {
-                        addAttributeItems();
-                        rootPopup.show(AnimationElementTree.this, e.getX(), e.getY());
-                    } else
-                        leafPopup.show(AnimationElementTree.this, e.getX(), e.getY());
+                        if (selectedNode == rootNode)
+                        {
+                            addAttributeItems();
+                            rootPopup.show(AnimationElementTree.this, e.getX(), e.getY());
+                        } else
+                            leafPopup.show(AnimationElementTree.this, e.getX(), e.getY());
+                    } catch (java.awt.IllegalComponentStateException icse)
+                    {
+                    }
 
+            }
+        });
+        addMouseMotionListener(new MouseMotionAdapter()
+        {
+            @Override
+            public void mouseDragged(MouseEvent e)
+            {
+                dragging = true;
+                CurrentData.getEditorWindow().getKeyframeAnimationEditor().setTreePanelCursor(new Cursor(Cursor.HAND_CURSOR));
+                CurrentData.getEditorWindow().getKeyframeAnimationEditor().updateTreeDragging(AnimationElementTree.this, e.getY());
             }
         });
         treeModel = new DefaultTreeModel(rootNode, true);

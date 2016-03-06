@@ -18,7 +18,7 @@ public class NodeModel
     private Spatial model;
     private Node node;
     private Node lineNode = new Node("Connections");
-    private Material lineMaterial;
+    private Material lineMaterial, nodeMaterial;
     private Geometry lineGeometry;
 
     public NodeModel(Node n)
@@ -28,9 +28,9 @@ public class NodeModel
         node = n;
         model = CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadModel("Models/node.j3o");
         model.setName("nodeModel");
-        Material material = new Material(CurrentData.getEditorWindow().getB3DApp().getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
-        material.setTexture("DiffuseMap", CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture("Textures/nodeTexture.PNG"));
-        model.setMaterial(material);
+        nodeMaterial = new Material(CurrentData.getEditorWindow().getB3DApp().getAssetManager(), "Common/MatDefs/Light/Lighting.j3md");
+        nodeMaterial.setTexture("DiffuseMap", CurrentData.getEditorWindow().getB3DApp().getAssetManager().loadTexture("Textures/nodeTexture.PNG"));
+        model.setMaterial(nodeMaterial);
         Vector<Geometry> geometrys = new Vector<Geometry>();
         Wizard.insertAllGeometrys((Node) model, geometrys);
         model.setLocalTransform(node.getLocalTransform());
@@ -58,7 +58,7 @@ public class NodeModel
         this.node = node;
     }
 
-    void update(boolean selected)
+    void update(boolean selected, boolean further)
     {
         if (!(Boolean) CurrentData.getPrefs().get(Preference.SHOW_NODE_HIERARCHY))
             return;
@@ -70,11 +70,12 @@ public class NodeModel
             CurrentData.getEditorWindow().getB3DApp().getEditorNode().attachChild(model);
             for (Spatial spatial : node.getChildren())
             {
-                /* if (spatial instanceof Node)
-                 for (NodeModel nm : CurrentData.getEditorWindow().getB3DApp().getNodeModels())
-                 if (nm.getNode().equals(spatial))
-                 nm.update(true);*/
-                lineGeometry = new Geometry("connection", new Line(Vector3f.ZERO, spatial.getWorldTranslation().subtract(model.getWorldTranslation())));
+                if (spatial instanceof Node && further)
+                    for (NodeModel nm : CurrentData.getEditorWindow().getB3DApp().getNodeModels())
+                        if (nm.getNode().equals(spatial))
+                            nm.update(true, false);
+                Vector3f lineDifference = spatial.getWorldTranslation().subtract(model.getWorldTranslation());
+                lineGeometry = new Geometry("connection", new Line(Vector3f.ZERO, lineDifference));
                 lineGeometry.setLocalTranslation(model.getWorldTranslation());
                 lineGeometry.setMaterial(lineMaterial);
                 lineNode.attachChild(lineGeometry);
