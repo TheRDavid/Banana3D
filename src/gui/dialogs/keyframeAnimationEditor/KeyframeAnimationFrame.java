@@ -59,6 +59,7 @@ import monkeyStuff.keyframeAnimation.LiveKeyframeAnimation;
 import monkeyStuff.keyframeAnimation.LiveKeyframeProperty;
 import monkeyStuff.keyframeAnimation.LiveKeyframeUpdater;
 import b3dElements.animations.keyframeAnimations.AnimationType;
+import b3dElements.spatials.B3D_Spatial;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
@@ -67,11 +68,13 @@ import com.jme3.light.SpotLight;
 import com.jme3.math.ColorRGBA;
 import components.BSpinnerNumberModel;
 import gui.components.BColorButton;
+import gui.components.ElementSelectionPanel;
 import gui.components.LightDirectionPanel;
 import java.awt.Cursor;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Collections;
+import java.util.UUID;
 import javax.swing.JSpinner;
 import monkeyStuff.CustomParticleEmitter;
 import org.jdesktop.swingx.VerticalLayout;
@@ -188,7 +191,7 @@ public class KeyframeAnimationFrame extends JFrame
                 editPanel.keyframeEditor.xOffset,
                 editPanel.keyframeEditor.getWidth(),
                 0,
-                (int) (maxFrame * timelinePanel.gapSize * 1.1));
+                (int) (maxFrame * timelinePanel.gapSize * 1.2));
         editPanel.hscrollbar.repaint();
         attributesPanel.repaint();
     }
@@ -233,6 +236,8 @@ public class KeyframeAnimationFrame extends JFrame
         });
         setSize(getWidth() + 1, getHeight() + 1);
         arrangeSizes();
+        GUI_Tools.revalidateAll(attributesPanel);
+        GUI_Tools.repaintAll(attributesPanel);
     }
 
     private void arrangeSizes()
@@ -244,7 +249,7 @@ public class KeyframeAnimationFrame extends JFrame
         timelinePanel.setPreferredSize(new Dimension(editorPanel.getWidth() - 200, TIMELINE_HEIGHT));
         attributesPanel.setPreferredSize(new Dimension(200, 200));
         editPanel.setPreferredSize(new Dimension(keyframePanel.getWidth() - 500, keyframePanel.getHeight()));
-        toolsPanel.updateSlider();
+        //why? toolsPanel.updateSlider();
         toolsPanel.repaint();
         editorPanel.repaint();
         keyframePanel.repaint();
@@ -253,6 +258,7 @@ public class KeyframeAnimationFrame extends JFrame
         editPanel.repaint();
         arrangeScrollbars();
         repaint();
+        GUI_Tools.repaintAll(attributesPanel);
     }
 
     private void updateFrames()
@@ -408,6 +414,7 @@ public class KeyframeAnimationFrame extends JFrame
                     }
                     zoom = zoomSlider.getValue() * timelinePanel.getWidth() / 500;
                     updateFrames();
+                    arrangeScrollbars();
                 }
             });
             zoomOutButton.addActionListener(this);
@@ -532,6 +539,7 @@ public class KeyframeAnimationFrame extends JFrame
                 }
             } else if (e.getActionCommand().equals("play"))
             {
+                valuePanel.deselect();
                 editingEnabled(false);
                 if (currentAnimation == null)
                     JOptionPane.showMessageDialog(playButton, "Select an Animation first!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -602,10 +610,29 @@ public class KeyframeAnimationFrame extends JFrame
         {
             setBorder(new EmptyBorder(10, 20, 10, 20));
             setLayout(new RiverLayout(10, 10));
+            liveValuesChecker.addMouseListener(new MouseAdapter()
+            {
+                @Override
+                public void mouseReleased(MouseEvent e)
+                {
+                    CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
+                    {
+                        public Void call() throws Exception
+                        {
+                            if (liveValuesChecker.isChecked())
+                                CurrentData.getEditorWindow().getB3DApp().frameSelected(frame);
+                            else
+                                CurrentData.getEditorWindow().getB3DApp().frameUnselected();
+                            return null;
+                        }
+                    });
+                }
+            });
         }
 
         public void updateValues(LiveKeyframeProperty currentProperty, int currentFrame)
         {
+            boolean liveEnabled = true;
             liveValuesChecker.setChecked(false);
             removeAll();
             property = currentProperty;
@@ -651,6 +678,31 @@ public class KeyframeAnimationFrame extends JFrame
                         }
                     };
                     add("br", new JLabel("Rotation: "));
+                    add("br hfill", valueComponent);
+                } else if (property.type.toString().contains("Constraint"))
+                {
+                    liveEnabled = false;
+                    Class[] allowedClasses = null;
+                    if (property.type == AnimationType.Translation_Constraint)
+                        allowedClasses = new Class[]
+                        {
+                            B3D_Spatial.class
+                        };
+                    //Index 2
+                    valueComponent = new ElementSelectionPanel((UUID) property.getValues()[frame], allowedClasses)
+                    {
+                        @Override
+                        public void onSelectionChange()
+                        {
+                            System.out.println("ELEMENT: " + element);
+                            //why nullpointer? System.out.println("Set value at " + frame + " to " + element == null ? null : element.getUUID());
+                            if (element == null)
+                                property.setValue(frame, null);
+                            else
+                                property.setValue(frame, element.getUUID());
+                        }
+                    };
+                    add("br", new JLabel("Reference: "));
                     add("br hfill", valueComponent);
                 } else if (property.type == AnimationType.Rotation)
                 {
@@ -724,26 +776,11 @@ public class KeyframeAnimationFrame extends JFrame
                     add("br", new JLabel("Color: "));
                     add("tab", valueComponent);
                 }
-                add("br", new JLabel("Use Live-Value: "));
-                add("tab", liveValuesChecker);
-                liveValuesChecker.addMouseListener(new MouseAdapter()
+                if (liveEnabled)
                 {
-                    @Override
-                    public void mouseReleased(MouseEvent e)
-                    {
-                        CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
-                        {
-                            public Void call() throws Exception
-                            {
-                                if (liveValuesChecker.isChecked())
-                                    CurrentData.getEditorWindow().getB3DApp().frameSelected(frame);
-                                else
-                                    CurrentData.getEditorWindow().getB3DApp().frameUnselected();
-                                return null;
-                            }
-                        });
-                    }
-                });
+                    add("br", new JLabel("Use Live-Value: "));
+                    add("tab", liveValuesChecker);
+                }
             }
             repaint();
             revalidate();
@@ -769,42 +806,57 @@ public class KeyframeAnimationFrame extends JFrame
 
         public void refresh()
         {
-            if (property != null && valueComponent != null && liveValuesChecker.isChecked())
+            if (frame != -1 && property != null && valueComponent != null && liveValuesChecker.isChecked())
             {
                 System.out.println("Refresh");
                 if (property.type == AnimationType.Translation)
                 {
-                    Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalTranslation());
-                    ((Float3Panel) valueComponent).setVector(newVec);
-                    property.setValue(frame, newVec);
+                    if (!((Float3Panel) valueComponent).hasFocus())
+                    {
+                        Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalTranslation());
+                        ((Float3Panel) valueComponent).setVector(newVec);
+                        property.setValue(frame, newVec);
+                    }
                 } else if (property.type == AnimationType.Position)
                 {
-                    Vector3f newVec;
-                    if (property.getUpdater().getObject() instanceof PointLight)
-                        newVec = new Vector3f(((PointLight) property.getUpdater().getObject()).getPosition());
-                    else
-                        newVec = new Vector3f(((SpotLight) property.getUpdater().getObject()).getPosition());
-                    ((Float3Panel) valueComponent).setVector(newVec);
-                    property.setValue(frame, newVec);
+                    if (!((Float3Panel) valueComponent).hasFocus())
+                    {
+                        Vector3f newVec;
+                        if (property.getUpdater().getObject() instanceof PointLight)
+                            newVec = new Vector3f(((PointLight) property.getUpdater().getObject()).getPosition());
+                        else
+                            newVec = new Vector3f(((SpotLight) property.getUpdater().getObject()).getPosition());
+                        ((Float3Panel) valueComponent).setVector(newVec);
+                        property.setValue(frame, newVec);
+                    }
                 } else if (property.type == AnimationType.Scale)
                 {
-                    Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalScale());
-                    ((Float3Panel) valueComponent).setVector(newVec);
-                    property.setValue(frame, newVec);
+                    if (!((Float3Panel) valueComponent).hasFocus())
+                    {
+                        Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalScale());
+                        ((Float3Panel) valueComponent).setVector(newVec);
+                        property.setValue(frame, newVec);
+                    }
                 } else if (property.type == AnimationType.Direction)
                 {
-                    Vector3f newVec;
-                    if (property.getUpdater().getObject() instanceof DirectionalLight)
-                        newVec = new Vector3f(((DirectionalLight) property.getUpdater().getObject()).getDirection());
-                    else
-                        newVec = new Vector3f(((SpotLight) property.getUpdater().getObject()).getDirection());
-                    ((LightDirectionPanel) valueComponent).setVector(newVec);
-                    property.setValue(frame, newVec);
+                    if (!((Float3Panel) valueComponent).hasFocus())
+                    {
+                        Vector3f newVec;
+                        if (property.getUpdater().getObject() instanceof DirectionalLight)
+                            newVec = new Vector3f(((DirectionalLight) property.getUpdater().getObject()).getDirection());
+                        else
+                            newVec = new Vector3f(((SpotLight) property.getUpdater().getObject()).getDirection());
+                        ((LightDirectionPanel) valueComponent).setVector(newVec);
+                        property.setValue(frame, newVec);
+                    }
                 } else if (property.type == AnimationType.Rotation)
                 {
-                    Quaternion newQuat = new Quaternion(((Spatial) property.getUpdater().getObject()).getLocalRotation());
-                    ((Float4Panel) valueComponent).setFloats(newQuat);
-                    property.setValue(frame, newQuat);
+                    if (!((Float4Panel) valueComponent).hasFocus())
+                    {
+                        Quaternion newQuat = new Quaternion(((Spatial) property.getUpdater().getObject()).getLocalRotation());
+                        ((Float4Panel) valueComponent).setFloats(newQuat);
+                        property.setValue(frame, newQuat);
+                    }
                 } else if (property.type == AnimationType.Frozen)
                 {
                     boolean enabled = ((ParticleEmitter) property.getUpdater().getObject()).isEnabled();
@@ -1068,7 +1120,6 @@ public class KeyframeAnimationFrame extends JFrame
             @Override
             public void paintChildren(Graphics g)
             {
-                System.out.println("repainting at " + drag);
                 super.paintChildren(g);
                 if (drag != -1)
                 {
@@ -1086,6 +1137,7 @@ public class KeyframeAnimationFrame extends JFrame
             setLayout(null);
             setBackground(Color.GRAY);
             add(treePanel);
+            treePanel.repaint();
         }
 
         public void updateAttributes()

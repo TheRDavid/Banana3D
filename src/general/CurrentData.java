@@ -1452,6 +1452,8 @@ public class CurrentData
             add(attribs, AnimationType.Translation, nodes);
             add(attribs, AnimationType.Rotation, nodes);
             add(attribs, AnimationType.Scale, nodes);
+            attribs.add(null);
+            add(attribs, AnimationType.Translation_Constraint, nodes);
         }
         boolean insertAllowed = false;
         if (clipboardData != null && clipboardData instanceof LiveKeyframeProperty)
@@ -1473,14 +1475,11 @@ public class CurrentData
     {
         boolean legit = true;
         for (DefaultMutableTreeNode dmtn : nodes)
-        {
             if (dmtn.getUserObject().toString().equals(at.toString()))
             {
                 legit = false;
                 break;
-
             }
-        }
         if (legit)
             vec.add(at);
     }

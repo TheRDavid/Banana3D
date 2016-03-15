@@ -44,6 +44,7 @@ import b3dElements.animations.keyframeAnimations.AnimationType;
 import b3dElements.animations.keyframeAnimations.Properties.BoolProperty;
 import b3dElements.animations.keyframeAnimations.Properties.ColorRGBAProperty;
 import b3dElements.animations.keyframeAnimations.Properties.IntProperty;
+import b3dElements.animations.keyframeAnimations.Properties.UUIDProperty;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.Light;
@@ -216,7 +217,10 @@ public class AnimationElementTree extends JXTree implements ActionListener
         Vector<AnimationType> attributeTypes = new Vector<AnimationType>();
         insertAttributeItem.setEnabled(CurrentData.insertAttributes(attributeTypes, element, attributeNodes));
         for (AnimationType s : attributeTypes)
-            addAttributeMenu.add(new AttributeItem(s.toString()));
+            if (s == null)
+                addAttributeMenu.add(new JSeparator());
+            else
+                addAttributeMenu.add(new AttributeItem(s.toString()));
     }
 
     public B3D_Element getElement()
@@ -306,6 +310,8 @@ public class AnimationElementTree extends JXTree implements ActionListener
                     try
                     {
                         LiveKeyframeProperty property = null;
+                        if (getText().contains("Constraint"))
+                            property = new UUIDProperty(AnimationType.valueOfString(getText()), 61, Wizard.NULL_SELECTION, keyframeUpdater);
                         if (object instanceof Spatial)
                         {
                             Spatial spatial = (Spatial) object;
@@ -318,7 +324,6 @@ public class AnimationElementTree extends JXTree implements ActionListener
                             else if (AnimationType.valueOfString(getText()).equals(AnimationType.Scale))
                                 property = new Vector3fProperty(AnimationType.valueOfString(getText()),
                                         61, new Vector3f(spatial.getLocalScale()), keyframeUpdater);
-
                         }
                         if (object instanceof CustomParticleEmitter)
                         {
