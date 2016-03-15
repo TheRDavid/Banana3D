@@ -1,11 +1,15 @@
-1.0 - Cinemonkey, Theatre, Theater?
+1.0 - Cinemonkey, Theatre, Theater, Stage, Puppet Play?
+kfa bugs
+    - constraints funktionieren random gar nicht mehr
+    - attribute panel zu Beginn nicht immer sichtbar
+KeyframeAnimation easeIn - Out for Vectors, Quaternions, Integers
+Switch scene removed nur alles (manchmal??)
 Neuer Startbildschirm (Coole Scene -> Coole Models benötigt? Oder Animation?)
 coole Screenshots
 coole Videos
 Code einbinden
 Installer
 badass fucking website (blues?)
-KeyframeAnimation Constrains
 
 1.x
 on resize: change camera, not ratio
@@ -17,21 +21,28 @@ Save Camera position
 Keyframes for
     -Lights
         -Stärke(DL)
-        -Radius(PL)
+        -Radius(PL) -> FloatProperty!
     - Active ParticleEmitter
     - Basic Camera Stuff
         -Position
         -Rotation
+More KeyframeAnimationConstraints
+    - Rotation, Scale
+    - Brightness (Color)
+KeyframeAnimationConstraints hashcodes statt UUIDs? (schneller, da kein Umweg ueber Wizard)
 KeyframeEditor sort Updaters (Combobox)
-KeyframeEditor copy updater / property
+KeyframeEditor duplicate keyframe via shift + drag
+KeyframeEditor highlight selected property
+KeyframeEditor copy updater
 KeyframeEditor execute single Updaters / Properties
 KeyframeEditor duplicate whole Animation
+KeyframeEditor local and static animations
 tasten shortcuts rot, scal, translation (alt+r,s,t)
 EditorGUI: Lichtquellen ein/ausblenden
 Lichter ein-ausschalten
 Swing GUI Performance (Checker vs Checkbox?)
 Edit Keyframe translations like MotionPaths
-Keyframe bezier / Culling - Time ease in / out
+Keyframe easeIn and out, verschiedene Steigungen in Veränderungsraten (Krümmung)
 Ghost Mode: getMaterial().getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.FrontAndBack);?????
 Save Particles of Emitter
 Neues Error Handling für den User
@@ -93,3 +104,11 @@ PointLight.gui:
     Radius: BTextField_Float
    -> GUI generieren lassen
 Material Queue Bucket Option
+
+--new Keyframetype-edit in:
+    - AnimationType (legit)
+    - ETO Converter (Property)
+    - CurrentData (insertAttributes)
+    - AnimationElementTree (AttributeItem)
+    - Updaters
+    - KeyframeAnimationFrame ValuePanel updateValues
