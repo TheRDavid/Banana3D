@@ -2,7 +2,7 @@
 kfa bugs
     - constraints funktionieren random gar nicht mehr
     - attribute panel zu Beginn nicht immer sichtbar
-KeyframeAnimation easeIn - Out for Vectors, Quaternions, Integers
+KeyframeAnimation easeIn - Out for Integers
 Switch scene removed nur alles (manchmal??)
 Neuer Startbildschirm (Coole Scene -> Coole Models benötigt? Oder Animation?)
 coole Screenshots
