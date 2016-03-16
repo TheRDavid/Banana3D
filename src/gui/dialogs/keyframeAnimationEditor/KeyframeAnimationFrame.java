@@ -59,6 +59,7 @@ import monkeyStuff.keyframeAnimation.LiveKeyframeAnimation;
 import monkeyStuff.keyframeAnimation.LiveKeyframeProperty;
 import monkeyStuff.keyframeAnimation.LiveKeyframeUpdater;
 import b3dElements.animations.keyframeAnimations.AnimationType;
+import b3dElements.animations.keyframeAnimations.InterpolationType;
 import b3dElements.spatials.B3D_Spatial;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.light.DirectionalLight;
@@ -75,6 +76,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Collections;
 import java.util.UUID;
+import javax.swing.JComboBox;
 import javax.swing.JSpinner;
 import monkeyStuff.CustomParticleEmitter;
 import org.jdesktop.swingx.VerticalLayout;
@@ -604,12 +606,25 @@ public class KeyframeAnimationFrame extends JFrame
         private LiveKeyframeProperty property;
         private int frame = -1;
         private Checker liveValuesChecker = new Checker();
+        private JComboBox<InterpolationType> interpolationTypeComboBox = new JComboBox<InterpolationType>(new InterpolationType[]
+        {
+            InterpolationType.Linear,
+            InterpolationType.Ease_In,
+            InterpolationType.Ease_Out
+        });
         private JComponent valueComponent;
 
         public ValuePanel()
         {
             setBorder(new EmptyBorder(10, 20, 10, 20));
             setLayout(new RiverLayout(10, 10));
+            interpolationTypeComboBox.addItemListener(new ItemListener()
+            {
+                public void itemStateChanged(ItemEvent e)
+                {
+                    property.setInterpolationType(frame, (InterpolationType) e.getItem());
+                }
+            });
             liveValuesChecker.addMouseListener(new MouseAdapter()
             {
                 @Override
@@ -662,7 +677,9 @@ public class KeyframeAnimationFrame extends JFrame
                         @Override
                         public void keyReleased(KeyEvent e)
                         {
-                            property.setValue(frame, ((Float3Panel) valueComponent).getVector());
+                            property.setValue(frame, ((Float3Panel) valueComponent).getVector(),
+                                    (InterpolationType) InterpolationType.
+                                    valueOfName(interpolationTypeComboBox.getSelectedItem().toString()));
                         }
                     });
                     add("br hfill", valueComponent);
@@ -674,7 +691,9 @@ public class KeyframeAnimationFrame extends JFrame
                         @Override
                         public void updateDirection(Vector3f direction)
                         {
-                            property.setValue(frame, ((LightDirectionPanel) valueComponent).getVector());
+                            property.setValue(frame, ((LightDirectionPanel) valueComponent).getVector(),
+                                    (InterpolationType) InterpolationType.
+                                    valueOfName(interpolationTypeComboBox.getSelectedItem().toString()));
                         }
                     };
                     add("br", new JLabel("Rotation: "));
@@ -697,9 +716,9 @@ public class KeyframeAnimationFrame extends JFrame
                             System.out.println("ELEMENT: " + element);
                             //why nullpointer? System.out.println("Set value at " + frame + " to " + element == null ? null : element.getUUID());
                             if (element == null)
-                                property.setValue(frame, null);
+                                property.setValue(frame, null, InterpolationType.Linear);
                             else
-                                property.setValue(frame, element.getUUID());
+                                property.setValue(frame, element.getUUID(), InterpolationType.Linear);
                         }
                     };
                     add("br", new JLabel("Reference: "));
@@ -715,11 +734,13 @@ public class KeyframeAnimationFrame extends JFrame
                         @Override
                         public void keyReleased(KeyEvent e)
                         {
-                            property.setValue(frame, new Quaternion(((Float4Panel) valueComponent).getQuaternion()));
+                            property.setValue(frame, new Quaternion(((Float4Panel) valueComponent).getQuaternion()),
+                                    (InterpolationType) InterpolationType.
+                                    valueOfName(interpolationTypeComboBox.getSelectedItem().toString()));
                         }
                     });
                     add("br hfill", valueComponent);
-                } else if (property.type == AnimationType.Frozen)
+                } else if (property.type == AnimationType.Frozen || property.type == AnimationType.Emit_All)
                 {
                     //Index 2
                     valueComponent = new Checker();
@@ -729,25 +750,15 @@ public class KeyframeAnimationFrame extends JFrame
                         @Override
                         public void mouseReleased(MouseEvent e)
                         {
-                            property.setValue(frame, ((Checker) valueComponent).isChecked());
+                            property.setValue(frame, ((Checker) valueComponent).isChecked(),
+                                    (InterpolationType) InterpolationType.
+                                    valueOfName(interpolationTypeComboBox.getSelectedItem().toString()));
                         }
                     });
-                    add("br", new JLabel("Freeze: "));
-                    add("tab", valueComponent);
-                } else if (property.type == AnimationType.Emit_All)
-                {
-                    //Index 2
-                    valueComponent = new Checker();
-                    ((Checker) valueComponent).setChecked((Boolean) property.getValues()[frame]);
-                    ((Checker) valueComponent).addMouseListener(new MouseAdapter()
-                    {
-                        @Override
-                        public void mouseReleased(MouseEvent e)
-                        {
-                            property.setValue(frame, ((Checker) valueComponent).isChecked());
-                        }
-                    });
-                    add("br", new JLabel("Emit 'em ALL!: "));
+                    if (property.type == AnimationType.Emit_All)
+                        add("br", new JLabel("Emit 'em ALL!: "));
+                    else
+                        add("br", new JLabel("Freeze: "));
                     add("tab", valueComponent);
                 } else if (property.type == AnimationType.Particles_Per_Second)
                 {
@@ -756,7 +767,9 @@ public class KeyframeAnimationFrame extends JFrame
                     {
                         public void stateChanged(ChangeEvent e)
                         {
-                            property.setValue(frame, (Serializable) ((JSpinner) valueComponent).getValue());
+                            property.setValue(frame, (Serializable) ((JSpinner) valueComponent).getValue(),
+                                    (InterpolationType) InterpolationType.
+                                    valueOfName(interpolationTypeComboBox.getSelectedItem().toString()));
                         }
                     });
                     add("br", new JLabel("Particles Per Second: "));
@@ -770,12 +783,17 @@ public class KeyframeAnimationFrame extends JFrame
                         @Override
                         public void andThenDoThis()
                         {
-                            property.setValue(frame, (Serializable) Wizard.makeColorRGBA(((BColorButton) valueComponent).getColor()));
+                            property.setValue(frame, (Serializable) Wizard.makeColorRGBA(((BColorButton) valueComponent).getColor()),
+                                    (InterpolationType) InterpolationType.
+                                    valueOfName(interpolationTypeComboBox.getSelectedItem().toString()));
                         }
                     };
                     add("br", new JLabel("Color: "));
                     add("tab", valueComponent);
                 }
+                add("br", new JLabel("Interpolation to the next Keyframe: "));
+                add("br hfill", interpolationTypeComboBox);
+                interpolationTypeComboBox.setSelectedItem(currentProperty.getInterpolationType(frame));
                 if (liveEnabled)
                 {
                     add("br", new JLabel("Use Live-Value: "));
@@ -815,7 +833,7 @@ public class KeyframeAnimationFrame extends JFrame
                     {
                         Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalTranslation());
                         ((Float3Panel) valueComponent).setVector(newVec);
-                        property.setValue(frame, newVec);
+                        property.setValue(frame, newVec, (InterpolationType) interpolationTypeComboBox.getSelectedItem());
                     }
                 } else if (property.type == AnimationType.Position)
                 {
@@ -827,7 +845,7 @@ public class KeyframeAnimationFrame extends JFrame
                         else
                             newVec = new Vector3f(((SpotLight) property.getUpdater().getObject()).getPosition());
                         ((Float3Panel) valueComponent).setVector(newVec);
-                        property.setValue(frame, newVec);
+                        property.setValue(frame, newVec, (InterpolationType) interpolationTypeComboBox.getSelectedItem());
                     }
                 } else if (property.type == AnimationType.Scale)
                 {
@@ -835,7 +853,7 @@ public class KeyframeAnimationFrame extends JFrame
                     {
                         Vector3f newVec = new Vector3f(((Spatial) property.getUpdater().getObject()).getLocalScale());
                         ((Float3Panel) valueComponent).setVector(newVec);
-                        property.setValue(frame, newVec);
+                        property.setValue(frame, newVec, (InterpolationType) interpolationTypeComboBox.getSelectedItem());
                     }
                 } else if (property.type == AnimationType.Direction)
                 {
@@ -847,7 +865,7 @@ public class KeyframeAnimationFrame extends JFrame
                         else
                             newVec = new Vector3f(((SpotLight) property.getUpdater().getObject()).getDirection());
                         ((LightDirectionPanel) valueComponent).setVector(newVec);
-                        property.setValue(frame, newVec);
+                        property.setValue(frame, newVec, (InterpolationType) interpolationTypeComboBox.getSelectedItem());
                     }
                 } else if (property.type == AnimationType.Rotation)
                 {
@@ -855,38 +873,38 @@ public class KeyframeAnimationFrame extends JFrame
                     {
                         Quaternion newQuat = new Quaternion(((Spatial) property.getUpdater().getObject()).getLocalRotation());
                         ((Float4Panel) valueComponent).setFloats(newQuat);
-                        property.setValue(frame, newQuat);
+                        property.setValue(frame, newQuat, (InterpolationType) interpolationTypeComboBox.getSelectedItem());
                     }
                 } else if (property.type == AnimationType.Frozen)
                 {
                     boolean enabled = ((ParticleEmitter) property.getUpdater().getObject()).isEnabled();
                     ((Checker) valueComponent).setChecked(enabled);
-                    property.setValue(frame, enabled);
+                    property.setValue(frame, enabled, InterpolationType.Linear);
                 } else if (property.type == AnimationType.Emit_All)
                 {
                     boolean enabled = false;
                     ((Checker) valueComponent).setChecked(enabled);
-                    property.setValue(frame, enabled);
+                    property.setValue(frame, enabled, InterpolationType.Linear);
                 } else if (property.type == AnimationType.Particles_Per_Second)
                 {
                     int pps = (int) ((CustomParticleEmitter) property.getUpdater().getObject()).getParticlesPerSec();
                     ((JSpinner) valueComponent).setValue(pps);
-                    property.setValue(frame, pps);
+                    property.setValue(frame, pps, (InterpolationType) interpolationTypeComboBox.getSelectedItem());
                 } else if (property.type == AnimationType.Start_Color_Blend)
                 {
                     ColorRGBA color = (ColorRGBA) ((CustomParticleEmitter) property.getUpdater().getObject()).getStartColor();
                     ((BColorButton) valueComponent).setColor(Wizard.makeColor(color));
-                    property.setValue(frame, color);
+                    property.setValue(frame, color, (InterpolationType) interpolationTypeComboBox.getSelectedItem());
                 } else if (property.type == AnimationType.End_Color_Blend)
                 {
                     ColorRGBA color = (ColorRGBA) ((CustomParticleEmitter) property.getUpdater().getObject()).getEndColor();
                     ((BColorButton) valueComponent).setColor(Wizard.makeColor(color));
-                    property.setValue(frame, color);
+                    property.setValue(frame, color, (InterpolationType) interpolationTypeComboBox.getSelectedItem());
                 } else if (property.type == AnimationType.Light_Color_Blend)
                 {
                     ColorRGBA color = (ColorRGBA) ((Light) property.getUpdater().getObject()).getColor();
                     ((BColorButton) valueComponent).setColor(Wizard.makeColor(color));
-                    property.setValue(frame, color);
+                    property.setValue(frame, color, (InterpolationType) interpolationTypeComboBox.getSelectedItem());
                 }
                 valueComponent.repaint();
             }
@@ -986,7 +1004,7 @@ public class KeyframeAnimationFrame extends JFrame
                         x = 0;
                     currentFrame = (int) (x / timelinePanel.gapSize);
                     editPanel.keyframeEditor.select(currentFrame);
-                    if (currentAnimation.getCurrentFrame() != 0)
+                    if (currentAnimation.getCurrentFrame() >= 0)
                     {
                         toolsPanel.playButton.setIcon(new ImageIcon("dat//img//menu//keyframe//play.png"));
                         currentAnimation.pause();
@@ -1223,17 +1241,17 @@ public class KeyframeAnimationFrame extends JFrame
                         {
                             System.out.println("frames between " + keyframeEditor.mksd.firstFrame + " and " + keyframeEditor.mksd.lastFrame);
                             if (lkp.getValues().length > i)
-                                lkp.setValue(i, null);
+                                lkp.setValue(i, null, null);
                         }
                 else if (currentProperty.numKeyframes() > 2)
                 {
                     if (editPanel.keyframeEditor.mksd == null)
-                        currentProperty.setValue(currentFrame, null);
+                        currentProperty.setValue(currentFrame, null, null);
                     else
                         for (LiveKeyframeProperty lkp : keyframeEditor.mksd.properties)
                             for (int i = keyframeEditor.mksd.firstFrame; i <= keyframeEditor.mksd.lastFrame; i++)
                                 if (lkp.getValues().length > i)
-                                    lkp.setValue(i, null);
+                                    lkp.setValue(i, null, null);
                     keyframeEditor.repaint();
                 } else
                     JOptionPane.showMessageDialog(this, "At least 2 Keyframes requiered!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1260,7 +1278,7 @@ public class KeyframeAnimationFrame extends JFrame
                     valid = JOptionPane.showConfirmDialog(this, "Overwrite Keyframe at " + destination + "?", "Overwrite Keyframe?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
                 if (valid)
                 {
-                    currentProperty.setValue(destination, currentProperty.getValues()[currentFrame]);
+                    currentProperty.setValue(destination, currentProperty.getValues()[currentFrame], currentProperty.getInterpolationType(currentFrame));
                     keyframeEditor.repaint();
                 }
             }
@@ -1381,10 +1399,12 @@ public class KeyframeAnimationFrame extends JFrame
                             if (property.getValues()[i] != null)
                             {
                                 copy[i + dragDifference] = property.getValues()[i];
+                                property.setInterpolationType(i + dragDifference, property.getInterpolationType(i));
+                                property.setInterpolationType(i, null);
                                 copy[i] = null;
                             }
                         for (int i = 0; i < copy.length; i++)
-                            property.setValue(i, copy[i]);
+                            property.setValue(i, copy[i], InterpolationType.Keep);
                     }
                     xStart += dragDifference;
                     xEnd += dragDifference;
@@ -1402,6 +1422,7 @@ public class KeyframeAnimationFrame extends JFrame
             private MultipleKeyframeSelectionData mksd = null;
             protected int dragStart = -1, xOffset = 0, yOffset = 0;
             private Serializable dragData = null;
+            private InterpolationType dragInterpolationType = null;
 
             void select(int frame)
             {
@@ -1440,12 +1461,12 @@ public class KeyframeAnimationFrame extends JFrame
                                     cFrame = 0;
                                 if (cFrame >= currentProperty.getValues().length || currentProperty.getValues()[cFrame] == null)
                                 {
-                                    currentProperty.setValue(dragStart, null);
+                                    currentProperty.setValue(dragStart, null, null);
                                     dragStart = cFrame;
                                     currentFrame = dragStart;
                                     valuePanel.setFrame(currentFrame);
                                     timelinePanel.currentFrame = currentFrame;
-                                    currentProperty.setValue(dragStart, dragData);
+                                    currentProperty.setValue(dragStart, dragData, dragInterpolationType);
                                     currentProperty.cutValues();
                                     toolsPanel.currentFrameLabel.setText("Frame " + currentFrame + " / " + (currentProperty.getValues().length - 1));
                                     timelinePanel.repaint();
@@ -1507,7 +1528,7 @@ public class KeyframeAnimationFrame extends JFrame
                                 if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1)
                                     try
                                     {
-                                        property.setValue(frame, updater.getLiveValue(property.type));
+                                        property.setValue(frame, updater.getLiveValue(property.type), InterpolationType.Linear);
                                         arrangeScrollbars();
                                     } catch (Exception ex)
                                     {
@@ -1553,6 +1574,7 @@ public class KeyframeAnimationFrame extends JFrame
                                     draggingSingle = true;
                                     dragStart = currentFrame;
                                     dragData = currentProperty.getValues()[frame];
+                                    dragInterpolationType = currentProperty.getInterpolationType(frame);
                                     mksd = null;
                                 } else
                                 {
@@ -1595,11 +1617,11 @@ public class KeyframeAnimationFrame extends JFrame
                             for (int k = 0; k < an.getProperty().getValues().length; k++)
                                 if (an.getProperty().getValues()[k] != null)
                                 {
-                                    if (k == 0)
-                                        g.setColor(Color.red);
-                                    else if ((mksd != null && mksd.ready && mksd.contains(an.getProperty(), k) // is it one of the selected?
+                                    if ((mksd != null && mksd.ready && mksd.contains(an.getProperty(), k) // is it one of the selected?
                                             || (an.getProperty() == currentProperty && k == currentFrame))) // is it the selected?
                                         g.setColor(Color.cyan);
+                                    else if (k == 0)
+                                        g.setColor(Color.red);
                                     else
                                         g.setColor(Color.orange);
                                     int radius = (int) (timelinePanel.gapSize > 25 ? 25 : timelinePanel.gapSize) / 4 * 3;
