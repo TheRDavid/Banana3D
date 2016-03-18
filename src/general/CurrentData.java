@@ -496,11 +496,6 @@ public class CurrentData
             /*
              * Ignoring the Filters, MotionEvents and LightControls here so their spatials and lights will be refreshed first
              */
-            //Keyframe Animations first
-            if (editorWindow.getKeyframeAnimationEditor().getCurrentAnimation() != null)
-                editorWindow.getKeyframeAnimationEditor().compileCurrent();
-            for (LiveKeyframeAnimation lka : Wizard.getKeyframeAnimations())
-                lka.calcValues();
             //Lights next
             for (Object o : Wizard.getObjects().getOriginalObjectsIterator().toArray())
             {
@@ -571,9 +566,13 @@ public class CurrentData
                     });
                 }
             }
+            //Keyframe Animations
+            if (editorWindow.getKeyframeAnimationEditor().getCurrentAnimation() != null)
+                editorWindow.getKeyframeAnimationEditor().compileCurrent();
             // At last, the Keyframe Animations
             for (LiveKeyframeAnimation lka : Wizard.getKeyframeAnimations())
             {
+                lka.calcValues();
                 scene.getElements().add(ObjectToElementConverter.convertKeyframeAnimation(lka));
                 SwingUtilities.invokeLater(new Runnable()
                 {
@@ -1460,7 +1459,7 @@ public class CurrentData
         {
             LiveKeyframeProperty lkp = (LiveKeyframeProperty) clipboardData;
             for (AnimationType at : attribs)
-                if (at.legit(lkp.getClass()))
+                if (at != null && at.legit(lkp.getClass()))
                 {
                     System.out.println(lkp.getClass() + " legit for " + at);
                     insertAllowed = true;

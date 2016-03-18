@@ -227,7 +227,6 @@ public class KeyframeAnimationFrame extends JFrame
     @Override
     public void setVisible(boolean b)
     {
-        super.setVisible(b);
         repaint();
         EventQueue.invokeLater(new Runnable()
         {
@@ -240,6 +239,7 @@ public class KeyframeAnimationFrame extends JFrame
         arrangeSizes();
         GUI_Tools.revalidateAll(attributesPanel);
         GUI_Tools.repaintAll(attributesPanel);
+        super.setVisible(b);
     }
 
     private void arrangeSizes()
@@ -625,24 +625,6 @@ public class KeyframeAnimationFrame extends JFrame
                     property.setInterpolationType(frame, (InterpolationType) e.getItem());
                 }
             });
-            liveValuesChecker.addMouseListener(new MouseAdapter()
-            {
-                @Override
-                public void mouseReleased(MouseEvent e)
-                {
-                    CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
-                    {
-                        public Void call() throws Exception
-                        {
-                            if (liveValuesChecker.isChecked())
-                                CurrentData.getEditorWindow().getB3DApp().frameSelected(frame);
-                            else
-                                CurrentData.getEditorWindow().getB3DApp().frameUnselected();
-                            return null;
-                        }
-                    });
-                }
-            });
         }
 
         public void updateValues(LiveKeyframeProperty currentProperty, int currentFrame)
@@ -654,14 +636,6 @@ public class KeyframeAnimationFrame extends JFrame
             frame = currentFrame;
             if (property.getValues().length > frame && property.getValues()[frame] != null)
             {
-                CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
-                {
-                    public Void call() throws Exception
-                    {
-                        CurrentData.getEditorWindow().getB3DApp().frameSelected(frame);
-                        return null;
-                    }
-                });
                 add("hfill", new JLabel(property.type.toString() + " [" + frame + "]", SwingConstants.CENTER));
                 add("br hfill", new JSeparator(JSeparator.HORIZONTAL));
                 if (property.type == AnimationType.Translation
@@ -808,14 +782,6 @@ public class KeyframeAnimationFrame extends JFrame
 
         public void deselect()
         {
-            CurrentData.getEditorWindow().getB3DApp().enqueue(new Callable<Void>()
-            {
-                public Void call() throws Exception
-                {
-                    CurrentData.getEditorWindow().getB3DApp().frameUnselected();
-                    return null;
-                }
-            });
             property = null;
             frame = -1;
             removeAll();

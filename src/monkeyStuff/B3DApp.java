@@ -176,9 +176,6 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     private boolean waterTexturesSynced = false, returnToNormalSpeed = false;
     private Vector<Spatial> spatials = new Vector<Spatial>();
     private NodeModel currentNodeModel;
-    //AnimationFrame selected
-    private BitmapText frameText;
-    private boolean keyframePlaying = false;
 
     /**
      * Just settin variables
@@ -265,24 +262,12 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             }
         });
         //System.out.println("Sorting Filters:");
-        int count = 0;
         for (Filter f : filters)
         {
             //System.out.println("Next: " + f.getName() + " at " + count++);
             filterPostProcessor.addFilter(f);
         }
         viewPort.addProcessor(filterPostProcessor);
-    }
-
-    public void frameSelected(int frame)
-    {
-        frameText.setText("Animation Frame: " + frame);
-        guiNode.attachChild(frameText);
-    }
-
-    public void frameUnselected()
-    {
-        guiNode.detachChild(frameText);
     }
 
     public enum InteractionType
@@ -297,8 +282,6 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
     @Override
     public void simpleInitApp()
     {
-        frameText = new BitmapText(guiFont);
-        frameText.setLocalTranslation(300, 30, 0);
         gizmo = new Gizmo(assetManager);
         flyingEditor = new EditorCamera(cam);
         flyingEditor.registerWithInput(inputManager);
@@ -350,13 +333,7 @@ public class B3DApp extends SimpleApplication implements ActionListener, AnalogL
             waterTexturesSynced = true;
         }
         if (CurrentData.getEditorWindow().getKeyframeAnimationEditor().getCurrentAnimation() != null)
-        {
-            keyframePlaying = CurrentData.getEditorWindow().getKeyframeAnimationEditor().getCurrentAnimation().isPlaying();
             Wizard.updateCustomAnimations(tpf);
-            if (keyframePlaying)
-                CurrentData.getEditorWindow().getKeyframeAnimationEditor().updateOnPlay();
-            keyframePlaying = CurrentData.getEditorWindow().getKeyframeAnimationEditor().getCurrentAnimation().isPlaying();
-        }
         Wizard.updateKeyframeAnimations();
         spatials.clear();
         Wizard.insertAllSpatials(sceneNode, spatials);
