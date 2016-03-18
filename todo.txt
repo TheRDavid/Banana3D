@@ -1,17 +1,19 @@
 1.0 - Cinemonkey, Theatre, Theater, Stage, Puppet Play?
 kfa bugs
+    - all values saved as indexes
+    - not playing certain animation in editor (but app)
     - constraints funktionieren random gar nicht mehr
     - attribute panel zu Beginn nicht immer sichtbar
-KeyframeAnimation easeIn - Out for Integers
 Switch scene removed nur alles (manchmal??)
 Neuer Startbildschirm (Coole Scene -> Coole Models benötigt? Oder Animation?)
 coole Screenshots
 coole Videos
 Code einbinden
-Installer
 badass fucking website (blues?)
 
 1.x
+Installer
+nicht-lineare interpolation für Farben und Floats
 on resize: change camera, not ratio
 selectElementDialog aktualisiert nicht, wenn objekte gelöscht wurden?
 UAManager -> Save complete Scene
@@ -31,12 +33,15 @@ More KeyframeAnimationConstraints
     - Brightness (Color)
 KeyframeAnimationConstraints hashcodes statt UUIDs? (schneller, da kein Umweg ueber Wizard)
 KeyframeEditor sort Updaters (Combobox)
+KeyframeEditor change properties of multiple Keyframes (live-value, Interpolation)
 KeyframeEditor duplicate keyframe via shift + drag
 KeyframeEditor highlight selected property
 KeyframeEditor copy updater
 KeyframeEditor execute single Updaters / Properties
 KeyframeEditor duplicate whole Animation
 KeyframeEditor local and static animations
+KeyframeEditor show Translation Paths
+KeyframeEditor Translation Spline Paths
 tasten shortcuts rot, scal, translation (alt+r,s,t)
 EditorGUI: Lichtquellen ein/ausblenden
 Lichter ein-ausschalten
